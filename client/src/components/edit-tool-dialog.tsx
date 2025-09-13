@@ -226,3 +226,4 @@ export function EditToolDialog({ open, onOpenChange, tool }: EditToolDialogProps
     </Dialog>
   );
 }
+

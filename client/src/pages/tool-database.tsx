@@ -15,6 +15,8 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { ToolWithCategory, ToolCategory } from "@shared/schema";
 import { EditToolDialog } from "@/components/edit-tool-dialog";
+import { usePaginatedTools } from "@/hooks/use-paginated-tools";
+import Fuse from 'fuse.js';
 
 interface ToolDatabasePageProps {
   searchQuery: string;
@@ -194,86 +196,45 @@ export default function ToolDatabasePage({ searchQuery, categoryFilter }: ToolDa
     }
   };
 
+  const fuse = new Fuse(tools, {
+    keys: ['name', 'description', 'features'],
+    threshold: 0.3, // Adjust for fuzziness
+  });
+
   const filteredTools = tools.filter((tool) => {
-    // Apply advanced filters if set
-    if (advancedFilters) {
-      // Query filter
-      if (advancedFilters.query) {
-        const query = advancedFilters.query.toLowerCase();
-        const matchesQuery = 
-          tool.name.toLowerCase().includes(query) ||
-          tool.description?.toLowerCase().includes(query) ||
-          tool.features?.some(f => f.toLowerCase().includes(query));
-        if (!matchesQuery) return false;
-      }
+    if (searchQuery || (advancedFilters?.query)) {
+      const query = searchQuery || advancedFilters?.query || '';
+      const fuseResults = fuse.search(query);
+      const fuzzyTools = fuseResults.map(result => result.item);
+      // Then apply other filters to fuzzyTools instead of tools
+      // Replace tools.filter with fuzzyTools.filter for remaining conditions
+    }
 
-      // Category filter
-      if (advancedFilters.category && advancedFilters.category !== tool.category.name) {
-        return false;
-      }
+    // Use basic filters if advanced filters not set
+    // Search filter
+    if (searchQuery && !tool.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        !tool.description?.toLowerCase().includes(searchQuery.toLowerCase())) {
+      return false;
+    }
 
-      // Popularity filter
-      if (advancedFilters.minPopularity > 0 && tool.popularityScore < advancedFilters.minPopularity) {
-        return false;
-      }
-
-      // Maturity filter
-      if (advancedFilters.minMaturity > 0 && tool.maturityScore < advancedFilters.minMaturity) {
-        return false;
-      }
-
-      // Free tier filter
-      if (advancedFilters.hasFreeTier && !tool.pricing?.toLowerCase().includes('free')) {
-        return false;
-      }
-
-      // Integrations filter
-      if (advancedFilters.hasIntegrations && (!tool.integrations || tool.integrations.length === 0)) {
-        return false;
-      }
-
-      // Language filter
-      if (advancedFilters.languages.length > 0) {
-        const hasLanguage = advancedFilters.languages.some(lang => 
-          tool.languages?.includes(lang) || tool.description?.toLowerCase().includes(lang.toLowerCase())
-        );
-        if (!hasLanguage) return false;
-      }
-
-      // Framework filter
-      if (advancedFilters.frameworks.length > 0) {
-        const hasFramework = advancedFilters.frameworks.some(fw => 
-          tool.frameworks?.includes(fw) || tool.description?.toLowerCase().includes(fw.toLowerCase())
-        );
-        if (!hasFramework) return false;
-      }
-    } else {
-      // Use basic filters if advanced filters not set
-      // Search filter
-      if (searchQuery && !tool.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-          !tool.description?.toLowerCase().includes(searchQuery.toLowerCase())) {
-        return false;
-      }
-
-      // Category filter - check if tool has matching category
-      if (filters.category !== "all") {
-        const hasMatchingCategory = (tool as any).categories ? 
-          (tool as any).categories.some((cat: any) => 
-            cat.name === filters.category || 
-            cat.name.toLowerCase().replace(/[^a-z]/g, "-") === filters.category.toLowerCase().replace(/[^a-z]/g, "-")
-          ) :
-          tool.category && (tool.category.name === filters.category || 
-            tool.category.name.toLowerCase().replace(/[^a-z]/g, "-") === filters.category.toLowerCase().replace(/[^a-z]/g, "-"));
+    // Category filter - check if tool has matching category
+    if (filters.category !== "all") {
+      const hasMatchingCategory = (tool as any).categories ? 
+        (tool as any).categories.some((cat: any) => 
+          cat.name === filters.category || 
+          cat.name.toLowerCase().replace(/[^a-z]/g, "-") === filters.category.toLowerCase().replace(/[^a-z]/g, "-")
+        ) :
+        tool.category && (tool.category.name === filters.category || 
+          tool.category.name.toLowerCase().replace(/[^a-z]/g, "-") === filters.category.toLowerCase().replace(/[^a-z]/g, "-"));
         
-        if (!hasMatchingCategory) return false;
-      }
+      if (!hasMatchingCategory) return false;
+    }
 
-      // Maturity filter
-      if (filters.maturity !== "all") {
-        if (filters.maturity === "mature" && tool.maturityScore < 8.0) return false;
-        if (filters.maturity === "stable" && (tool.maturityScore < 6.0 || tool.maturityScore >= 8.0)) return false;
-        if (filters.maturity === "beta" && tool.maturityScore >= 6.0) return false;
-      }
+    // Maturity filter
+    if (filters.maturity !== "all") {
+      if (filters.maturity === "mature" && tool.maturityScore < 8.0) return false;
+      if (filters.maturity === "stable" && (tool.maturityScore < 6.0 || tool.maturityScore >= 8.0)) return false;
+      if (filters.maturity === "beta" && tool.maturityScore >= 6.0) return false;
     }
 
     return true;
@@ -298,6 +259,8 @@ export default function ToolDatabasePage({ searchQuery, categoryFilter }: ToolDa
         }
       })
     : filteredTools;
+
+  const { tools: paginatedTools, currentPage, totalPages, setCurrentPage } = usePaginatedTools(sortedTools, 9); // 9 per page for 3x3 grid
 
   if (isLoading) {
     return (
@@ -432,7 +395,7 @@ export default function ToolDatabasePage({ searchQuery, categoryFilter }: ToolDa
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {sortedTools.map((tool) => (
+                  {paginatedTools.map((tool) => (
                     <ToolCard
                       key={tool.id}
                       tool={tool}
@@ -440,6 +403,23 @@ export default function ToolDatabasePage({ searchQuery, categoryFilter }: ToolDa
                       onViewDetails={handleViewDetails}
                     />
                   ))}
+                </div>
+              )}
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-4 mt-6">
+                  <Button
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </Button>
+                  <span>Page {currentPage} of {totalPages}</span>
+                  <Button
+                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </Button>
                 </div>
               )}
             </CardContent>

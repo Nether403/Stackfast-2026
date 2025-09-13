@@ -11,6 +11,7 @@ import { Loader2, AlertCircle, CheckCircle2, XCircle, Package, ArrowRight, Zap, 
 import { useToast } from "@/hooks/use-toast";
 import { ToolRecommendations } from "@/components/tool-recommendations";
 import { MigrationPaths } from "@/components/migration-paths";
+import { StackExport } from "@/components/stack-export";
 
 export function StackBuilder() {
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
@@ -549,6 +550,7 @@ export function StackBuilder() {
           <MigrationPaths />
         </TabsContent>
       </Tabs>
+      <StackExport toolIds={selectedTools.map(t => t.id)} />
     </div>
   );
 }

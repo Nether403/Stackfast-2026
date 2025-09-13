@@ -5,67 +5,7 @@ import { insertToolSchema, insertToolCategorySchema, insertCompatibilitySchema }
 import { cacheMiddleware, invalidateCache } from "./middleware/cache";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Tool Categories routes
-  app.get("/api/categories", async (req, res) => {
-    try {
-      const categories = await storage.getToolCategories();
-      res.json(categories);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch categories" });
-    }
-  });
-
-  app.get("/api/categories/:id", async (req, res) => {
-    try {
-      const category = await storage.getToolCategory(req.params.id);
-      if (!category) {
-        return res.status(404).json({ message: "Category not found" });
-      }
-      res.json(category);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch category" });
-    }
-  });
-
-  app.post("/api/categories", async (req, res) => {
-    try {
-      const categoryData = insertToolCategorySchema.parse(req.body);
-      const category = await storage.createToolCategory(categoryData);
-      invalidateCache("/api/categories");
-      res.status(201).json(category);
-    } catch (error) {
-      res.status(400).json({ message: "Invalid category data" });
-    }
-  });
-
-  app.put("/api/categories/:id", async (req, res) => {
-    try {
-      const categoryData = insertToolCategorySchema.partial().parse(req.body);
-      const category = await storage.updateToolCategory(req.params.id, categoryData);
-      if (!category) {
-        return res.status(404).json({ message: "Category not found" });
-      }
-      invalidateCache("/api/categories");
-      res.json(category);
-    } catch (error) {
-      res.status(400).json({ message: "Invalid category data" });
-    }
-  });
-
-  app.delete("/api/categories/:id", async (req, res) => {
-    try {
-      const deleted = await storage.deleteToolCategory(req.params.id);
-      if (!deleted) {
-        return res.status(404).json({ message: "Category not found" });
-      }
-      invalidateCache("/api/categories");
-      res.status(204).send();
-    } catch (error) {
-      res.status(500).json({ message: "Failed to delete category" });
-    }
-  });
-
-  // Tools routes
+  // Split into tools.routes.ts
   app.get("/api/tools", async (req, res) => {
     try {
       const tools = await storage.getToolsWithAllCategories();
@@ -310,117 +250,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ===== STACKFAST INTEGRATION ENDPOINTS =====
   
-  // Migration Path Analysis
-  app.get("/api/v1/migration/:fromTool/:toTool", async (req, res) => {
-    try {
-      const { fromTool, toTool } = req.params;
-      
-      // Get both tools
-      const from = await storage.getToolByName(fromTool);
-      const to = await storage.getToolByName(toTool);
-      
-      if (!from || !to) {
-        return res.status(404).json({ 
-          success: false, 
-          error: "One or both tools not found" 
-        });
-      }
-      
-      // Get compatibility score
-      const compatibility = await storage.getCompatibility(from.id, to.id);
-      const score = compatibility?.compatibilityScore || 50;
-      
-      // Determine migration difficulty
-      let difficulty: 'easy' | 'medium' | 'hard' = 'medium';
-      let estimatedTime = '7-14 days';
-      
-      if (score >= 80) {
-        difficulty = 'easy';
-        estimatedTime = '3-7 days';
-      } else if (score < 60) {
-        difficulty = 'hard';
-        estimatedTime = '14-30 days';
-      }
-      
-      // Generate migration steps
-      const steps = [
-        `Analyze current ${fromTool} setup and dependencies`,
-        `Export data and configurations from ${fromTool}`,
-        `Set up ${toTool} environment and initial configuration`,
-        `Map features and identify gaps between tools`,
-        `Migrate core functionality and test basic operations`,
-        `Port custom configurations and integrations`,
-        `Perform comprehensive testing and validation`,
-        `Train team on ${toTool} specific features`,
-        `Monitor and optimize performance post-migration`
-      ];
-      
-      // Calculate portability scores
-      const dataPortability = Math.min(100, score + 10);
-      const featureParity = Math.max(40, Math.min(95, score + (Math.random() * 20 - 10)));
-      
-      // Generate risks and benefits
-      const risks = [];
-      const benefits = [];
-      
-      if (difficulty === 'hard') {
-        risks.push('Significant feature differences may require workflow changes');
-        risks.push('Data migration may require custom transformation scripts');
-        risks.push('Extended downtime possible during migration');
-      } else if (difficulty === 'medium') {
-        risks.push('Some features may not have direct equivalents');
-        risks.push('Team training required for new workflows');
-      }
-      
-      if (score < 60) {
-        risks.push('Integration complexity may increase development time');
-      }
-      
-      // Add benefits based on target tool
-      benefits.push(`Access to ${toTool}'s unique features and ecosystem`);
-      benefits.push('Potential for improved performance and scalability');
-      benefits.push('Updated technology stack and better support');
-      
-      if (score >= 70) {
-        benefits.push('Smooth transition with minimal disruption');
-        benefits.push('High compatibility ensures feature preservation');
-      }
-      
-      // Cost implications
-      let costImplication = `Migration from ${fromTool} to ${toTool} `;
-      if (from.pricing && to.pricing) {
-        costImplication += `may involve licensing changes. `;
-      }
-      costImplication += `Budget for ${estimatedTime} of development effort, `;
-      costImplication += `plus training and potential consulting costs.`;
-      
-      res.json({
-        success: true,
-        fromTool,
-        toTool,
-        difficulty,
-        estimatedTime,
-        steps,
-        dataPortability,
-        featureParity,
-        risks,
-        benefits,
-        costImplication,
-        compatibilityScore: score
-      });
-      
-    } catch (error) {
-      console.error("Migration path error:", error);
-      res.status(500).json({ 
-        success: false, 
-        error: "Failed to generate migration path" 
-      });
-    }
-  });
-  
-  // Generate enhanced blueprint with compatibility awareness
-  // (canonical definition retained below)
-
   // Get tool recommendations for a project idea
   app.post("/api/v1/tools/recommend", async (req, res) => {
     try {
@@ -1229,25 +1058,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // (duplicate /api/v1/migration/:fromTool/:toTool removed; canonical earlier)
   
   // ===== END OF STACKFAST API ENDPOINTS =====
-
-  // Stack Export - export compatibility matrix as JSON/CSV
-  app.post("/api/stack/export", async (req, res) => {
-    try {
-      const { format = "json", toolIds } = req.body;
-      
-      if (format === "csv") {
-        const csv = await storage.exportStackAsCSV(toolIds);
-        res.setHeader("Content-Type", "text/csv");
-        res.setHeader("Content-Disposition", "attachment; filename=stack-compatibility.csv");
-        res.send(csv);
-      } else {
-        const data = await storage.exportStackAsJSON(toolIds);
-        res.json(data);
-      }
-    } catch (error) {
-      res.status(500).json({ message: "Failed to export stack data" });
-    }
-  });
 
   // Compatibility Generation routes
   app.post("/api/compatibility/generate", async (req, res) => {
