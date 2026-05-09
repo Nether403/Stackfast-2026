@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* WCAG 2.1 AA compliant color palette */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%; /* Dark text on light bg - 4.9% lightness ensures >7:1 contrast */
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%; /* Dark primary for good contrast */
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 44%; /* Adjusted for 4.5:1 contrast ratio */
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 40%; /* Darker red for better contrast */
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --radius: 0.5rem;
+    
+    /* Score color indicators */
+    --score-low: 0 84.2% 40%; /* Red for <50 */
+    --score-medium: 45 93% 47%; /* Yellow for 50-75 */
+    --score-high: 142 76% 36%; /* Green for >75 */
+    
+    /* Diagnostic colors */
+    --diagnostic-error: 0 84.2% 40%;
+    --diagnostic-warning: 38 92% 50%;
+    --diagnostic-info: 221.2 83.2% 53.3%;
+    --diagnostic-success: 142 76% 36%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* Enhanced focus states for keyboard navigation (WCAG 2.1 AA) */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+  
+  /* Ensure minimum 44px touch targets for mobile */
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Exception for icon-only buttons that have proper padding */
+  button[aria-label]:not([aria-label=""]) {
+    min-width: 44px;
+  }
+}

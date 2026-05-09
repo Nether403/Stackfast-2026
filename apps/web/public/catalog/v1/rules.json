@@ -1,0 +1,440 @@
+[
+  {
+    "id": "mutual-exclusive-frontend",
+    "version": "1.0.0",
+    "kind": "mutualExclusiveCategory",
+    "categoryId": "frontend",
+    "severity": "error"
+  },
+  {
+    "id": "mutual-exclusive-runtime",
+    "version": "1.0.0",
+    "kind": "mutualExclusiveCategory",
+    "categoryId": "runtime",
+    "severity": "error"
+  },
+  {
+    "id": "mutual-exclusive-hosting",
+    "version": "1.0.0",
+    "kind": "mutualExclusiveCategory",
+    "categoryId": "hosting",
+    "severity": "error"
+  },
+  {
+    "id": "mutual-exclusive-database",
+    "version": "1.0.0",
+    "kind": "mutualExclusiveCategory",
+    "categoryId": "database",
+    "severity": "error"
+  },
+  {
+    "id": "mutual-exclusive-orm",
+    "version": "1.0.0",
+    "kind": "mutualExclusiveCategory",
+    "categoryId": "orm",
+    "severity": "error"
+  },
+  {
+    "id": "mutual-exclusive-auth",
+    "version": "1.0.0",
+    "kind": "mutualExclusiveCategory",
+    "categoryId": "auth",
+    "severity": "error"
+  },
+  {
+    "id": "mutual-exclusive-payments",
+    "version": "1.0.0",
+    "kind": "mutualExclusiveCategory",
+    "categoryId": "payments",
+    "severity": "error"
+  },
+  {
+    "id": "mutual-exclusive-email",
+    "version": "1.0.0",
+    "kind": "mutualExclusiveCategory",
+    "categoryId": "email",
+    "severity": "error"
+  },
+  {
+    "id": "mutual-exclusive-storage",
+    "version": "1.0.0",
+    "kind": "mutualExclusiveCategory",
+    "categoryId": "storage",
+    "severity": "error"
+  },
+  {
+    "id": "mutual-exclusive-styling",
+    "version": "1.0.0",
+    "kind": "mutualExclusiveCategory",
+    "categoryId": "styling",
+    "severity": "error"
+  },
+  {
+    "id": "synergy-nextjs-vercel",
+    "version": "1.0.0",
+    "kind": "synergy",
+    "toolA": "nextjs",
+    "toolB": "vercel",
+    "reason": "Vercel is built by the Next.js team with first-class support",
+    "weight": 12
+  },
+  {
+    "id": "synergy-nextjs-tailwind",
+    "version": "1.0.0",
+    "kind": "synergy",
+    "toolA": "nextjs",
+    "toolB": "tailwind",
+    "reason": "Tailwind CSS integrates seamlessly with Next.js",
+    "weight": 4
+  },
+  {
+    "id": "synergy-remix-fly",
+    "version": "1.0.0",
+    "kind": "synergy",
+    "toolA": "remix",
+    "toolB": "fly",
+    "reason": "Remix has excellent deployment templates for Fly.io",
+    "weight": 8
+  },
+  {
+    "id": "synergy-nextjs-clerk",
+    "version": "1.0.0",
+    "kind": "synergy",
+    "toolA": "nextjs",
+    "toolB": "clerk",
+    "reason": "Clerk provides excellent Next.js integration with App Router support",
+    "weight": 6
+  },
+  {
+    "id": "synergy-nextjs-stripe",
+    "version": "1.0.0",
+    "kind": "synergy",
+    "toolA": "nextjs",
+    "toolB": "stripe",
+    "reason": "Stripe has comprehensive Next.js examples and webhooks support",
+    "weight": 4
+  },
+  {
+    "id": "synergy-clerk-stripe",
+    "version": "1.0.0",
+    "kind": "synergy",
+    "toolA": "clerk",
+    "toolB": "stripe",
+    "reason": "Clerk and Stripe integrate well for user management and payments",
+    "weight": 6
+  },
+  {
+    "id": "synergy-nextjs-resend",
+    "version": "1.0.0",
+    "kind": "synergy",
+    "toolA": "nextjs",
+    "toolB": "resend",
+    "reason": "Resend is designed for Next.js with React Email templates",
+    "weight": 6
+  },
+  {
+    "id": "synergy-prisma-postgres",
+    "version": "1.0.0",
+    "kind": "synergy",
+    "toolA": "prisma",
+    "toolB": "postgres",
+    "reason": "Prisma has excellent PostgreSQL support with advanced features",
+    "weight": 4
+  },
+  {
+    "id": "synergy-drizzle-postgres",
+    "version": "1.0.0",
+    "kind": "synergy",
+    "toolA": "drizzle",
+    "toolB": "postgres",
+    "reason": "Drizzle ORM is optimized for PostgreSQL",
+    "weight": 4
+  },
+  {
+    "id": "capability-compat-nextjs-node",
+    "version": "1.0.0",
+    "kind": "capabilityCompat",
+    "toolA": "nextjs",
+    "toolB": "node",
+    "reason": "Next.js runs on Node.js runtime",
+    "weight": 8
+  },
+  {
+    "id": "capability-compat-nextjs-bun",
+    "version": "1.0.0",
+    "kind": "capabilityCompat",
+    "toolA": "nextjs",
+    "toolB": "bun",
+    "reason": "Next.js has experimental Bun support",
+    "weight": 6
+  }
+,
+  {
+    "id": "capability-compat-remix-node",
+    "version": "1.0.0",
+    "kind": "capabilityCompat",
+    "toolA": "remix",
+    "toolB": "node",
+    "reason": "Remix runs on Node.js runtime",
+    "weight": 8
+  },
+  {
+    "id": "capability-compat-remix-bun",
+    "version": "1.0.0",
+    "kind": "capabilityCompat",
+    "toolA": "remix",
+    "toolB": "bun",
+    "reason": "Remix supports Bun runtime",
+    "weight": 6
+  },
+  {
+    "id": "capability-compat-astro-node",
+    "version": "1.0.0",
+    "kind": "capabilityCompat",
+    "toolA": "astro",
+    "toolB": "node",
+    "reason": "Astro runs on Node.js runtime",
+    "weight": 8
+  },
+  {
+    "id": "capability-compat-sveltekit-node",
+    "version": "1.0.0",
+    "kind": "capabilityCompat",
+    "toolA": "sveltekit",
+    "toolB": "node",
+    "reason": "SvelteKit runs on Node.js runtime",
+    "weight": 8
+  },
+  {
+    "id": "capability-compat-prisma-postgres",
+    "version": "1.0.0",
+    "kind": "capabilityCompat",
+    "toolA": "prisma",
+    "toolB": "postgres",
+    "reason": "Prisma supports PostgreSQL databases",
+    "weight": 6
+  },
+  {
+    "id": "capability-compat-prisma-mysql",
+    "version": "1.0.0",
+    "kind": "capabilityCompat",
+    "toolA": "prisma",
+    "toolB": "mysql",
+    "reason": "Prisma supports MySQL databases",
+    "weight": 6
+  },
+  {
+    "id": "capability-compat-drizzle-postgres",
+    "version": "1.0.0",
+    "kind": "capabilityCompat",
+    "toolA": "drizzle",
+    "toolB": "postgres",
+    "reason": "Drizzle ORM supports PostgreSQL",
+    "weight": 6
+  },
+  {
+    "id": "capability-compat-drizzle-mysql",
+    "version": "1.0.0",
+    "kind": "capabilityCompat",
+    "toolA": "drizzle",
+    "toolB": "mysql",
+    "reason": "Drizzle ORM supports MySQL",
+    "weight": 6
+  },
+  {
+    "id": "capability-compat-typeorm-postgres",
+    "version": "1.0.0",
+    "kind": "capabilityCompat",
+    "toolA": "typeorm",
+    "toolB": "postgres",
+    "reason": "TypeORM supports PostgreSQL",
+    "weight": 6
+  },
+  {
+    "id": "capability-compat-typeorm-mysql",
+    "version": "1.0.0",
+    "kind": "capabilityCompat",
+    "toolA": "typeorm",
+    "toolB": "mysql",
+    "reason": "TypeORM supports MySQL",
+    "weight": 6
+  },
+  {
+    "id": "capability-compat-mongoose-mongodb",
+    "version": "1.0.0",
+    "kind": "capabilityCompat",
+    "toolA": "mongoose",
+    "toolB": "mongodb",
+    "reason": "Mongoose is designed specifically for MongoDB",
+    "weight": 8
+  },
+  {
+    "id": "requires-orm-database",
+    "version": "1.0.0",
+    "kind": "requiresTool",
+    "tool": "prisma",
+    "requiresAnyOf": ["postgres", "mysql"],
+    "reason": "Prisma requires a database to connect to",
+    "severity": "error"
+  },
+  {
+    "id": "requires-drizzle-database",
+    "version": "1.0.0",
+    "kind": "requiresTool",
+    "tool": "drizzle",
+    "requiresAnyOf": ["postgres", "mysql"],
+    "reason": "Drizzle ORM requires a database to connect to",
+    "severity": "error"
+  },
+  {
+    "id": "requires-typeorm-database",
+    "version": "1.0.0",
+    "kind": "requiresTool",
+    "tool": "typeorm",
+    "requiresAnyOf": ["postgres", "mysql"],
+    "reason": "TypeORM requires a database to connect to",
+    "severity": "error"
+  },
+  {
+    "id": "requires-mongoose-mongodb",
+    "version": "1.0.0",
+    "kind": "requiresTool",
+    "tool": "mongoose",
+    "requiresAnyOf": ["mongodb"],
+    "reason": "Mongoose requires MongoDB",
+    "severity": "error"
+  },
+  {
+    "id": "requires-nextauth-nextjs",
+    "version": "1.0.0",
+    "kind": "requiresTool",
+    "tool": "nextauth",
+    "requiresAnyOf": ["nextjs"],
+    "reason": "NextAuth.js is designed specifically for Next.js",
+    "severity": "error"
+  },
+  {
+    "id": "requires-uploadthing-nextjs",
+    "version": "1.0.0",
+    "kind": "requiresTool",
+    "tool": "uploadthing",
+    "requiresAnyOf": ["nextjs"],
+    "reason": "UploadThing is designed specifically for Next.js",
+    "severity": "error"
+  },
+  {
+    "id": "hard-conflict-mongoose-prisma",
+    "version": "1.0.0",
+    "kind": "hardConflict",
+    "toolA": "mongoose",
+    "toolB": "prisma",
+    "reason": "Mongoose is for MongoDB, Prisma is for SQL databases - incompatible database types",
+    "weight": -30
+  },
+  {
+    "id": "hard-conflict-mongoose-drizzle",
+    "version": "1.0.0",
+    "kind": "hardConflict",
+    "toolA": "mongoose",
+    "toolB": "drizzle",
+    "reason": "Mongoose is for MongoDB, Drizzle is for SQL databases - incompatible database types",
+    "weight": -30
+  },
+  {
+    "id": "hard-conflict-mongoose-typeorm",
+    "version": "1.0.0",
+    "kind": "hardConflict",
+    "toolA": "mongoose",
+    "toolB": "typeorm",
+    "reason": "Mongoose is for MongoDB, TypeORM is for SQL databases - incompatible database types",
+    "weight": -30
+  },
+  {
+    "id": "hard-conflict-mongodb-postgres",
+    "version": "1.0.0",
+    "kind": "hardConflict",
+    "toolA": "mongodb",
+    "toolB": "postgres",
+    "reason": "Cannot use both MongoDB and PostgreSQL in the same stack",
+    "weight": -40
+  },
+  {
+    "id": "hard-conflict-mongodb-mysql",
+    "version": "1.0.0",
+    "kind": "hardConflict",
+    "toolA": "mongodb",
+    "toolB": "mysql",
+    "reason": "Cannot use both MongoDB and MySQL in the same stack",
+    "weight": -40
+  },
+  {
+    "id": "category-coverage-frontend",
+    "version": "1.0.0",
+    "kind": "categoryCoverage",
+    "categoryId": "frontend",
+    "weight": 5
+  },
+  {
+    "id": "category-coverage-runtime",
+    "version": "1.0.0",
+    "kind": "categoryCoverage",
+    "categoryId": "runtime",
+    "weight": 5
+  },
+  {
+    "id": "category-coverage-hosting",
+    "version": "1.0.0",
+    "kind": "categoryCoverage",
+    "categoryId": "hosting",
+    "weight": 5
+  },
+  {
+    "id": "category-coverage-database",
+    "version": "1.0.0",
+    "kind": "categoryCoverage",
+    "categoryId": "database",
+    "weight": 3
+  },
+  {
+    "id": "category-coverage-orm",
+    "version": "1.0.0",
+    "kind": "categoryCoverage",
+    "categoryId": "orm",
+    "weight": 3
+  },
+  {
+    "id": "category-coverage-auth",
+    "version": "1.0.0",
+    "kind": "categoryCoverage",
+    "categoryId": "auth",
+    "weight": 2
+  },
+  {
+    "id": "category-coverage-payments",
+    "version": "1.0.0",
+    "kind": "categoryCoverage",
+    "categoryId": "payments",
+    "weight": 2
+  },
+  {
+    "id": "category-coverage-email",
+    "version": "1.0.0",
+    "kind": "categoryCoverage",
+    "categoryId": "email",
+    "weight": 2
+  },
+  {
+    "id": "category-coverage-storage",
+    "version": "1.0.0",
+    "kind": "categoryCoverage",
+    "categoryId": "storage",
+    "weight": 2
+  },
+  {
+    "id": "category-coverage-styling",
+    "version": "1.0.0",
+    "kind": "categoryCoverage",
+    "categoryId": "styling",
+    "weight": 2
+  }
+]

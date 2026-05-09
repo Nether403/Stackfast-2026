@@ -16,18 +16,32 @@
     "@stackfast/schemas": "workspace:*",
     "@stackfast/rules-engine": "workspace:*",
     "@stackfast/registry": "workspace:*",
+    "@radix-ui/react-collapsible": "^1.1.12",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@radix-ui/react-toast": "^1.2.15",
+    "@radix-ui/react-tooltip": "^1.2.8",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "jszip": "^3.10.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "wouter": "^3.3.5",
     "@tanstack/react-query": "^5.60.5",
     "lucide-react": "^0.453.0",
-    "better-auth": "^1.1.13"
+    "better-auth": "^1.1.13",
+    "tailwind-merge": "^2.5.4",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "typescript": "^5.6.3",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.3",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.14",
+    "tailwindcss-animate": "^1.0.7",
     "vite": "^5.4.11"
   }
 }

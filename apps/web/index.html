@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="StackFast - Build your perfect JavaScript tech stack with intelligent compatibility checking and smart suggestions" />
+    <meta name="keywords" content="javascript, tech stack, full-stack, react, nextjs, builder, compatibility" />
+    <meta name="author" content="StackFast" />
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="StackFast - Full-Stack Builder" />
+    <meta property="og:description" content="Build your perfect JavaScript tech stack with intelligent compatibility checking" />
+    <meta property="og:type" content="website" />
+    
+    <!-- Security Headers (fallback for environments without server-side headers) -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+    
+    <!-- Content Security Policy (Note: Vercel headers take precedence) -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval';
+      style-src 'self' 'unsafe-inline';
+      img-src 'self' data: https:;
+      font-src 'self' data:;
+      connect-src 'self';
+      worker-src 'self' blob:;
+      child-src 'self' blob:;
+    " />
+    
+    <title>StackFast - Full-Stack Builder</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

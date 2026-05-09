@@ -1,0 +1,27 @@
+/**
+ * Prisma schema for PostgreSQL
+ */
+
+export function generatePrismaSchemaPostgres(): string {
+  return `// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Example model - customize as needed
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+`;
+}
