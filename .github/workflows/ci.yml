@@ -47,3 +47,6 @@ jobs:
 
       - name: Test
         run: pnpm -r test
+
+      - name: Validate Registry
+        run: pnpm validate:registry
