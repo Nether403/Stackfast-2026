@@ -5,12 +5,34 @@ import { insertToolSchema, insertToolCategorySchema, insertCompatibilitySchema }
 import { cacheMiddleware, invalidateCache } from "./middleware/cache";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  console.log("Registering routes...");
+  
+  // Simple test route
+  app.get("/test", async (req, res) => {
+    console.log("Test route hit!");
+    res.json({ message: "Server is working!" });
+  });
+
+  // Add a simple synchronous route for testing
+  app.get("/simple", (req, res) => {
+    console.log("Simple route hit!");
+    res.json({ message: "Simple route working!" });
+  });
+
+  // Add a ping route for testing
+  app.get("/ping", async (req, res) => {
+    console.log("Ping route hit!");
+    res.json({ message: "Server is alive!" });
+  });
+
   // Split into tools.routes.ts
   app.get("/api/tools", async (req, res) => {
+    console.log("API tools route hit!");
     try {
       const tools = await storage.getToolsWithAllCategories();
       res.json(tools);
     } catch (error) {
+      console.error("Error fetching tools:", error);
       res.status(500).json({ message: "Failed to fetch tools" });
     }
   });
