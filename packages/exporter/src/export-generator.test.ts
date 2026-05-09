@@ -1,10 +1,18 @@
 import { CatalogLoader } from "@stackfast/registry";
+import { ExportRecipeMetadataSchema } from "@stackfast/schemas";
 import { describe, expect, it } from "vitest";
 import { generateExport, generateExportAsText } from "./export-generator";
+import { recipes } from "./recipes";
 
 const loader = new CatalogLoader();
 
 describe("exporter", () => {
+  it("validates all recipe metadata against the shared schema", () => {
+    for (const recipe of recipes) {
+      expect(() => ExportRecipeMetadataSchema.parse(recipe)).not.toThrow();
+    }
+  });
+
   it("generates a valid Next.js scaffold file structure", async () => {
     const tools = [
       loader.requireTool("nextjs"),
@@ -45,5 +53,38 @@ describe("exporter", () => {
     const exportData = await generateExport([loader.requireTool("nextjs")], [], "zip", "1.0.0", "demo-app");
 
     expect(generateExportAsText(exportData)).toContain("## File: package.json");
+  });
+
+  it("generates Drizzle, Tailwind, hosting, email, and storage scaffolds", async () => {
+    const tools = [
+      loader.requireTool("nextjs"),
+      loader.requireTool("postgres"),
+      loader.requireTool("drizzle"),
+      loader.requireTool("tailwind"),
+      loader.requireTool("vercel"),
+      loader.requireTool("resend"),
+      loader.requireTool("s3"),
+    ];
+
+    const exportData = await generateExport(tools, [], "zip", "1.0.0", "phase-two-app");
+    const paths = exportData.files.map((file) => file.path);
+
+    expect(exportData.meta.recipeOrder).toEqual(expect.arrayContaining([
+      "nextjs-base",
+      "nextjs-drizzle-postgres",
+      "tailwind-nextjs",
+      "vercel-deployment",
+      "resend-email",
+      "s3-storage",
+    ]));
+    expect(paths).toEqual(expect.arrayContaining([
+      "drizzle.config.ts",
+      "src/db/schema.ts",
+      "tailwind.config.ts",
+      "vercel.json",
+      "src/email/resend.ts",
+      "src/storage/s3.ts",
+      ".env.example",
+    ]));
   });
 });

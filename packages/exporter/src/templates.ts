@@ -128,6 +128,143 @@ export async function POST(request: Request) {
   return NextResponse.json({ received: true, type: event.type });
 }
 `,
+  "drizzle-config-postgres": () => `import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  schema: "./src/db/schema.ts",
+  out: "./drizzle",
+  dialect: "postgresql",
+  dbCredentials: {
+    url: process.env.DATABASE_URL!,
+  },
+});
+`,
+  "drizzle-schema": () => `import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+
+export const users = pgTable("users", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  email: text("email").notNull().unique(),
+  name: text("name"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+`,
+  "drizzle-client": () => `import { neon } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/neon-http";
+
+if (!process.env.DATABASE_URL) {
+  throw new Error("DATABASE_URL is not set");
+}
+
+const sql = neon(process.env.DATABASE_URL);
+export const db = drizzle(sql);
+`,
+  "nextauth-route": () => `import NextAuth from "next-auth";
+import { authOptions } from "@/src/auth/options";
+
+const handler = NextAuth(authOptions);
+
+export { handler as GET, handler as POST };
+`,
+  "nextauth-options": () => `import { PrismaAdapter } from "@auth/prisma-adapter";
+import GitHubProvider from "next-auth/providers/github";
+import type { NextAuthOptions } from "next-auth";
+import { prisma } from "@/lib/prisma";
+
+export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma),
+  providers: [
+    GitHubProvider({
+      clientId: process.env.GITHUB_CLIENT_ID!,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+    }),
+  ],
+  session: { strategy: "database" },
+};
+`,
+  "tailwind-config-nextjs": () => `import type { Config } from "tailwindcss";
+
+const config: Config = {
+  content: ["./app/**/*.{js,ts,jsx,tsx,mdx}", "./src/**/*.{js,ts,jsx,tsx,mdx}"],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+};
+
+export default config;
+`,
+  "postcss-config": () => `module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+};
+`,
+  "tailwind-globals": () => `@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+}
+`,
+  "vercel-json": () => `${JSON.stringify({ framework: "nextjs", buildCommand: "npm run build" }, null, 2)}\n`,
+  "railway-json": () => `${JSON.stringify({
+    build: { builder: "NIXPACKS" },
+    deploy: { startCommand: "npm run start", restartPolicyType: "ON_FAILURE", restartPolicyMaxRetries: 10 },
+  }, null, 2)}\n`,
+  "resend-client": () => `import { Resend } from "resend";
+
+if (!process.env.RESEND_API_KEY) {
+  throw new Error("RESEND_API_KEY is not set");
+}
+
+export const resend = new Resend(process.env.RESEND_API_KEY);
+`,
+  "resend-route": () => `import { NextResponse } from "next/server";
+import { resend } from "@/src/email/resend";
+
+export async function POST() {
+  const result = await resend.emails.send({
+    from: process.env.EMAIL_FROM!,
+    to: "user@example.com",
+    subject: "Hello from Stackfast",
+    text: "Your email integration is ready.",
+  });
+
+  return NextResponse.json(result);
+}
+`,
+  "s3-client": () => `import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+
+export const s3 = new S3Client({ region: process.env.AWS_REGION });
+
+export function createUploadUrl(key: string, contentType: string) {
+  const command = new PutObjectCommand({
+    Bucket: process.env.S3_BUCKET_NAME!,
+    Key: key,
+    ContentType: contentType,
+  });
+
+  return getSignedUrl(s3, command, { expiresIn: 60 });
+}
+`,
+  "s3-presign-route": () => `import { NextResponse } from "next/server";
+import { createUploadUrl } from "@/src/storage/s3";
+
+export async function POST(request: Request) {
+  const { key, contentType } = await request.json();
+  const url = await createUploadUrl(key, contentType);
+
+  return NextResponse.json({ url });
+}
+`,
 };
 
 export function getTemplateContent(templateId: string): string {

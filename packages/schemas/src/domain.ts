@@ -80,11 +80,11 @@ export const ToolSchema = z.object({
   docsUrl: z.string().url().optional(),
   homepageUrl: z.string().url().optional(),
   exportRecipeId: z.string().optional(),
-  lastVerified: z.string().optional(),
-  sourceUrls: z.array(z.string().url()).optional(),
-  confidence: z.number().min(0).max(1).optional(),
-  capabilities: z.array(z.string()).optional(),
-  deprecated: z.boolean().optional(),
+  lastVerified: z.string().min(1),
+  sourceUrls: z.array(z.string().url()).min(1),
+  confidence: z.number().min(0).max(1),
+  capabilities: z.array(z.string().min(1)).min(1),
+  deprecated: z.boolean(),
 });
 
 export type Tool = z.infer<typeof ToolSchema>;

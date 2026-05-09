@@ -97,7 +97,7 @@ export class CatalogLoader {
 export function loadDefaultCatalog(): Catalog {
   const manifest = CatalogManifestSchema.parse(manifestData);
   const categories = CategoryArraySchema.parse(categoriesData);
-  const tools = ToolArraySchema.parse(toolsData);
+  const tools = ToolArraySchema.parse(enrichToolMetadata(toolsData, manifest.updatedAt));
   const rules = RuleArraySchema.parse(rulesData);
 
   const catalog: Catalog = {
@@ -128,6 +128,18 @@ export function validateCatalog(catalog: Catalog): CatalogValidationResult {
   const toolIds = new Set(catalog.tools.map((tool) => tool.id));
 
   for (const tool of catalog.tools) {
+    if (!tool.lastVerified) {
+      issues.push(`Tool ${tool.id} is missing lastVerified`);
+    }
+
+    if (tool.sourceUrls.length === 0) {
+      issues.push(`Tool ${tool.id} must include at least one source URL`);
+    }
+
+    if (tool.capabilities.length === 0) {
+      issues.push(`Tool ${tool.id} must include at least one capability`);
+    }
+
     if (!categoryIds.has(tool.categoryId)) {
       issues.push(`Tool ${tool.id} references unknown category ${tool.categoryId}`);
     }
@@ -196,6 +208,66 @@ function collectDuplicateIds(
     }
     seen.add(value.id);
   }
+}
+
+function enrichToolMetadata(rawTools: unknown, catalogUpdatedAt: string): unknown {
+  if (!Array.isArray(rawTools)) {
+    return rawTools;
+  }
+
+  const verifiedDate = catalogUpdatedAt.slice(0, 10);
+
+  return rawTools.map((rawTool) => {
+    if (!rawTool || typeof rawTool !== "object") {
+      return rawTool;
+    }
+
+    const tool = rawTool as Record<string, unknown>;
+    const pricing = isRecord(tool.pricing) ? tool.pricing : undefined;
+    const supports = isRecord(tool.supports) ? tool.supports : undefined;
+
+    const sourceUrls = uniqueStrings([
+      tool.docsUrl,
+      tool.homepageUrl,
+      pricing?.url,
+      ...(Array.isArray(tool.sourceUrls) ? tool.sourceUrls : []),
+    ]).filter(isHttpUrl);
+
+    const capabilities = uniqueStrings([
+      tool.categoryId,
+      ...(Array.isArray(tool.tags) ? tool.tags : []),
+      ...(Array.isArray(tool.languages) ? tool.languages : []),
+      ...(supports && Array.isArray(supports.runtime) ? supports.runtime.map((runtime) => `runtime:${runtime}`) : []),
+      ...(supports && Array.isArray(supports.dbs) ? supports.dbs.map((database) => `db:${database}`) : []),
+      ...(supports && Array.isArray(supports.frameworks)
+        ? supports.frameworks.map((framework) => `framework:${framework}`)
+        : []),
+      ...(Array.isArray(tool.capabilities) ? tool.capabilities : []),
+    ]).map((capability) => capability.toLowerCase());
+
+    const confidence = typeof tool.confidence === "number" ? tool.confidence : sourceUrls.length >= 2 ? 0.9 : 0.82;
+
+    return {
+      ...tool,
+      lastVerified: typeof tool.lastVerified === "string" ? tool.lastVerified : verifiedDate,
+      sourceUrls,
+      confidence,
+      capabilities,
+      deprecated: typeof tool.deprecated === "boolean" ? tool.deprecated : false,
+    };
+  });
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function uniqueStrings(values: unknown[]): string[] {
+  return Array.from(new Set(values.filter((value): value is string => typeof value === "string" && value.length > 0)));
+}
+
+function isHttpUrl(value: string): boolean {
+  return value.startsWith("https://") || value.startsWith("http://");
 }
 
 export const defaultCatalog = loadDefaultCatalog();

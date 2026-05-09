@@ -12,6 +12,17 @@ describe("registry", () => {
     expect(defaultCatalog.rules).toHaveLength(53);
   });
 
+  it("enriches every tool with Phase 2 metadata", () => {
+    for (const tool of defaultCatalog.tools) {
+      expect(tool.lastVerified).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      expect(tool.sourceUrls.length).toBeGreaterThan(0);
+      expect(tool.confidence).toBeGreaterThanOrEqual(0);
+      expect(tool.confidence).toBeLessThanOrEqual(1);
+      expect(tool.capabilities.length).toBeGreaterThan(0);
+      expect(tool.deprecated).toBe(false);
+    }
+  });
+
   it("provides typed lookup helpers", () => {
     const loader = new CatalogLoader(defaultCatalog);
 

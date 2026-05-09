@@ -81,6 +81,39 @@ export const nextjsPrismaPostgresRecipe: ExportRecipe = {
   },
 };
 
+export const nextjsDrizzlePostgresRecipe: ExportRecipe = {
+  id: "nextjs-drizzle-postgres",
+  version: "1.0.0",
+  appliesWhen: (tools: Tool[]) =>
+    hasTool(tools, "nextjs") && hasTool(tools, "drizzle") && hasTool(tools, "postgres"),
+  targets: {
+    packageJson: {
+      deps: {
+        "@neondatabase/serverless": "^0.10.4",
+        "drizzle-orm": "^0.39.3",
+      },
+      devDeps: { "drizzle-kit": "^0.30.4" },
+      scripts: {
+        "db:generate": "drizzle-kit generate",
+        "db:migrate": "drizzle-kit migrate",
+        "db:studio": "drizzle-kit studio",
+      },
+    },
+    files: [
+      { path: "drizzle.config.ts", templateId: "drizzle-config-postgres", mergeStrategy: "create" },
+      { path: "src/db/schema.ts", templateId: "drizzle-schema", mergeStrategy: "create" },
+      { path: "src/db/client.ts", templateId: "drizzle-client", mergeStrategy: "create" },
+    ],
+    env: {
+      example: { DATABASE_URL: "postgresql://user:password@localhost:5432/mydb?sslmode=require" },
+      notes: ["Use a pooled Postgres connection string for serverless deployments when available"],
+    },
+    postInstallSteps: ["npm run db:generate", "npm run db:migrate"],
+    docsLinks: ["https://orm.drizzle.team/docs", "https://neon.tech/docs"],
+    readme: { intro: "This project uses Drizzle ORM with PostgreSQL." },
+  },
+};
+
 export const nextjsClerkRecipe: ExportRecipe = {
   id: "nextjs-clerk",
   version: "1.0.0",
@@ -119,6 +152,35 @@ export const nextjsClerkRecipe: ExportRecipe = {
   },
 };
 
+export const nextjsNextAuthPrismaRecipe: ExportRecipe = {
+  id: "nextjs-nextauth-prisma",
+  version: "1.0.0",
+  appliesWhen: (tools: Tool[]) => hasTool(tools, "nextjs") && hasTool(tools, "nextauth") && hasTool(tools, "prisma"),
+  targets: {
+    packageJson: {
+      deps: { "next-auth": "^4.24.11", "@auth/prisma-adapter": "^2.7.4" },
+      devDeps: {},
+      scripts: {},
+    },
+    files: [
+      { path: "app/api/auth/[...nextauth]/route.ts", templateId: "nextauth-route", mergeStrategy: "create" },
+      { path: "src/auth/options.ts", templateId: "nextauth-options", mergeStrategy: "create" },
+    ],
+    env: {
+      example: {
+        NEXTAUTH_URL: "http://localhost:3000",
+        NEXTAUTH_SECRET: "change-me",
+        GITHUB_CLIENT_ID: "github-client-id",
+        GITHUB_CLIENT_SECRET: "github-client-secret",
+      },
+      notes: ["Generate NEXTAUTH_SECRET with `openssl rand -base64 32` before production"],
+    },
+    postInstallSteps: ["Create a GitHub OAuth app and copy credentials into .env.local"],
+    docsLinks: ["https://next-auth.js.org/getting-started/introduction"],
+    readme: { intro: "This project uses NextAuth.js with a Prisma adapter." },
+  },
+};
+
 export const stripeIntegrationRecipe: ExportRecipe = {
   id: "stripe-integration",
   version: "1.0.0",
@@ -153,11 +215,117 @@ export const stripeIntegrationRecipe: ExportRecipe = {
   },
 };
 
+export const tailwindRecipe: ExportRecipe = {
+  id: "tailwind-nextjs",
+  version: "1.0.0",
+  appliesWhen: (tools: Tool[]) => hasTool(tools, "nextjs") && hasTool(tools, "tailwind"),
+  targets: {
+    packageJson: {
+      deps: {},
+      devDeps: {
+        autoprefixer: "^10.4.20",
+        postcss: "^8.4.49",
+        tailwindcss: "^3.4.17",
+      },
+      scripts: {},
+    },
+    files: [
+      { path: "tailwind.config.ts", templateId: "tailwind-config-nextjs", mergeStrategy: "create" },
+      { path: "postcss.config.js", templateId: "postcss-config", mergeStrategy: "create" },
+      { path: "app/globals.css", templateId: "tailwind-globals", mergeStrategy: "create" },
+    ],
+    env: { example: {}, notes: [] },
+    postInstallSteps: ["Customize app/globals.css and tailwind.config.ts for your design system"],
+    docsLinks: ["https://tailwindcss.com/docs/guides/nextjs"],
+    readme: { intro: "This project uses Tailwind CSS for styling." },
+  },
+};
+
+export const vercelRecipe: ExportRecipe = {
+  id: "vercel-deployment",
+  version: "1.0.0",
+  appliesWhen: (tools: Tool[]) => hasTool(tools, "vercel"),
+  targets: {
+    packageJson: { deps: {}, devDeps: {}, scripts: {} },
+    files: [{ path: "vercel.json", templateId: "vercel-json", mergeStrategy: "create" }],
+    env: { example: {}, notes: ["Configure production environment variables in Vercel project settings"] },
+    postInstallSteps: ["Deploy with `npx vercel` or connect the repository in Vercel"],
+    docsLinks: ["https://vercel.com/docs"],
+    readme: { intro: "This project includes Vercel deployment defaults." },
+  },
+};
+
+export const railwayRecipe: ExportRecipe = {
+  id: "railway-deployment",
+  version: "1.0.0",
+  appliesWhen: (tools: Tool[]) => hasTool(tools, "railway"),
+  targets: {
+    packageJson: { deps: {}, devDeps: {}, scripts: {} },
+    files: [{ path: "railway.json", templateId: "railway-json", mergeStrategy: "create" }],
+    env: { example: {}, notes: ["Configure service variables in Railway before deploying"] },
+    postInstallSteps: ["Deploy with Railway from the dashboard or Railway CLI"],
+    docsLinks: ["https://docs.railway.com"],
+    readme: { intro: "This project includes Railway deployment defaults." },
+  },
+};
+
+export const resendRecipe: ExportRecipe = {
+  id: "resend-email",
+  version: "1.0.0",
+  appliesWhen: (tools: Tool[]) => hasTool(tools, "resend"),
+  targets: {
+    packageJson: { deps: { resend: "^4.0.1" }, devDeps: {}, scripts: {} },
+    files: [
+      { path: "src/email/resend.ts", templateId: "resend-client", mergeStrategy: "create" },
+      { path: "app/api/email/route.ts", templateId: "resend-route", mergeStrategy: "create" },
+    ],
+    env: {
+      example: { RESEND_API_KEY: "re_...", EMAIL_FROM: "onboarding@example.com" },
+      notes: ["Verify a sending domain in Resend before production use"],
+    },
+    postInstallSteps: ["Create a Resend API key and add it to .env.local"],
+    docsLinks: ["https://resend.com/docs"],
+    readme: { intro: "This project uses Resend for transactional email." },
+  },
+};
+
+export const s3StorageRecipe: ExportRecipe = {
+  id: "s3-storage",
+  version: "1.0.0",
+  appliesWhen: (tools: Tool[]) => hasTool(tools, "s3"),
+  targets: {
+    packageJson: { deps: { "@aws-sdk/client-s3": "^3.717.0", "@aws-sdk/s3-request-presigner": "^3.717.0" }, devDeps: {}, scripts: {} },
+    files: [
+      { path: "src/storage/s3.ts", templateId: "s3-client", mergeStrategy: "create" },
+      { path: "app/api/uploads/presign/route.ts", templateId: "s3-presign-route", mergeStrategy: "create" },
+    ],
+    env: {
+      example: {
+        AWS_REGION: "us-east-1",
+        AWS_ACCESS_KEY_ID: "access-key-id",
+        AWS_SECRET_ACCESS_KEY: "secret-access-key",
+        S3_BUCKET_NAME: "my-bucket",
+      },
+      notes: ["Prefer IAM roles or workload identity over long-lived AWS keys in production"],
+    },
+    postInstallSteps: ["Create an S3 bucket and configure CORS for browser uploads"],
+    docsLinks: ["https://docs.aws.amazon.com/s3"],
+    readme: { intro: "This project uses AWS S3 for object storage." },
+  },
+};
+
 export const recipes: ExportRecipe[] = [
   nextjsBaseRecipe,
   nextjsPrismaPostgresRecipe,
+  nextjsDrizzlePostgresRecipe,
   nextjsClerkRecipe,
+  nextjsNextAuthPrismaRecipe,
   stripeIntegrationRecipe,
+  tailwindRecipe,
+  vercelRecipe,
+  railwayRecipe,
+  resendRecipe,
+  s3StorageRecipe,
 ];
 
 export function getRecipeById(id: string): ExportRecipe | undefined {
