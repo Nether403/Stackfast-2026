@@ -1,10 +1,7 @@
-import { Hono } from 'hono';
-import { serve } from '@hono/node-server';
+import { serve } from "@hono/node-server";
+import app from "./app.js";
 
-const app = new Hono();
 const port = Number(process.env.PORT ?? 3000);
-
-app.get('/health', (c) => c.text('OK'));
 
 serve({
 	fetch: app.fetch,
