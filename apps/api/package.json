@@ -1,0 +1,33 @@
+{
+  "name": "@stackfast/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "lint": "eslint src/",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@stackfast/shared": "workspace:*",
+    "@stackfast/schemas": "workspace:*",
+    "@stackfast/registry": "workspace:*",
+    "@stackfast/rules-engine": "workspace:*",
+    "@stackfast/exporter": "workspace:*",
+    "@stackfast/ai": "workspace:*",
+    "hono": "^4.6.1",
+    "@hono/node-server": "^1.13.7",
+    "better-auth": "^1.1.13",
+    "zod": "^3.24.2",
+    "drizzle-orm": "^0.39.1",
+    "@neondatabase/serverless": "^0.10.4"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "tsx": "^4.19.2",
+    "@types/node": "^22.10.2"
+  }
+}

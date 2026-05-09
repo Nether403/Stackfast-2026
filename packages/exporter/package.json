@@ -1,0 +1,21 @@
+{
+  "name": "@stackfast/exporter",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "lint": "eslint src/",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@stackfast/shared": "workspace:*",
+    "@stackfast/schemas": "workspace:*",
+    "@stackfast/registry": "workspace:*",
+    "@stackfast/rules-engine": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}

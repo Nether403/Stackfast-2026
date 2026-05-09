@@ -1,0 +1,33 @@
+{
+  "name": "@stackfast/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@stackfast/shared": "workspace:*",
+    "@stackfast/schemas": "workspace:*",
+    "@stackfast/rules-engine": "workspace:*",
+    "@stackfast/registry": "workspace:*",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "wouter": "^3.3.5",
+    "@tanstack/react-query": "^5.60.5",
+    "lucide-react": "^0.453.0",
+    "better-auth": "^1.1.13"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "vite": "^5.4.11"
+  }
+}
