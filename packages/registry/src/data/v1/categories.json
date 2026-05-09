@@ -1,0 +1,82 @@
+[
+  {
+    "id": "frontend",
+    "name": "Frontend Framework",
+    "description": "The core framework for building your application's user interface",
+    "required": true,
+    "cardinality": "exactly-one",
+    "order": 1
+  },
+  {
+    "id": "runtime",
+    "name": "Backend Runtime",
+    "description": "The JavaScript runtime environment for server-side code",
+    "required": true,
+    "cardinality": "exactly-one",
+    "order": 2
+  },
+  {
+    "id": "hosting",
+    "name": "Hosting Platform",
+    "description": "Where your application will be deployed and served",
+    "required": true,
+    "cardinality": "exactly-one",
+    "order": 3
+  },
+  {
+    "id": "database",
+    "name": "Database",
+    "description": "Data storage and persistence layer for your application",
+    "required": false,
+    "cardinality": "at-most-one",
+    "order": 4
+  },
+  {
+    "id": "orm",
+    "name": "ORM / Database Client",
+    "description": "Object-relational mapping tool or database client library",
+    "required": false,
+    "cardinality": "at-most-one",
+    "order": 5
+  },
+  {
+    "id": "auth",
+    "name": "Authentication",
+    "description": "User authentication and authorization service",
+    "required": false,
+    "cardinality": "zero-or-one",
+    "order": 6
+  },
+  {
+    "id": "payments",
+    "name": "Payments",
+    "description": "Payment processing and subscription management",
+    "required": false,
+    "cardinality": "zero-or-one",
+    "order": 7
+  },
+  {
+    "id": "email",
+    "name": "Email Service",
+    "description": "Transactional email delivery service",
+    "required": false,
+    "cardinality": "zero-or-one",
+    "order": 8
+  },
+  {
+    "id": "storage",
+    "name": "File Storage",
+    "description": "Cloud storage for files, images, and media",
+    "required": false,
+    "cardinality": "zero-or-one",
+    "order": 9
+  },
+  {
+    "id": "styling",
+    "name": "Styling Solution",
+    "description": "CSS framework or styling approach for your application",
+    "required": false,
+    "cardinality": "zero-or-one",
+    "order": 10
+  }
+]

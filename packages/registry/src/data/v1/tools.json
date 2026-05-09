@@ -1,0 +1,743 @@
+[
+  {
+    "id": "nextjs",
+    "name": "Next.js",
+    "categoryId": "frontend",
+    "description": "React framework with server-side rendering, static generation, and API routes",
+    "tags": ["react", "ssr", "ssg", "full-stack"],
+    "languages": ["TypeScript", "JavaScript"],
+    "supports": {
+      "runtime": ["node", "bun"],
+      "frameworks": ["nextjs"]
+    },
+    "integrations": ["vercel", "tailwind", "prisma", "drizzle", "clerk", "nextauth", "stripe"],
+    "pricing": {
+      "model": "free",
+      "url": "https://nextjs.org"
+    },
+    "docsUrl": "https://nextjs.org/docs",
+    "homepageUrl": "https://nextjs.org",
+    "exportRecipeId": "nextjs"
+  },
+  {
+    "id": "remix",
+    "name": "Remix",
+    "categoryId": "frontend",
+    "description": "Full-stack web framework focused on web standards and modern UX",
+    "tags": ["react", "ssr", "full-stack", "web-standards"],
+    "languages": ["TypeScript", "JavaScript"],
+    "supports": {
+      "runtime": ["node", "bun"],
+      "frameworks": ["remix"]
+    },
+    "integrations": ["fly", "railway", "tailwind", "prisma", "drizzle"],
+    "pricing": {
+      "model": "free",
+      "url": "https://remix.run"
+    },
+    "docsUrl": "https://remix.run/docs",
+    "homepageUrl": "https://remix.run",
+    "exportRecipeId": "remix"
+  },
+  {
+    "id": "astro",
+    "name": "Astro",
+    "categoryId": "frontend",
+    "description": "Content-focused framework with islands architecture and zero JS by default",
+    "tags": ["mpa", "ssg", "content", "islands"],
+    "languages": ["TypeScript", "JavaScript"],
+    "supports": {
+      "runtime": ["node", "bun"],
+      "frameworks": ["astro"]
+    },
+    "integrations": ["vercel", "netlify", "tailwind"],
+    "pricing": {
+      "model": "free",
+      "url": "https://astro.build"
+    },
+    "docsUrl": "https://docs.astro.build",
+    "homepageUrl": "https://astro.build",
+    "exportRecipeId": "astro"
+  },
+  {
+    "id": "sveltekit",
+    "name": "SvelteKit",
+    "categoryId": "frontend",
+    "description": "Full-stack framework built on Svelte with excellent performance",
+    "tags": ["svelte", "ssr", "ssg", "full-stack"],
+    "languages": ["TypeScript", "JavaScript"],
+    "supports": {
+      "runtime": ["node", "bun"],
+      "frameworks": ["sveltekit"]
+    },
+    "integrations": ["vercel", "netlify", "tailwind", "prisma"],
+    "pricing": {
+      "model": "free",
+      "url": "https://kit.svelte.dev"
+    },
+    "docsUrl": "https://kit.svelte.dev/docs",
+    "homepageUrl": "https://kit.svelte.dev",
+    "exportRecipeId": "sveltekit"
+  },
+  {
+    "id": "node",
+    "name": "Node.js",
+    "categoryId": "runtime",
+    "description": "JavaScript runtime built on Chrome's V8 engine",
+    "tags": ["runtime", "javascript", "v8"],
+    "languages": ["JavaScript", "TypeScript"],
+    "supports": {
+      "runtime": ["node"]
+    },
+    "integrations": [],
+    "pricing": {
+      "model": "free",
+      "url": "https://nodejs.org"
+    },
+    "docsUrl": "https://nodejs.org/docs",
+    "homepageUrl": "https://nodejs.org",
+    "exportRecipeId": "node"
+  },
+  {
+    "id": "bun",
+    "name": "Bun",
+    "categoryId": "runtime",
+    "description": "Fast all-in-one JavaScript runtime with built-in bundler and package manager",
+    "tags": ["runtime", "javascript", "fast", "bundler"],
+    "languages": ["JavaScript", "TypeScript"],
+    "supports": {
+      "runtime": ["bun"]
+    },
+    "integrations": [],
+    "pricing": {
+      "model": "free",
+      "url": "https://bun.sh"
+    },
+    "docsUrl": "https://bun.sh/docs",
+    "homepageUrl": "https://bun.sh",
+    "exportRecipeId": "bun"
+  }
+,
+  {
+    "id": "vercel",
+    "name": "Vercel",
+    "categoryId": "hosting",
+    "description": "Cloud platform optimized for frontend frameworks and serverless functions",
+    "tags": ["hosting", "serverless", "edge", "cdn"],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": ["JavaScript", "TypeScript"],
+    "supports": {
+      "runtime": ["node", "bun"],
+      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+    },
+    "integrations": ["nextjs", "postgres", "stripe"],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Free for hobby projects, paid plans for teams",
+      "url": "https://vercel.com/pricing"
+    },
+    "docsUrl": "https://vercel.com/docs",
+    "homepageUrl": "https://vercel.com",
+    "exportRecipeId": "vercel"
+  },
+  {
+    "id": "railway",
+    "name": "Railway",
+    "categoryId": "hosting",
+    "description": "Infrastructure platform with databases, services, and instant deployments",
+    "tags": ["hosting", "infrastructure", "databases"],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": ["JavaScript", "TypeScript"],
+    "supports": {
+      "runtime": ["node", "bun"],
+      "frameworks": ["nextjs", "remix", "astro", "sveltekit"],
+      "dbs": ["postgres", "mysql", "mongodb"]
+    },
+    "integrations": ["postgres", "mysql", "mongodb"],
+    "pricing": {
+      "model": "free-tier",
+      "note": "$5 free credit monthly, pay-as-you-go",
+      "url": "https://railway.app/pricing"
+    },
+    "docsUrl": "https://docs.railway.app",
+    "homepageUrl": "https://railway.app",
+    "exportRecipeId": "railway"
+  },
+  {
+    "id": "fly",
+    "name": "Fly.io",
+    "categoryId": "hosting",
+    "description": "Global application platform running apps close to users",
+    "tags": ["hosting", "edge", "global"],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": ["JavaScript", "TypeScript"],
+    "supports": {
+      "runtime": ["node", "bun"],
+      "frameworks": ["nextjs", "remix", "astro", "sveltekit"],
+      "dbs": ["postgres"]
+    },
+    "integrations": ["postgres"],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Free allowances, pay for usage",
+      "url": "https://fly.io/pricing"
+    },
+    "docsUrl": "https://fly.io/docs",
+    "homepageUrl": "https://fly.io",
+    "exportRecipeId": "fly"
+  },
+  {
+    "id": "netlify",
+    "name": "Netlify",
+    "categoryId": "hosting",
+    "description": "Platform for web projects with continuous deployment and serverless functions",
+    "tags": ["hosting", "jamstack", "serverless"],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": ["JavaScript", "TypeScript"],
+    "supports": {
+      "runtime": ["node"],
+      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+    },
+    "integrations": [],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Free for personal projects",
+      "url": "https://www.netlify.com/pricing"
+    },
+    "docsUrl": "https://docs.netlify.com",
+    "homepageUrl": "https://www.netlify.com",
+    "exportRecipeId": "netlify"
+  },
+  {
+    "id": "postgres",
+    "name": "PostgreSQL",
+    "categoryId": "database",
+    "description": "Advanced open-source relational database with strong standards compliance",
+    "tags": ["database", "sql", "relational"],
+    "hosted": false,
+    "selfHostable": true,
+    "languages": ["SQL"],
+    "supports": {
+      "dbs": ["postgres"]
+    },
+    "integrations": ["prisma", "drizzle", "typeorm", "vercel", "railway", "fly"],
+    "pricing": {
+      "model": "free",
+      "note": "Open source, hosting costs vary",
+      "url": "https://www.postgresql.org"
+    },
+    "docsUrl": "https://www.postgresql.org/docs",
+    "homepageUrl": "https://www.postgresql.org",
+    "exportRecipeId": "postgres"
+  },
+  {
+    "id": "mongodb",
+    "name": "MongoDB",
+    "categoryId": "database",
+    "description": "Document-oriented NoSQL database with flexible schema",
+    "tags": ["database", "nosql", "document"],
+    "hosted": false,
+    "selfHostable": true,
+    "languages": ["JavaScript"],
+    "supports": {
+      "dbs": ["mongodb"]
+    },
+    "integrations": ["mongoose", "railway"],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Free tier on MongoDB Atlas",
+      "url": "https://www.mongodb.com/pricing"
+    },
+    "docsUrl": "https://docs.mongodb.com",
+    "homepageUrl": "https://www.mongodb.com",
+    "exportRecipeId": "mongodb"
+  },
+  {
+    "id": "mysql",
+    "name": "MySQL",
+    "categoryId": "database",
+    "description": "Popular open-source relational database management system",
+    "tags": ["database", "sql", "relational"],
+    "hosted": false,
+    "selfHostable": true,
+    "languages": ["SQL"],
+    "supports": {
+      "dbs": ["mysql"]
+    },
+    "integrations": ["prisma", "drizzle", "typeorm", "railway"],
+    "pricing": {
+      "model": "free",
+      "note": "Open source, hosting costs vary",
+      "url": "https://www.mysql.com"
+    },
+    "docsUrl": "https://dev.mysql.com/doc",
+    "homepageUrl": "https://www.mysql.com",
+    "exportRecipeId": "mysql"
+  },
+  {
+    "id": "prisma",
+    "name": "Prisma",
+    "categoryId": "orm",
+    "description": "Next-generation ORM with type-safe database client and migrations",
+    "tags": ["orm", "typescript", "type-safe"],
+    "languages": ["TypeScript", "JavaScript"],
+    "supports": {
+      "runtime": ["node", "bun"],
+      "dbs": ["postgres", "mysql", "sqlite"],
+      "frameworks": ["nextjs", "remix", "sveltekit"]
+    },
+    "integrations": ["postgres", "mysql", "nextjs", "remix"],
+    "requires": {
+      "categoryId": "database"
+    },
+    "pricing": {
+      "model": "free",
+      "url": "https://www.prisma.io"
+    },
+    "docsUrl": "https://www.prisma.io/docs",
+    "homepageUrl": "https://www.prisma.io",
+    "exportRecipeId": "prisma"
+  },
+  {
+    "id": "drizzle",
+    "name": "Drizzle ORM",
+    "categoryId": "orm",
+    "description": "Lightweight TypeScript ORM with SQL-like syntax and excellent performance",
+    "tags": ["orm", "typescript", "lightweight"],
+    "languages": ["TypeScript", "JavaScript"],
+    "supports": {
+      "runtime": ["node", "bun"],
+      "dbs": ["postgres", "mysql", "sqlite"],
+      "frameworks": ["nextjs", "remix", "sveltekit"]
+    },
+    "integrations": ["postgres", "mysql", "nextjs"],
+    "requires": {
+      "categoryId": "database"
+    },
+    "pricing": {
+      "model": "free",
+      "url": "https://orm.drizzle.team"
+    },
+    "docsUrl": "https://orm.drizzle.team/docs",
+    "homepageUrl": "https://orm.drizzle.team",
+    "exportRecipeId": "drizzle"
+  },
+  {
+    "id": "typeorm",
+    "name": "TypeORM",
+    "categoryId": "orm",
+    "description": "Mature ORM supporting Active Record and Data Mapper patterns",
+    "tags": ["orm", "typescript", "decorators"],
+    "languages": ["TypeScript", "JavaScript"],
+    "supports": {
+      "runtime": ["node", "bun"],
+      "dbs": ["postgres", "mysql", "sqlite"],
+      "frameworks": ["nextjs", "remix", "sveltekit"]
+    },
+    "integrations": ["postgres", "mysql"],
+    "requires": {
+      "categoryId": "database"
+    },
+    "pricing": {
+      "model": "free",
+      "url": "https://typeorm.io"
+    },
+    "docsUrl": "https://typeorm.io",
+    "homepageUrl": "https://typeorm.io",
+    "exportRecipeId": "typeorm"
+  },
+  {
+    "id": "mongoose",
+    "name": "Mongoose",
+    "categoryId": "orm",
+    "description": "MongoDB object modeling for Node.js with schema validation",
+    "tags": ["orm", "mongodb", "schemas"],
+    "languages": ["TypeScript", "JavaScript"],
+    "supports": {
+      "runtime": ["node", "bun"],
+      "dbs": ["mongodb"],
+      "frameworks": ["nextjs", "remix", "sveltekit"]
+    },
+    "integrations": ["mongodb"],
+    "requires": {
+      "anyOfToolIds": ["mongodb"]
+    },
+    "pricing": {
+      "model": "free",
+      "url": "https://mongoosejs.com"
+    },
+    "docsUrl": "https://mongoosejs.com/docs",
+    "homepageUrl": "https://mongoosejs.com",
+    "exportRecipeId": "mongoose"
+  }
+,
+  {
+    "id": "clerk",
+    "name": "Clerk",
+    "categoryId": "auth",
+    "description": "Complete user management with authentication, profiles, and organizations",
+    "tags": ["auth", "user-management", "saas"],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": ["TypeScript", "JavaScript"],
+    "supports": {
+      "runtime": ["node", "bun"],
+      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+    },
+    "integrations": ["nextjs", "stripe"],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Free up to 10k MAU, paid plans available",
+      "url": "https://clerk.com/pricing"
+    },
+    "docsUrl": "https://clerk.com/docs",
+    "homepageUrl": "https://clerk.com",
+    "exportRecipeId": "clerk"
+  },
+  {
+    "id": "auth0",
+    "name": "Auth0",
+    "categoryId": "auth",
+    "description": "Enterprise-grade authentication and authorization platform",
+    "tags": ["auth", "enterprise", "oauth"],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": ["TypeScript", "JavaScript"],
+    "supports": {
+      "runtime": ["node", "bun"],
+      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+    },
+    "integrations": ["nextjs"],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Free up to 7k MAU",
+      "url": "https://auth0.com/pricing"
+    },
+    "docsUrl": "https://auth0.com/docs",
+    "homepageUrl": "https://auth0.com",
+    "exportRecipeId": "auth0"
+  },
+  {
+    "id": "nextauth",
+    "name": "NextAuth.js",
+    "categoryId": "auth",
+    "description": "Open-source authentication solution designed for Next.js",
+    "tags": ["auth", "nextjs", "oauth"],
+    "hosted": false,
+    "selfHostable": true,
+    "languages": ["TypeScript", "JavaScript"],
+    "supports": {
+      "runtime": ["node", "bun"],
+      "frameworks": ["nextjs"]
+    },
+    "integrations": ["nextjs", "prisma"],
+    "requires": {
+      "anyOfToolIds": ["nextjs"]
+    },
+    "pricing": {
+      "model": "free",
+      "url": "https://next-auth.js.org"
+    },
+    "docsUrl": "https://next-auth.js.org/getting-started/introduction",
+    "homepageUrl": "https://next-auth.js.org",
+    "exportRecipeId": "nextauth"
+  },
+  {
+    "id": "supabase-auth",
+    "name": "Supabase Auth",
+    "categoryId": "auth",
+    "description": "Open-source authentication with email, OAuth, and magic links",
+    "tags": ["auth", "open-source", "postgres"],
+    "hosted": true,
+    "selfHostable": true,
+    "languages": ["TypeScript", "JavaScript"],
+    "supports": {
+      "runtime": ["node", "bun"],
+      "frameworks": ["nextjs", "remix", "astro", "sveltekit"],
+      "dbs": ["postgres"]
+    },
+    "integrations": ["postgres"],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Free tier with 50k MAU",
+      "url": "https://supabase.com/pricing"
+    },
+    "docsUrl": "https://supabase.com/docs/guides/auth",
+    "homepageUrl": "https://supabase.com/auth",
+    "exportRecipeId": "supabase-auth"
+  },
+  {
+    "id": "stripe",
+    "name": "Stripe",
+    "categoryId": "payments",
+    "description": "Complete payment infrastructure with subscriptions and billing",
+    "tags": ["payments", "subscriptions", "billing"],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": ["TypeScript", "JavaScript"],
+    "supports": {
+      "runtime": ["node", "bun"],
+      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+    },
+    "integrations": ["nextjs", "clerk"],
+    "pricing": {
+      "model": "paid",
+      "note": "2.9% + 30¢ per transaction",
+      "url": "https://stripe.com/pricing"
+    },
+    "docsUrl": "https://stripe.com/docs",
+    "homepageUrl": "https://stripe.com",
+    "exportRecipeId": "stripe"
+  },
+  {
+    "id": "lemonsqueezy",
+    "name": "Lemon Squeezy",
+    "categoryId": "payments",
+    "description": "All-in-one platform for payments, tax, and subscriptions",
+    "tags": ["payments", "subscriptions", "tax"],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": ["TypeScript", "JavaScript"],
+    "supports": {
+      "runtime": ["node", "bun"],
+      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+    },
+    "integrations": [],
+    "pricing": {
+      "model": "paid",
+      "note": "5% + payment processor fees",
+      "url": "https://www.lemonsqueezy.com/pricing"
+    },
+    "docsUrl": "https://docs.lemonsqueezy.com",
+    "homepageUrl": "https://www.lemonsqueezy.com",
+    "exportRecipeId": "lemonsqueezy"
+  },
+  {
+    "id": "paddle",
+    "name": "Paddle",
+    "categoryId": "payments",
+    "description": "Payment infrastructure with merchant of record services",
+    "tags": ["payments", "subscriptions", "mor"],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": ["TypeScript", "JavaScript"],
+    "supports": {
+      "runtime": ["node", "bun"],
+      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+    },
+    "integrations": [],
+    "pricing": {
+      "model": "paid",
+      "note": "5% + payment processor fees",
+      "url": "https://www.paddle.com/pricing"
+    },
+    "docsUrl": "https://developer.paddle.com",
+    "homepageUrl": "https://www.paddle.com",
+    "exportRecipeId": "paddle"
+  },
+  {
+    "id": "resend",
+    "name": "Resend",
+    "categoryId": "email",
+    "description": "Modern email API for developers with React email templates",
+    "tags": ["email", "transactional", "react"],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": ["TypeScript", "JavaScript"],
+    "supports": {
+      "runtime": ["node", "bun"],
+      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+    },
+    "integrations": ["nextjs"],
+    "pricing": {
+      "model": "free-tier",
+      "note": "100 emails/day free, paid plans available",
+      "url": "https://resend.com/pricing"
+    },
+    "docsUrl": "https://resend.com/docs",
+    "homepageUrl": "https://resend.com",
+    "exportRecipeId": "resend"
+  },
+  {
+    "id": "sendgrid",
+    "name": "SendGrid",
+    "categoryId": "email",
+    "description": "Reliable email delivery platform with marketing tools",
+    "tags": ["email", "transactional", "marketing"],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": ["TypeScript", "JavaScript"],
+    "supports": {
+      "runtime": ["node", "bun"],
+      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+    },
+    "integrations": [],
+    "pricing": {
+      "model": "free-tier",
+      "note": "100 emails/day free",
+      "url": "https://sendgrid.com/pricing"
+    },
+    "docsUrl": "https://docs.sendgrid.com",
+    "homepageUrl": "https://sendgrid.com",
+    "exportRecipeId": "sendgrid"
+  },
+  {
+    "id": "postmark",
+    "name": "Postmark",
+    "categoryId": "email",
+    "description": "Fast and reliable transactional email service",
+    "tags": ["email", "transactional", "reliable"],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": ["TypeScript", "JavaScript"],
+    "supports": {
+      "runtime": ["node", "bun"],
+      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+    },
+    "integrations": [],
+    "pricing": {
+      "model": "free-tier",
+      "note": "100 emails/month free",
+      "url": "https://postmarkapp.com/pricing"
+    },
+    "docsUrl": "https://postmarkapp.com/developer",
+    "homepageUrl": "https://postmarkapp.com",
+    "exportRecipeId": "postmark"
+  },
+  {
+    "id": "s3",
+    "name": "AWS S3",
+    "categoryId": "storage",
+    "description": "Scalable object storage with industry-leading durability",
+    "tags": ["storage", "cloud", "aws"],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": ["TypeScript", "JavaScript"],
+    "supports": {
+      "runtime": ["node", "bun"],
+      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+    },
+    "integrations": [],
+    "pricing": {
+      "model": "free-tier",
+      "note": "5GB free for 12 months",
+      "url": "https://aws.amazon.com/s3/pricing"
+    },
+    "docsUrl": "https://docs.aws.amazon.com/s3",
+    "homepageUrl": "https://aws.amazon.com/s3",
+    "exportRecipeId": "s3"
+  },
+  {
+    "id": "cloudinary",
+    "name": "Cloudinary",
+    "categoryId": "storage",
+    "description": "Media management platform with image and video transformations",
+    "tags": ["storage", "media", "cdn", "transformations"],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": ["TypeScript", "JavaScript"],
+    "supports": {
+      "runtime": ["node", "bun"],
+      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+    },
+    "integrations": [],
+    "pricing": {
+      "model": "free-tier",
+      "note": "25 credits/month free",
+      "url": "https://cloudinary.com/pricing"
+    },
+    "docsUrl": "https://cloudinary.com/documentation",
+    "homepageUrl": "https://cloudinary.com",
+    "exportRecipeId": "cloudinary"
+  },
+  {
+    "id": "uploadthing",
+    "name": "UploadThing",
+    "categoryId": "storage",
+    "description": "Simple file uploads for Next.js with type-safe API",
+    "tags": ["storage", "uploads", "nextjs"],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": ["TypeScript", "JavaScript"],
+    "supports": {
+      "runtime": ["node", "bun"],
+      "frameworks": ["nextjs"]
+    },
+    "integrations": ["nextjs"],
+    "requires": {
+      "anyOfToolIds": ["nextjs"]
+    },
+    "pricing": {
+      "model": "free-tier",
+      "note": "2GB storage free",
+      "url": "https://uploadthing.com/pricing"
+    },
+    "docsUrl": "https://docs.uploadthing.com",
+    "homepageUrl": "https://uploadthing.com",
+    "exportRecipeId": "uploadthing"
+  },
+  {
+    "id": "tailwind",
+    "name": "Tailwind CSS",
+    "categoryId": "styling",
+    "description": "Utility-first CSS framework for rapid UI development",
+    "tags": ["css", "utility-first", "responsive"],
+    "languages": ["CSS"],
+    "supports": {
+      "runtime": ["node", "bun"],
+      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+    },
+    "integrations": ["nextjs", "remix", "astro", "sveltekit"],
+    "pricing": {
+      "model": "free",
+      "url": "https://tailwindcss.com"
+    },
+    "docsUrl": "https://tailwindcss.com/docs",
+    "homepageUrl": "https://tailwindcss.com",
+    "exportRecipeId": "tailwind"
+  },
+  {
+    "id": "css-modules",
+    "name": "CSS Modules",
+    "categoryId": "styling",
+    "description": "Locally scoped CSS with automatic unique class names",
+    "tags": ["css", "scoped", "modular"],
+    "languages": ["CSS"],
+    "supports": {
+      "runtime": ["node", "bun"],
+      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+    },
+    "integrations": [],
+    "pricing": {
+      "model": "free",
+      "url": "https://github.com/css-modules/css-modules"
+    },
+    "docsUrl": "https://github.com/css-modules/css-modules",
+    "homepageUrl": "https://github.com/css-modules/css-modules",
+    "exportRecipeId": "css-modules"
+  },
+  {
+    "id": "vanilla-extract",
+    "name": "vanilla-extract",
+    "categoryId": "styling",
+    "description": "Zero-runtime CSS-in-TypeScript with type-safe styles",
+    "tags": ["css", "typescript", "zero-runtime"],
+    "languages": ["TypeScript"],
+    "supports": {
+      "runtime": ["node", "bun"],
+      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+    },
+    "integrations": [],
+    "pricing": {
+      "model": "free",
+      "url": "https://vanilla-extract.style"
+    },
+    "docsUrl": "https://vanilla-extract.style/documentation",
+    "homepageUrl": "https://vanilla-extract.style",
+    "exportRecipeId": "vanilla-extract"
+  }
+]

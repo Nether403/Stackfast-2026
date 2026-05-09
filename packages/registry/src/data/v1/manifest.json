@@ -1,0 +1,10 @@
+{
+  "version": "1.0.0",
+  "updatedAt": "2024-01-15T00:00:00.000Z",
+  "files": {
+    "categories": "/catalog/v1/categories.json",
+    "tools": "/catalog/v1/tools.json",
+    "rules": "/catalog/v1/rules.json"
+  },
+  "etag": "v1.0.0-initial"
+}
