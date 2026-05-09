@@ -1,3 +1,4 @@
+import { createExplainer } from "@stackfast/ai";
 import { generateExport, type ExportError } from "@stackfast/exporter";
 import { CatalogLoader } from "@stackfast/registry";
 import { evaluateRulesSync } from "@stackfast/rules-engine";
@@ -16,6 +17,7 @@ import type { ContentfulStatusCode } from "hono/utils/http-status";
 import type { MiddlewareHandler } from "hono/types";
 import { z } from "zod";
 import { openApiDocument } from "./openapi.js";
+import { getAuth, requireSession, optionalSession } from "./middleware/auth.js";
 
 type Bindings = {
   ADMIN_API_KEY?: string;
@@ -53,9 +55,10 @@ const EnrichToolSchema = z.object({
 const GENERATION_LIMIT = 30;
 const READ_LIMIT = 100;
 const WINDOW_MS = 60_000;
-const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
+export const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
 
 const catalogLoader = new CatalogLoader();
+const explainer = createExplainer();
 
 export const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
@@ -68,9 +71,15 @@ app.use("*", async (c, next) => {
   await next();
 });
 
+// --- Rate limiting ---
 app.use("/api/v1/blueprints", rateLimit("generation", GENERATION_LIMIT));
 app.use("/api/v1/scaffolds", rateLimit("generation", GENERATION_LIMIT));
 app.use("/api/v1/*", rateLimit("read", READ_LIMIT));
+
+// --- Auth middleware ---
+app.use("/api/v1/blueprints", requireSession());
+app.use("/api/v1/scaffolds", requireSession());
+app.use("/api/v1/*", optionalSession());
 app.use("/admin/*", requireAdminApiKey());
 app.use("/internal/*", requireAdminApiKey());
 
@@ -88,6 +97,15 @@ app.onError((error, c) => {
 app.get("/health", (c) => c.text("OK"));
 app.get("/openapi.json", (c) => c.json(openApiDocument));
 
+// --- Better Auth route handler ---
+app.on(["GET", "POST"], "/api/auth/*", async (c) => {
+  const auth = getAuth();
+  if (!auth) {
+    return c.json({ error: "Auth not available (no database)", requestId: c.get("requestId") }, 503);
+  }
+  return auth.handler(c.req.raw);
+});
+
 app.post("/api/v1/blueprints", async (c) => {
   const body = await parseJson(c.req.raw, BlueprintRequestSchema);
   const primaryToolIds = chooseBlueprintTools(body.idea, body.preferredTools ?? [], body.constraints ?? []);
@@ -95,17 +113,24 @@ app.post("/api/v1/blueprints", async (c) => {
   const primaryEvaluation = evaluateRulesSync(primaryTools, catalogLoader.getRules());
   const primaryExport = await generateSafeExport(primaryTools, primaryEvaluation.diagnostics, "blueprint-app");
 
-  const alternatives = buildAlternatives(primaryToolIds).map((toolIds) => {
-    const tools = resolveTools(toolIds);
-    const evaluation = evaluateRulesSync(tools, catalogLoader.getRules());
-    return {
-      id: toolIds.join("-"),
-      name: tools.map((tool) => tool.name).join(" + "),
-      toolIds,
-      harmonyScore: evaluation.score,
-      tradeoffs: summarizeTradeoffs(tools, evaluation.diagnostics),
-    };
-  });
+  // Use AI explainer interface (heuristic in Phase 3, swappable in Phase 5)
+  const explanation = await explainer.explainStack(primaryTools, body.idea);
+
+  const alternatives = await Promise.all(
+    buildAlternatives(primaryToolIds).map(async (toolIds) => {
+      const tools = resolveTools(toolIds);
+      const evaluation = evaluateRulesSync(tools, catalogLoader.getRules());
+      const tradeoffResult = await explainer.summarizeTradeoffs(tools, evaluation.diagnostics);
+      return {
+        id: toolIds.join("-"),
+        name: tools.map((tool) => tool.name).join(" + "),
+        toolIds,
+        harmonyScore: evaluation.score,
+        tradeoffs: tradeoffResult.tradeoffs,
+        tradeoffSource: tradeoffResult.source,
+      };
+    }),
+  );
 
   return c.json({
     idea: body.idea,
@@ -114,7 +139,8 @@ app.post("/api/v1/blueprints", async (c) => {
       tools: primaryTools,
       harmonyScore: primaryEvaluation.score,
       diagnostics: primaryEvaluation.diagnostics,
-      rationale: explainStack(primaryTools, body.idea),
+      rationale: explanation.text,
+      explanationSource: explanation.source,
     },
     alternatives,
     risks: primaryEvaluation.diagnostics
@@ -368,18 +394,7 @@ async function generateSafeExport(tools: Tool[], diagnostics: Diagnostic[], proj
   }
 }
 
-function explainStack(tools: Tool[], idea: string): string {
-  const names = tools.map((tool) => tool.name).join(", ");
-  return `Recommended ${names} because it provides a validated path for ${idea.trim()} with common integration coverage.`;
-}
-
-function summarizeTradeoffs(tools: Tool[], diagnostics: Diagnostic[]): string[] {
-  const tradeoffs = diagnostics.filter((diagnostic) => diagnostic.level !== "info").map((diagnostic) => diagnostic.message);
-  if (tradeoffs.length > 0) {
-    return tradeoffs;
-  }
-  return [`${tools[0]?.name ?? "This stack"} has no blocking compatibility diagnostics.`];
-}
+// explainStack and summarizeTradeoffs now handled by @stackfast/ai BlueprintExplainer
 
 function buildRecommendations(tools: Tool[], diagnostics: Diagnostic[]): string[] {
   const selectedCategories = new Set<CategoryId>(tools.map((tool) => tool.categoryId));
