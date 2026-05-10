@@ -1,10 +1,10 @@
 {
-  "version": "1.0.1",
-  "updatedAt": "2026-05-09T00:00:00.000Z",
+  "version": "1.1.0",
+  "updatedAt": "2026-05-10T00:00:00.000Z",
   "files": {
     "categories": "/catalog/v1/categories.json",
     "tools": "/catalog/v1/tools.json",
     "rules": "/catalog/v1/rules.json"
   },
-  "etag": "v1.0.1-enriched-metadata"
+  "etag": "v1.1.0-registry-expansion-80-tools"
 }

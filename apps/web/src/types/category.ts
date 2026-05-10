@@ -14,7 +14,17 @@ export type CategoryId =
   | 'payments'
   | 'email'
   | 'storage'
-  | 'styling';
+  | 'styling'
+  | 'agent-framework'
+  | 'ai-model'
+  | 'vector-database'
+  | 'eval-observability'
+  | 'backend-framework'
+  | 'queue-workflow'
+  | 'testing'
+  | 'monorepo'
+  | 'cms'
+  | 'mobile';
 
 /**
  * Cardinality types for category selection rules
@@ -31,6 +41,7 @@ export interface Category {
   required: boolean;
   cardinality: Cardinality;
   order: number;
+  capabilities?: string[];
 }
 
 /**
@@ -47,6 +58,16 @@ export const CategoryIdSchema = z.enum([
   'email',
   'storage',
   'styling',
+  'agent-framework',
+  'ai-model',
+  'vector-database',
+  'eval-observability',
+  'backend-framework',
+  'queue-workflow',
+  'testing',
+  'monorepo',
+  'cms',
+  'mobile',
 ]);
 
 /**
@@ -69,6 +90,7 @@ export const CategorySchema = z.object({
   required: z.boolean(),
   cardinality: CardinalitySchema,
   order: z.number(),
+  capabilities: z.array(z.string()).optional(),
 });
 
 /**

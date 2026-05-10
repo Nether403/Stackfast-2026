@@ -11,6 +11,16 @@ export const CategoryIdSchema = z.enum([
   "email",
   "storage",
   "styling",
+  "agent-framework",
+  "ai-model",
+  "vector-database",
+  "eval-observability",
+  "backend-framework",
+  "queue-workflow",
+  "testing",
+  "monorepo",
+  "cms",
+  "mobile",
 ]);
 
 export type CategoryId = z.infer<typeof CategoryIdSchema>;
@@ -56,9 +66,9 @@ export const ToolRequirementsSchema = z.object({
 export type ToolRequirements = z.infer<typeof ToolRequirementsSchema>;
 
 export const ToolSupportsSchema = z.object({
-  runtime: z.array(z.enum(["node", "bun"])).optional(),
+  runtime: z.array(z.enum(["node", "bun", "deno", "cloudflare-workers"])).optional(),
   dbs: z.array(z.enum(["postgres", "mysql", "sqlite", "mongodb"])).optional(),
-  frameworks: z.array(z.enum(["nextjs", "remix", "astro", "sveltekit"])).optional(),
+  frameworks: z.array(z.enum(["nextjs", "remix", "astro", "sveltekit", "react", "vue"])).optional(),
 });
 
 export type ToolSupports = z.infer<typeof ToolSupportsSchema>;
@@ -411,7 +421,8 @@ export type BlueprintResponse = z.infer<typeof BlueprintResponseSchema>;
 export const CompatibilityResponseSchema = z.object({
   toolA: z.string(),
   toolB: z.string(),
-  score: z.number(),
+  harmonyScore: z.number(),
+  compatible: z.boolean(),
   diagnostics: z.array(DiagnosticSchema),
 });
 export type CompatibilityResponse = z.infer<typeof CompatibilityResponseSchema>;

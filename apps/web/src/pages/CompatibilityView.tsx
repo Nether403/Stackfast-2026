@@ -84,20 +84,20 @@ export function CompatibilityView() {
               {/* Score Display */}
               <div className="flex flex-col items-center justify-center p-8 rounded-2xl bg-card border border-border text-center space-y-4 shadow-sm relative overflow-hidden">
                 <div className={`absolute top-0 w-full h-2 ${
-                  compatibility.score >= 80 ? 'bg-diagnostic-success' :
-                  compatibility.score >= 50 ? 'bg-diagnostic-warning' : 'bg-destructive'
+                  compatibility.harmonyScore >= 80 ? 'bg-diagnostic-success' :
+                  compatibility.harmonyScore >= 50 ? 'bg-diagnostic-warning' : 'bg-destructive'
                 }`} />
                 
                 <h3 className="text-lg font-medium text-muted-foreground">Harmony Score</h3>
                 <div className={`text-7xl font-bold tracking-tighter ${
-                  compatibility.score >= 80 ? 'text-diagnostic-success' :
-                  compatibility.score >= 50 ? 'text-diagnostic-warning' : 'text-destructive'
+                  compatibility.harmonyScore >= 80 ? 'text-diagnostic-success' :
+                  compatibility.harmonyScore >= 50 ? 'text-diagnostic-warning' : 'text-destructive'
                 }`}>
-                  {compatibility.score}
+                  {compatibility.harmonyScore}
                 </div>
                 <div className="text-sm text-muted-foreground max-w-[200px]">
-                  {compatibility.score >= 80 ? "Excellent compatibility. These tools are often used together." :
-                   compatibility.score >= 50 ? "Moderate compatibility. May require custom configuration." : 
+                  {compatibility.harmonyScore >= 80 ? "Excellent compatibility. These tools are often used together." :
+                   compatibility.harmonyScore >= 50 ? "Moderate compatibility. May require custom configuration." : 
                    "Poor compatibility. Significant friction expected."}
                 </div>
               </div>

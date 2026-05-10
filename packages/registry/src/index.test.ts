@@ -7,9 +7,9 @@ describe("registry", () => {
   });
 
   it("loads expected catalog counts", () => {
-    expect(defaultCatalog.tools).toHaveLength(33);
-    expect(defaultCatalog.categories).toHaveLength(10);
-    expect(defaultCatalog.rules).toHaveLength(53);
+    expect(defaultCatalog.tools).toHaveLength(97);
+    expect(defaultCatalog.categories).toHaveLength(20);
+    expect(defaultCatalog.rules).toHaveLength(93);
   });
 
   it("enriches every tool with Phase 2 metadata", () => {
@@ -29,5 +29,6 @@ describe("registry", () => {
     expect(loader.requireTool("nextjs").name).toBe("Next.js");
     expect(loader.getToolsByCategory("frontend").map((tool) => tool.id)).toContain("nextjs");
     expect(loader.searchTools("postgres").map((tool) => tool.id)).toContain("postgres");
+    expect(loader.searchTools("rag").map((tool) => tool.id)).toContain("pinecone");
   });
 });

@@ -78,5 +78,145 @@
     "required": false,
     "cardinality": "zero-or-one",
     "order": 10
+  },
+  {
+    "id": "agent-framework",
+    "name": "Agent Framework",
+    "description": "Frameworks for building agentic workflows, tool use, orchestration, and multi-agent systems",
+    "required": false,
+    "cardinality": "zero-or-one",
+    "order": 11,
+    "capabilities": [
+      "agents",
+      "orchestration",
+      "tool-calling",
+      "workflow"
+    ]
+  },
+  {
+    "id": "ai-model",
+    "name": "AI Model Provider",
+    "description": "Hosted model APIs and open model families used for generation, reasoning, embeddings, and multimodal features",
+    "required": false,
+    "cardinality": "zero-or-one",
+    "order": 12,
+    "capabilities": [
+      "llm",
+      "embeddings",
+      "reasoning",
+      "multimodal"
+    ]
+  },
+  {
+    "id": "vector-database",
+    "name": "Vector Database",
+    "description": "Vector storage and retrieval engines for semantic search, RAG, recommendations, and memory",
+    "required": false,
+    "cardinality": "zero-or-one",
+    "order": 13,
+    "capabilities": [
+      "vector-search",
+      "rag",
+      "embeddings",
+      "semantic-search"
+    ]
+  },
+  {
+    "id": "eval-observability",
+    "name": "Evaluation & Observability",
+    "description": "Platforms for tracing, evaluating, monitoring, and debugging AI applications",
+    "required": false,
+    "cardinality": "zero-or-one",
+    "order": 14,
+    "capabilities": [
+      "tracing",
+      "evals",
+      "monitoring",
+      "prompt-management"
+    ]
+  },
+  {
+    "id": "backend-framework",
+    "name": "Backend Framework",
+    "description": "Server frameworks and API layers for routing, RPC, middleware, and backend application structure",
+    "required": false,
+    "cardinality": "zero-or-one",
+    "order": 15,
+    "capabilities": [
+      "api",
+      "routing",
+      "middleware",
+      "rpc"
+    ]
+  },
+  {
+    "id": "queue-workflow",
+    "name": "Queue & Workflow",
+    "description": "Background job, queue, workflow, and durable execution platforms",
+    "required": false,
+    "cardinality": "zero-or-one",
+    "order": 16,
+    "capabilities": [
+      "queues",
+      "jobs",
+      "workflows",
+      "scheduling"
+    ]
+  },
+  {
+    "id": "testing",
+    "name": "Testing",
+    "description": "Unit, integration, browser, and end-to-end testing frameworks",
+    "required": false,
+    "cardinality": "zero-or-one",
+    "order": 17,
+    "capabilities": [
+      "unit-testing",
+      "e2e-testing",
+      "browser-testing",
+      "quality"
+    ]
+  },
+  {
+    "id": "monorepo",
+    "name": "Monorepo Tooling",
+    "description": "Workspace, task graph, and build orchestration tools for multi-package repositories",
+    "required": false,
+    "cardinality": "zero-or-one",
+    "order": 18,
+    "capabilities": [
+      "workspace",
+      "task-graph",
+      "build-cache",
+      "packages"
+    ]
+  },
+  {
+    "id": "cms",
+    "name": "CMS & Content",
+    "description": "Headless CMS and content platforms for structured content, editorial workflows, and media",
+    "required": false,
+    "cardinality": "zero-or-one",
+    "order": 19,
+    "capabilities": [
+      "content",
+      "headless-cms",
+      "editorial",
+      "media"
+    ]
+  },
+  {
+    "id": "mobile",
+    "name": "Mobile Framework",
+    "description": "Frameworks for building native, cross-platform, or hybrid mobile applications",
+    "required": false,
+    "cardinality": "zero-or-one",
+    "order": 20,
+    "capabilities": [
+      "mobile",
+      "ios",
+      "android",
+      "cross-platform"
+    ]
   }
 ]

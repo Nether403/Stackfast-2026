@@ -1,6 +1,7 @@
 import { ReactNode, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Layers, Database, Compass, ArrowRightLeft, Menu, X, Search } from "lucide-react";
+import { AuthStatus } from "@/components/AuthStatus";
 
 interface LayoutProps {
   children: ReactNode;
@@ -64,6 +65,7 @@ export function Layout({ children }: LayoutProps) {
                 />
               </div>
             </div>
+            <AuthStatus />
             <nav className="flex items-center">
               <button 
                 className="md:hidden p-2 text-foreground/60 hover:text-foreground"
@@ -111,6 +113,9 @@ export function Layout({ children }: LayoutProps) {
               </Link>
             ))}
           </nav>
+          <div className="border-t border-border/40 pt-4">
+            <AuthStatus />
+          </div>
         </div>
       )}
 

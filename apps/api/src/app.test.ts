@@ -55,7 +55,7 @@ describe("api", () => {
   });
 
   it("searches tools with pagination", async () => {
-    const response = await app.request("/api/v1/tools/search?q=next&limit=5");
+    const response = await app.request("/api/v1/tools/search?q=next.js&limit=5");
     const body = await response.json();
 
     expect(response.status).toBe(200);

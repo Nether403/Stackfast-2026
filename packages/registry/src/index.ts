@@ -88,7 +88,14 @@ export class CatalogLoader {
     }
 
     return this.catalog.tools.filter((tool) => {
-      const haystack = [tool.name, tool.description, ...tool.tags, ...tool.languages].join(" ").toLowerCase();
+      const haystack = [
+        tool.name,
+        tool.description,
+        ...tool.tags,
+        ...tool.languages,
+        ...tool.capabilities,
+        ...(tool.sourceUrls ?? []),
+      ].join(" ").toLowerCase();
       return haystack.includes(needle);
     });
   }

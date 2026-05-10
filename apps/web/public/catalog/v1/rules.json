@@ -167,8 +167,7 @@
     "toolB": "bun",
     "reason": "Next.js has experimental Bun support",
     "weight": 6
-  }
-,
+  },
   {
     "id": "capability-compat-remix-node",
     "version": "1.0.0",
@@ -273,7 +272,10 @@
     "version": "1.0.0",
     "kind": "requiresTool",
     "tool": "prisma",
-    "requiresAnyOf": ["postgres", "mysql"],
+    "requiresAnyOf": [
+      "postgres",
+      "mysql"
+    ],
     "reason": "Prisma requires a database to connect to",
     "severity": "error"
   },
@@ -282,7 +284,10 @@
     "version": "1.0.0",
     "kind": "requiresTool",
     "tool": "drizzle",
-    "requiresAnyOf": ["postgres", "mysql"],
+    "requiresAnyOf": [
+      "postgres",
+      "mysql"
+    ],
     "reason": "Drizzle ORM requires a database to connect to",
     "severity": "error"
   },
@@ -291,7 +296,10 @@
     "version": "1.0.0",
     "kind": "requiresTool",
     "tool": "typeorm",
-    "requiresAnyOf": ["postgres", "mysql"],
+    "requiresAnyOf": [
+      "postgres",
+      "mysql"
+    ],
     "reason": "TypeORM requires a database to connect to",
     "severity": "error"
   },
@@ -300,7 +308,9 @@
     "version": "1.0.0",
     "kind": "requiresTool",
     "tool": "mongoose",
-    "requiresAnyOf": ["mongodb"],
+    "requiresAnyOf": [
+      "mongodb"
+    ],
     "reason": "Mongoose requires MongoDB",
     "severity": "error"
   },
@@ -309,7 +319,9 @@
     "version": "1.0.0",
     "kind": "requiresTool",
     "tool": "nextauth",
-    "requiresAnyOf": ["nextjs"],
+    "requiresAnyOf": [
+      "nextjs"
+    ],
     "reason": "NextAuth.js is designed specifically for Next.js",
     "severity": "error"
   },
@@ -318,7 +330,9 @@
     "version": "1.0.0",
     "kind": "requiresTool",
     "tool": "uploadthing",
-    "requiresAnyOf": ["nextjs"],
+    "requiresAnyOf": [
+      "nextjs"
+    ],
     "reason": "UploadThing is designed specifically for Next.js",
     "severity": "error"
   },
@@ -436,5 +450,329 @@
     "kind": "categoryCoverage",
     "categoryId": "styling",
     "weight": 2
+  },
+  {
+    "id": "mutual-exclusive-agent-framework",
+    "version": "1.0.0",
+    "kind": "mutualExclusiveCategory",
+    "categoryId": "agent-framework",
+    "severity": "error"
+  },
+  {
+    "id": "mutual-exclusive-ai-model",
+    "version": "1.0.0",
+    "kind": "mutualExclusiveCategory",
+    "categoryId": "ai-model",
+    "severity": "error"
+  },
+  {
+    "id": "mutual-exclusive-vector-database",
+    "version": "1.0.0",
+    "kind": "mutualExclusiveCategory",
+    "categoryId": "vector-database",
+    "severity": "error"
+  },
+  {
+    "id": "mutual-exclusive-eval-observability",
+    "version": "1.0.0",
+    "kind": "mutualExclusiveCategory",
+    "categoryId": "eval-observability",
+    "severity": "error"
+  },
+  {
+    "id": "mutual-exclusive-backend-framework",
+    "version": "1.0.0",
+    "kind": "mutualExclusiveCategory",
+    "categoryId": "backend-framework",
+    "severity": "error"
+  },
+  {
+    "id": "mutual-exclusive-queue-workflow",
+    "version": "1.0.0",
+    "kind": "mutualExclusiveCategory",
+    "categoryId": "queue-workflow",
+    "severity": "error"
+  },
+  {
+    "id": "mutual-exclusive-testing",
+    "version": "1.0.0",
+    "kind": "mutualExclusiveCategory",
+    "categoryId": "testing",
+    "severity": "error"
+  },
+  {
+    "id": "mutual-exclusive-monorepo",
+    "version": "1.0.0",
+    "kind": "mutualExclusiveCategory",
+    "categoryId": "monorepo",
+    "severity": "error"
+  },
+  {
+    "id": "mutual-exclusive-cms",
+    "version": "1.0.0",
+    "kind": "mutualExclusiveCategory",
+    "categoryId": "cms",
+    "severity": "error"
+  },
+  {
+    "id": "mutual-exclusive-mobile",
+    "version": "1.0.0",
+    "kind": "mutualExclusiveCategory",
+    "categoryId": "mobile",
+    "severity": "error"
+  },
+  {
+    "id": "category-coverage-agent-framework",
+    "version": "1.0.0",
+    "kind": "categoryCoverage",
+    "categoryId": "agent-framework",
+    "weight": 3
+  },
+  {
+    "id": "category-coverage-ai-model",
+    "version": "1.0.0",
+    "kind": "categoryCoverage",
+    "categoryId": "ai-model",
+    "weight": 3
+  },
+  {
+    "id": "category-coverage-vector-database",
+    "version": "1.0.0",
+    "kind": "categoryCoverage",
+    "categoryId": "vector-database",
+    "weight": 2
+  },
+  {
+    "id": "category-coverage-eval-observability",
+    "version": "1.0.0",
+    "kind": "categoryCoverage",
+    "categoryId": "eval-observability",
+    "weight": 2
+  },
+  {
+    "id": "category-coverage-backend-framework",
+    "version": "1.0.0",
+    "kind": "categoryCoverage",
+    "categoryId": "backend-framework",
+    "weight": 2
+  },
+  {
+    "id": "category-coverage-queue-workflow",
+    "version": "1.0.0",
+    "kind": "categoryCoverage",
+    "categoryId": "queue-workflow",
+    "weight": 2
+  },
+  {
+    "id": "category-coverage-testing",
+    "version": "1.0.0",
+    "kind": "categoryCoverage",
+    "categoryId": "testing",
+    "weight": 2
+  },
+  {
+    "id": "category-coverage-monorepo",
+    "version": "1.0.0",
+    "kind": "categoryCoverage",
+    "categoryId": "monorepo",
+    "weight": 2
+  },
+  {
+    "id": "category-coverage-cms",
+    "version": "1.0.0",
+    "kind": "categoryCoverage",
+    "categoryId": "cms",
+    "weight": 2
+  },
+  {
+    "id": "category-coverage-mobile",
+    "version": "1.0.0",
+    "kind": "categoryCoverage",
+    "categoryId": "mobile",
+    "weight": 2
+  },
+  {
+    "id": "synergy-hono-cloudflare-workers",
+    "version": "1.0.0",
+    "kind": "synergy",
+    "toolA": "hono",
+    "toolB": "cloudflare-workers",
+    "reason": "Hono has first-class support for Cloudflare Workers edge deployments",
+    "weight": 8
+  },
+  {
+    "id": "synergy-hono-cloudflare-pages",
+    "version": "1.0.0",
+    "kind": "synergy",
+    "toolA": "hono",
+    "toolB": "cloudflare-pages",
+    "reason": "Hono integrates cleanly with Cloudflare Pages Functions and Workers",
+    "weight": 6
+  },
+  {
+    "id": "synergy-nextjs-vercel-ai-sdk",
+    "version": "1.0.0",
+    "kind": "synergy",
+    "toolA": "nextjs",
+    "toolB": "vercel-ai-sdk",
+    "reason": "Vercel AI SDK provides streaming UI patterns designed for Next.js applications",
+    "weight": 8
+  },
+  {
+    "id": "synergy-langchain-openai",
+    "version": "1.0.0",
+    "kind": "synergy",
+    "toolA": "langchain",
+    "toolB": "openai",
+    "reason": "LangChain includes mature OpenAI model, embedding, and tool integrations",
+    "weight": 8
+  },
+  {
+    "id": "synergy-langgraph-openai",
+    "version": "1.0.0",
+    "kind": "synergy",
+    "toolA": "langgraph",
+    "toolB": "openai",
+    "reason": "LangGraph works well with OpenAI tool-calling for stateful agent workflows",
+    "weight": 8
+  },
+  {
+    "id": "synergy-langchain-langsmith",
+    "version": "1.0.0",
+    "kind": "synergy",
+    "toolA": "langchain",
+    "toolB": "langsmith",
+    "reason": "LangSmith provides native tracing and evaluation workflows for LangChain apps",
+    "weight": 8
+  },
+  {
+    "id": "synergy-langgraph-langsmith",
+    "version": "1.0.0",
+    "kind": "synergy",
+    "toolA": "langgraph",
+    "toolB": "langsmith",
+    "reason": "LangSmith helps inspect and evaluate LangGraph state transitions and runs",
+    "weight": 8
+  },
+  {
+    "id": "synergy-langchain-pinecone",
+    "version": "1.0.0",
+    "kind": "synergy",
+    "toolA": "langchain",
+    "toolB": "pinecone",
+    "reason": "LangChain includes retriever and vector store integrations for Pinecone",
+    "weight": 6
+  },
+  {
+    "id": "synergy-langchain-qdrant",
+    "version": "1.0.0",
+    "kind": "synergy",
+    "toolA": "langchain",
+    "toolB": "qdrant",
+    "reason": "LangChain supports Qdrant vector store integrations for RAG pipelines",
+    "weight": 6
+  },
+  {
+    "id": "synergy-better-auth-drizzle",
+    "version": "1.0.0",
+    "kind": "synergy",
+    "toolA": "better-auth",
+    "toolB": "drizzle",
+    "reason": "Better Auth provides a Drizzle adapter for self-hosted TypeScript authentication",
+    "weight": 6
+  },
+  {
+    "id": "synergy-better-auth-nextjs",
+    "version": "1.0.0",
+    "kind": "synergy",
+    "toolA": "better-auth",
+    "toolB": "nextjs",
+    "reason": "Better Auth includes framework patterns that work well with Next.js apps",
+    "weight": 5
+  },
+  {
+    "id": "synergy-neon-drizzle",
+    "version": "1.0.0",
+    "kind": "synergy",
+    "toolA": "neon",
+    "toolB": "drizzle",
+    "reason": "Drizzle pairs well with Neon serverless Postgres for TypeScript apps",
+    "weight": 6
+  },
+  {
+    "id": "synergy-supabase-db-supabase-auth",
+    "version": "1.0.0",
+    "kind": "synergy",
+    "toolA": "supabase-db",
+    "toolB": "supabase-auth",
+    "reason": "Supabase Auth is built around Supabase Postgres projects and policies",
+    "weight": 8
+  },
+  {
+    "id": "synergy-bullmq-redis",
+    "version": "1.0.0",
+    "kind": "synergy",
+    "toolA": "bullmq",
+    "toolB": "redis",
+    "reason": "BullMQ requires Redis and is optimized for Redis-backed queues",
+    "weight": 8
+  },
+  {
+    "id": "synergy-vitest-vite",
+    "version": "1.0.0",
+    "kind": "synergy",
+    "toolA": "vitest",
+    "toolB": "vite",
+    "reason": "Vitest is Vite-native and reuses Vite configuration and plugins",
+    "weight": 8
+  },
+  {
+    "id": "synergy-playwright-nextjs",
+    "version": "1.0.0",
+    "kind": "synergy",
+    "toolA": "playwright",
+    "toolB": "nextjs",
+    "reason": "Playwright is a strong fit for end-to-end testing modern Next.js apps",
+    "weight": 4
+  },
+  {
+    "id": "synergy-turborepo-nextjs",
+    "version": "1.0.0",
+    "kind": "synergy",
+    "toolA": "turborepo",
+    "toolB": "nextjs",
+    "reason": "Turborepo is commonly used to orchestrate multi-package Next.js workspaces",
+    "weight": 6
+  },
+  {
+    "id": "synergy-pnpm-turborepo",
+    "version": "1.0.0",
+    "kind": "synergy",
+    "toolA": "pnpm-workspaces",
+    "toolB": "turborepo",
+    "reason": "pnpm workspaces provide efficient package linking for Turborepo monorepos",
+    "weight": 6
+  },
+  {
+    "id": "requires-bullmq-redis",
+    "version": "1.0.0",
+    "kind": "requiresTool",
+    "tool": "bullmq",
+    "requiresAnyOf": [
+      "redis"
+    ],
+    "reason": "BullMQ requires Redis as its backing queue store",
+    "severity": "error"
+  },
+  {
+    "id": "requires-expo-react-native",
+    "version": "1.0.0",
+    "kind": "requiresTool",
+    "tool": "expo",
+    "requiresAnyOf": [
+      "react-native"
+    ],
+    "reason": "Expo is built on top of React Native",
+    "severity": "warn"
   }
 ]

@@ -5,6 +5,7 @@ import { BlueprintBuilder } from '@/pages/BlueprintBuilder';
 import { ToolCatalog } from '@/pages/ToolCatalog';
 import { CompatibilityView } from '@/pages/CompatibilityView';
 import { MigrationExplorer } from '@/pages/MigrationExplorer';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -18,19 +19,21 @@ const queryClient = new QueryClient({
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Switch>
-        <Route path="/" component={StackBuilderPage} />
-        <Route path="/stack-builder" component={StackBuilderPage} />
-        <Route path="/blueprint" component={BlueprintBuilder} />
-        <Route path="/catalog" component={ToolCatalog} />
-        <Route path="/compatibility" component={CompatibilityView} />
-        <Route path="/migration" component={MigrationExplorer} />
-        <Route>
-          <div className="flex h-screen items-center justify-center">
-            <h1 className="text-2xl font-bold">404 - Page Not Found</h1>
-          </div>
-        </Route>
-      </Switch>
+      <ErrorBoundary>
+        <Switch>
+          <Route path="/" component={StackBuilderPage} />
+          <Route path="/stack-builder" component={StackBuilderPage} />
+          <Route path="/blueprint" component={BlueprintBuilder} />
+          <Route path="/catalog" component={ToolCatalog} />
+          <Route path="/compatibility" component={CompatibilityView} />
+          <Route path="/migration" component={MigrationExplorer} />
+          <Route>
+            <div className="flex h-screen items-center justify-center">
+              <h1 className="text-2xl font-bold">404 - Page Not Found</h1>
+            </div>
+          </Route>
+        </Switch>
+      </ErrorBoundary>
     </QueryClientProvider>
   );
 }

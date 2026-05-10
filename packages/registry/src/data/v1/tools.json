@@ -4,13 +4,34 @@
     "name": "Next.js",
     "categoryId": "frontend",
     "description": "React framework with server-side rendering, static generation, and API routes",
-    "tags": ["react", "ssr", "ssg", "full-stack"],
-    "languages": ["TypeScript", "JavaScript"],
+    "tags": [
+      "react",
+      "ssr",
+      "ssg",
+      "full-stack"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
     "supports": {
-      "runtime": ["node", "bun"],
-      "frameworks": ["nextjs"]
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "frameworks": [
+        "nextjs"
+      ]
     },
-    "integrations": ["vercel", "tailwind", "prisma", "drizzle", "clerk", "nextauth", "stripe"],
+    "integrations": [
+      "vercel",
+      "tailwind",
+      "prisma",
+      "drizzle",
+      "clerk",
+      "nextauth",
+      "stripe"
+    ],
     "pricing": {
       "model": "free",
       "url": "https://nextjs.org"
@@ -24,13 +45,32 @@
     "name": "Remix",
     "categoryId": "frontend",
     "description": "Full-stack web framework focused on web standards and modern UX",
-    "tags": ["react", "ssr", "full-stack", "web-standards"],
-    "languages": ["TypeScript", "JavaScript"],
+    "tags": [
+      "react",
+      "ssr",
+      "full-stack",
+      "web-standards"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
     "supports": {
-      "runtime": ["node", "bun"],
-      "frameworks": ["remix"]
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "frameworks": [
+        "remix"
+      ]
     },
-    "integrations": ["fly", "railway", "tailwind", "prisma", "drizzle"],
+    "integrations": [
+      "fly",
+      "railway",
+      "tailwind",
+      "prisma",
+      "drizzle"
+    ],
     "pricing": {
       "model": "free",
       "url": "https://remix.run"
@@ -44,13 +84,30 @@
     "name": "Astro",
     "categoryId": "frontend",
     "description": "Content-focused framework with islands architecture and zero JS by default",
-    "tags": ["mpa", "ssg", "content", "islands"],
-    "languages": ["TypeScript", "JavaScript"],
+    "tags": [
+      "mpa",
+      "ssg",
+      "content",
+      "islands"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
     "supports": {
-      "runtime": ["node", "bun"],
-      "frameworks": ["astro"]
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "frameworks": [
+        "astro"
+      ]
     },
-    "integrations": ["vercel", "netlify", "tailwind"],
+    "integrations": [
+      "vercel",
+      "netlify",
+      "tailwind"
+    ],
     "pricing": {
       "model": "free",
       "url": "https://astro.build"
@@ -64,13 +121,31 @@
     "name": "SvelteKit",
     "categoryId": "frontend",
     "description": "Full-stack framework built on Svelte with excellent performance",
-    "tags": ["svelte", "ssr", "ssg", "full-stack"],
-    "languages": ["TypeScript", "JavaScript"],
+    "tags": [
+      "svelte",
+      "ssr",
+      "ssg",
+      "full-stack"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
     "supports": {
-      "runtime": ["node", "bun"],
-      "frameworks": ["sveltekit"]
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "frameworks": [
+        "sveltekit"
+      ]
     },
-    "integrations": ["vercel", "netlify", "tailwind", "prisma"],
+    "integrations": [
+      "vercel",
+      "netlify",
+      "tailwind",
+      "prisma"
+    ],
     "pricing": {
       "model": "free",
       "url": "https://kit.svelte.dev"
@@ -84,10 +159,19 @@
     "name": "Node.js",
     "categoryId": "runtime",
     "description": "JavaScript runtime built on Chrome's V8 engine",
-    "tags": ["runtime", "javascript", "v8"],
-    "languages": ["JavaScript", "TypeScript"],
+    "tags": [
+      "runtime",
+      "javascript",
+      "v8"
+    ],
+    "languages": [
+      "JavaScript",
+      "TypeScript"
+    ],
     "supports": {
-      "runtime": ["node"]
+      "runtime": [
+        "node"
+      ]
     },
     "integrations": [],
     "pricing": {
@@ -103,10 +187,20 @@
     "name": "Bun",
     "categoryId": "runtime",
     "description": "Fast all-in-one JavaScript runtime with built-in bundler and package manager",
-    "tags": ["runtime", "javascript", "fast", "bundler"],
-    "languages": ["JavaScript", "TypeScript"],
+    "tags": [
+      "runtime",
+      "javascript",
+      "fast",
+      "bundler"
+    ],
+    "languages": [
+      "JavaScript",
+      "TypeScript"
+    ],
     "supports": {
-      "runtime": ["bun"]
+      "runtime": [
+        "bun"
+      ]
     },
     "integrations": [],
     "pricing": {
@@ -116,22 +210,41 @@
     "docsUrl": "https://bun.sh/docs",
     "homepageUrl": "https://bun.sh",
     "exportRecipeId": "bun"
-  }
-,
+  },
   {
     "id": "vercel",
     "name": "Vercel",
     "categoryId": "hosting",
     "description": "Cloud platform optimized for frontend frameworks and serverless functions",
-    "tags": ["hosting", "serverless", "edge", "cdn"],
+    "tags": [
+      "hosting",
+      "serverless",
+      "edge",
+      "cdn"
+    ],
     "hosted": true,
     "selfHostable": false,
-    "languages": ["JavaScript", "TypeScript"],
+    "languages": [
+      "JavaScript",
+      "TypeScript"
+    ],
     "supports": {
-      "runtime": ["node", "bun"],
-      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "frameworks": [
+        "nextjs",
+        "remix",
+        "astro",
+        "sveltekit"
+      ]
     },
-    "integrations": ["nextjs", "postgres", "stripe"],
+    "integrations": [
+      "nextjs",
+      "postgres",
+      "stripe"
+    ],
     "pricing": {
       "model": "free-tier",
       "note": "Free for hobby projects, paid plans for teams",
@@ -146,16 +259,39 @@
     "name": "Railway",
     "categoryId": "hosting",
     "description": "Infrastructure platform with databases, services, and instant deployments",
-    "tags": ["hosting", "infrastructure", "databases"],
+    "tags": [
+      "hosting",
+      "infrastructure",
+      "databases"
+    ],
     "hosted": true,
     "selfHostable": false,
-    "languages": ["JavaScript", "TypeScript"],
+    "languages": [
+      "JavaScript",
+      "TypeScript"
+    ],
     "supports": {
-      "runtime": ["node", "bun"],
-      "frameworks": ["nextjs", "remix", "astro", "sveltekit"],
-      "dbs": ["postgres", "mysql", "mongodb"]
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "frameworks": [
+        "nextjs",
+        "remix",
+        "astro",
+        "sveltekit"
+      ],
+      "dbs": [
+        "postgres",
+        "mysql",
+        "mongodb"
+      ]
     },
-    "integrations": ["postgres", "mysql", "mongodb"],
+    "integrations": [
+      "postgres",
+      "mysql",
+      "mongodb"
+    ],
     "pricing": {
       "model": "free-tier",
       "note": "$5 free credit monthly, pay-as-you-go",
@@ -170,16 +306,35 @@
     "name": "Fly.io",
     "categoryId": "hosting",
     "description": "Global application platform running apps close to users",
-    "tags": ["hosting", "edge", "global"],
+    "tags": [
+      "hosting",
+      "edge",
+      "global"
+    ],
     "hosted": true,
     "selfHostable": false,
-    "languages": ["JavaScript", "TypeScript"],
+    "languages": [
+      "JavaScript",
+      "TypeScript"
+    ],
     "supports": {
-      "runtime": ["node", "bun"],
-      "frameworks": ["nextjs", "remix", "astro", "sveltekit"],
-      "dbs": ["postgres"]
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "frameworks": [
+        "nextjs",
+        "remix",
+        "astro",
+        "sveltekit"
+      ],
+      "dbs": [
+        "postgres"
+      ]
     },
-    "integrations": ["postgres"],
+    "integrations": [
+      "postgres"
+    ],
     "pricing": {
       "model": "free-tier",
       "note": "Free allowances, pay for usage",
@@ -194,13 +349,27 @@
     "name": "Netlify",
     "categoryId": "hosting",
     "description": "Platform for web projects with continuous deployment and serverless functions",
-    "tags": ["hosting", "jamstack", "serverless"],
+    "tags": [
+      "hosting",
+      "jamstack",
+      "serverless"
+    ],
     "hosted": true,
     "selfHostable": false,
-    "languages": ["JavaScript", "TypeScript"],
+    "languages": [
+      "JavaScript",
+      "TypeScript"
+    ],
     "supports": {
-      "runtime": ["node"],
-      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+      "runtime": [
+        "node"
+      ],
+      "frameworks": [
+        "nextjs",
+        "remix",
+        "astro",
+        "sveltekit"
+      ]
     },
     "integrations": [],
     "pricing": {
@@ -217,14 +386,29 @@
     "name": "PostgreSQL",
     "categoryId": "database",
     "description": "Advanced open-source relational database with strong standards compliance",
-    "tags": ["database", "sql", "relational"],
+    "tags": [
+      "database",
+      "sql",
+      "relational"
+    ],
     "hosted": false,
     "selfHostable": true,
-    "languages": ["SQL"],
+    "languages": [
+      "SQL"
+    ],
     "supports": {
-      "dbs": ["postgres"]
+      "dbs": [
+        "postgres"
+      ]
     },
-    "integrations": ["prisma", "drizzle", "typeorm", "vercel", "railway", "fly"],
+    "integrations": [
+      "prisma",
+      "drizzle",
+      "typeorm",
+      "vercel",
+      "railway",
+      "fly"
+    ],
     "pricing": {
       "model": "free",
       "note": "Open source, hosting costs vary",
@@ -239,14 +423,25 @@
     "name": "MongoDB",
     "categoryId": "database",
     "description": "Document-oriented NoSQL database with flexible schema",
-    "tags": ["database", "nosql", "document"],
+    "tags": [
+      "database",
+      "nosql",
+      "document"
+    ],
     "hosted": false,
     "selfHostable": true,
-    "languages": ["JavaScript"],
+    "languages": [
+      "JavaScript"
+    ],
     "supports": {
-      "dbs": ["mongodb"]
+      "dbs": [
+        "mongodb"
+      ]
     },
-    "integrations": ["mongoose", "railway"],
+    "integrations": [
+      "mongoose",
+      "railway"
+    ],
     "pricing": {
       "model": "free-tier",
       "note": "Free tier on MongoDB Atlas",
@@ -261,14 +456,27 @@
     "name": "MySQL",
     "categoryId": "database",
     "description": "Popular open-source relational database management system",
-    "tags": ["database", "sql", "relational"],
+    "tags": [
+      "database",
+      "sql",
+      "relational"
+    ],
     "hosted": false,
     "selfHostable": true,
-    "languages": ["SQL"],
+    "languages": [
+      "SQL"
+    ],
     "supports": {
-      "dbs": ["mysql"]
+      "dbs": [
+        "mysql"
+      ]
     },
-    "integrations": ["prisma", "drizzle", "typeorm", "railway"],
+    "integrations": [
+      "prisma",
+      "drizzle",
+      "typeorm",
+      "railway"
+    ],
     "pricing": {
       "model": "free",
       "note": "Open source, hosting costs vary",
@@ -283,14 +491,37 @@
     "name": "Prisma",
     "categoryId": "orm",
     "description": "Next-generation ORM with type-safe database client and migrations",
-    "tags": ["orm", "typescript", "type-safe"],
-    "languages": ["TypeScript", "JavaScript"],
+    "tags": [
+      "orm",
+      "typescript",
+      "type-safe"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
     "supports": {
-      "runtime": ["node", "bun"],
-      "dbs": ["postgres", "mysql", "sqlite"],
-      "frameworks": ["nextjs", "remix", "sveltekit"]
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "dbs": [
+        "postgres",
+        "mysql",
+        "sqlite"
+      ],
+      "frameworks": [
+        "nextjs",
+        "remix",
+        "sveltekit"
+      ]
     },
-    "integrations": ["postgres", "mysql", "nextjs", "remix"],
+    "integrations": [
+      "postgres",
+      "mysql",
+      "nextjs",
+      "remix"
+    ],
     "requires": {
       "categoryId": "database"
     },
@@ -307,14 +538,36 @@
     "name": "Drizzle ORM",
     "categoryId": "orm",
     "description": "Lightweight TypeScript ORM with SQL-like syntax and excellent performance",
-    "tags": ["orm", "typescript", "lightweight"],
-    "languages": ["TypeScript", "JavaScript"],
+    "tags": [
+      "orm",
+      "typescript",
+      "lightweight"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
     "supports": {
-      "runtime": ["node", "bun"],
-      "dbs": ["postgres", "mysql", "sqlite"],
-      "frameworks": ["nextjs", "remix", "sveltekit"]
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "dbs": [
+        "postgres",
+        "mysql",
+        "sqlite"
+      ],
+      "frameworks": [
+        "nextjs",
+        "remix",
+        "sveltekit"
+      ]
     },
-    "integrations": ["postgres", "mysql", "nextjs"],
+    "integrations": [
+      "postgres",
+      "mysql",
+      "nextjs"
+    ],
     "requires": {
       "categoryId": "database"
     },
@@ -331,14 +584,35 @@
     "name": "TypeORM",
     "categoryId": "orm",
     "description": "Mature ORM supporting Active Record and Data Mapper patterns",
-    "tags": ["orm", "typescript", "decorators"],
-    "languages": ["TypeScript", "JavaScript"],
+    "tags": [
+      "orm",
+      "typescript",
+      "decorators"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
     "supports": {
-      "runtime": ["node", "bun"],
-      "dbs": ["postgres", "mysql", "sqlite"],
-      "frameworks": ["nextjs", "remix", "sveltekit"]
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "dbs": [
+        "postgres",
+        "mysql",
+        "sqlite"
+      ],
+      "frameworks": [
+        "nextjs",
+        "remix",
+        "sveltekit"
+      ]
     },
-    "integrations": ["postgres", "mysql"],
+    "integrations": [
+      "postgres",
+      "mysql"
+    ],
     "requires": {
       "categoryId": "database"
     },
@@ -355,16 +629,36 @@
     "name": "Mongoose",
     "categoryId": "orm",
     "description": "MongoDB object modeling for Node.js with schema validation",
-    "tags": ["orm", "mongodb", "schemas"],
-    "languages": ["TypeScript", "JavaScript"],
+    "tags": [
+      "orm",
+      "mongodb",
+      "schemas"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
     "supports": {
-      "runtime": ["node", "bun"],
-      "dbs": ["mongodb"],
-      "frameworks": ["nextjs", "remix", "sveltekit"]
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "dbs": [
+        "mongodb"
+      ],
+      "frameworks": [
+        "nextjs",
+        "remix",
+        "sveltekit"
+      ]
     },
-    "integrations": ["mongodb"],
+    "integrations": [
+      "mongodb"
+    ],
     "requires": {
-      "anyOfToolIds": ["mongodb"]
+      "anyOfToolIds": [
+        "mongodb"
+      ]
     },
     "pricing": {
       "model": "free",
@@ -373,22 +667,39 @@
     "docsUrl": "https://mongoosejs.com/docs",
     "homepageUrl": "https://mongoosejs.com",
     "exportRecipeId": "mongoose"
-  }
-,
+  },
   {
     "id": "clerk",
     "name": "Clerk",
     "categoryId": "auth",
     "description": "Complete user management with authentication, profiles, and organizations",
-    "tags": ["auth", "user-management", "saas"],
+    "tags": [
+      "auth",
+      "user-management",
+      "saas"
+    ],
     "hosted": true,
     "selfHostable": false,
-    "languages": ["TypeScript", "JavaScript"],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
     "supports": {
-      "runtime": ["node", "bun"],
-      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "frameworks": [
+        "nextjs",
+        "remix",
+        "astro",
+        "sveltekit"
+      ]
     },
-    "integrations": ["nextjs", "stripe"],
+    "integrations": [
+      "nextjs",
+      "stripe"
+    ],
     "pricing": {
       "model": "free-tier",
       "note": "Free up to 10k MAU, paid plans available",
@@ -403,15 +714,32 @@
     "name": "Auth0",
     "categoryId": "auth",
     "description": "Enterprise-grade authentication and authorization platform",
-    "tags": ["auth", "enterprise", "oauth"],
+    "tags": [
+      "auth",
+      "enterprise",
+      "oauth"
+    ],
     "hosted": true,
     "selfHostable": false,
-    "languages": ["TypeScript", "JavaScript"],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
     "supports": {
-      "runtime": ["node", "bun"],
-      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "frameworks": [
+        "nextjs",
+        "remix",
+        "astro",
+        "sveltekit"
+      ]
     },
-    "integrations": ["nextjs"],
+    "integrations": [
+      "nextjs"
+    ],
     "pricing": {
       "model": "free-tier",
       "note": "Free up to 7k MAU",
@@ -426,17 +754,34 @@
     "name": "NextAuth.js",
     "categoryId": "auth",
     "description": "Open-source authentication solution designed for Next.js",
-    "tags": ["auth", "nextjs", "oauth"],
+    "tags": [
+      "auth",
+      "nextjs",
+      "oauth"
+    ],
     "hosted": false,
     "selfHostable": true,
-    "languages": ["TypeScript", "JavaScript"],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
     "supports": {
-      "runtime": ["node", "bun"],
-      "frameworks": ["nextjs"]
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "frameworks": [
+        "nextjs"
+      ]
     },
-    "integrations": ["nextjs", "prisma"],
+    "integrations": [
+      "nextjs",
+      "prisma"
+    ],
     "requires": {
-      "anyOfToolIds": ["nextjs"]
+      "anyOfToolIds": [
+        "nextjs"
+      ]
     },
     "pricing": {
       "model": "free",
@@ -451,16 +796,35 @@
     "name": "Supabase Auth",
     "categoryId": "auth",
     "description": "Open-source authentication with email, OAuth, and magic links",
-    "tags": ["auth", "open-source", "postgres"],
+    "tags": [
+      "auth",
+      "open-source",
+      "postgres"
+    ],
     "hosted": true,
     "selfHostable": true,
-    "languages": ["TypeScript", "JavaScript"],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
     "supports": {
-      "runtime": ["node", "bun"],
-      "frameworks": ["nextjs", "remix", "astro", "sveltekit"],
-      "dbs": ["postgres"]
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "frameworks": [
+        "nextjs",
+        "remix",
+        "astro",
+        "sveltekit"
+      ],
+      "dbs": [
+        "postgres"
+      ]
     },
-    "integrations": ["postgres"],
+    "integrations": [
+      "postgres"
+    ],
     "pricing": {
       "model": "free-tier",
       "note": "Free tier with 50k MAU",
@@ -475,15 +839,33 @@
     "name": "Stripe",
     "categoryId": "payments",
     "description": "Complete payment infrastructure with subscriptions and billing",
-    "tags": ["payments", "subscriptions", "billing"],
+    "tags": [
+      "payments",
+      "subscriptions",
+      "billing"
+    ],
     "hosted": true,
     "selfHostable": false,
-    "languages": ["TypeScript", "JavaScript"],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
     "supports": {
-      "runtime": ["node", "bun"],
-      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "frameworks": [
+        "nextjs",
+        "remix",
+        "astro",
+        "sveltekit"
+      ]
     },
-    "integrations": ["nextjs", "clerk"],
+    "integrations": [
+      "nextjs",
+      "clerk"
+    ],
     "pricing": {
       "model": "paid",
       "note": "2.9% + 30¢ per transaction",
@@ -498,13 +880,28 @@
     "name": "Lemon Squeezy",
     "categoryId": "payments",
     "description": "All-in-one platform for payments, tax, and subscriptions",
-    "tags": ["payments", "subscriptions", "tax"],
+    "tags": [
+      "payments",
+      "subscriptions",
+      "tax"
+    ],
     "hosted": true,
     "selfHostable": false,
-    "languages": ["TypeScript", "JavaScript"],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
     "supports": {
-      "runtime": ["node", "bun"],
-      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "frameworks": [
+        "nextjs",
+        "remix",
+        "astro",
+        "sveltekit"
+      ]
     },
     "integrations": [],
     "pricing": {
@@ -521,13 +918,28 @@
     "name": "Paddle",
     "categoryId": "payments",
     "description": "Payment infrastructure with merchant of record services",
-    "tags": ["payments", "subscriptions", "mor"],
+    "tags": [
+      "payments",
+      "subscriptions",
+      "mor"
+    ],
     "hosted": true,
     "selfHostable": false,
-    "languages": ["TypeScript", "JavaScript"],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
     "supports": {
-      "runtime": ["node", "bun"],
-      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "frameworks": [
+        "nextjs",
+        "remix",
+        "astro",
+        "sveltekit"
+      ]
     },
     "integrations": [],
     "pricing": {
@@ -544,15 +956,32 @@
     "name": "Resend",
     "categoryId": "email",
     "description": "Modern email API for developers with React email templates",
-    "tags": ["email", "transactional", "react"],
+    "tags": [
+      "email",
+      "transactional",
+      "react"
+    ],
     "hosted": true,
     "selfHostable": false,
-    "languages": ["TypeScript", "JavaScript"],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
     "supports": {
-      "runtime": ["node", "bun"],
-      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "frameworks": [
+        "nextjs",
+        "remix",
+        "astro",
+        "sveltekit"
+      ]
     },
-    "integrations": ["nextjs"],
+    "integrations": [
+      "nextjs"
+    ],
     "pricing": {
       "model": "free-tier",
       "note": "100 emails/day free, paid plans available",
@@ -567,13 +996,28 @@
     "name": "SendGrid",
     "categoryId": "email",
     "description": "Reliable email delivery platform with marketing tools",
-    "tags": ["email", "transactional", "marketing"],
+    "tags": [
+      "email",
+      "transactional",
+      "marketing"
+    ],
     "hosted": true,
     "selfHostable": false,
-    "languages": ["TypeScript", "JavaScript"],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
     "supports": {
-      "runtime": ["node", "bun"],
-      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "frameworks": [
+        "nextjs",
+        "remix",
+        "astro",
+        "sveltekit"
+      ]
     },
     "integrations": [],
     "pricing": {
@@ -590,13 +1034,28 @@
     "name": "Postmark",
     "categoryId": "email",
     "description": "Fast and reliable transactional email service",
-    "tags": ["email", "transactional", "reliable"],
+    "tags": [
+      "email",
+      "transactional",
+      "reliable"
+    ],
     "hosted": true,
     "selfHostable": false,
-    "languages": ["TypeScript", "JavaScript"],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
     "supports": {
-      "runtime": ["node", "bun"],
-      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "frameworks": [
+        "nextjs",
+        "remix",
+        "astro",
+        "sveltekit"
+      ]
     },
     "integrations": [],
     "pricing": {
@@ -613,13 +1072,28 @@
     "name": "AWS S3",
     "categoryId": "storage",
     "description": "Scalable object storage with industry-leading durability",
-    "tags": ["storage", "cloud", "aws"],
+    "tags": [
+      "storage",
+      "cloud",
+      "aws"
+    ],
     "hosted": true,
     "selfHostable": false,
-    "languages": ["TypeScript", "JavaScript"],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
     "supports": {
-      "runtime": ["node", "bun"],
-      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "frameworks": [
+        "nextjs",
+        "remix",
+        "astro",
+        "sveltekit"
+      ]
     },
     "integrations": [],
     "pricing": {
@@ -636,13 +1110,29 @@
     "name": "Cloudinary",
     "categoryId": "storage",
     "description": "Media management platform with image and video transformations",
-    "tags": ["storage", "media", "cdn", "transformations"],
+    "tags": [
+      "storage",
+      "media",
+      "cdn",
+      "transformations"
+    ],
     "hosted": true,
     "selfHostable": false,
-    "languages": ["TypeScript", "JavaScript"],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
     "supports": {
-      "runtime": ["node", "bun"],
-      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "frameworks": [
+        "nextjs",
+        "remix",
+        "astro",
+        "sveltekit"
+      ]
     },
     "integrations": [],
     "pricing": {
@@ -659,17 +1149,33 @@
     "name": "UploadThing",
     "categoryId": "storage",
     "description": "Simple file uploads for Next.js with type-safe API",
-    "tags": ["storage", "uploads", "nextjs"],
+    "tags": [
+      "storage",
+      "uploads",
+      "nextjs"
+    ],
     "hosted": true,
     "selfHostable": false,
-    "languages": ["TypeScript", "JavaScript"],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
     "supports": {
-      "runtime": ["node", "bun"],
-      "frameworks": ["nextjs"]
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "frameworks": [
+        "nextjs"
+      ]
     },
-    "integrations": ["nextjs"],
+    "integrations": [
+      "nextjs"
+    ],
     "requires": {
-      "anyOfToolIds": ["nextjs"]
+      "anyOfToolIds": [
+        "nextjs"
+      ]
     },
     "pricing": {
       "model": "free-tier",
@@ -685,13 +1191,32 @@
     "name": "Tailwind CSS",
     "categoryId": "styling",
     "description": "Utility-first CSS framework for rapid UI development",
-    "tags": ["css", "utility-first", "responsive"],
-    "languages": ["CSS"],
+    "tags": [
+      "css",
+      "utility-first",
+      "responsive"
+    ],
+    "languages": [
+      "CSS"
+    ],
     "supports": {
-      "runtime": ["node", "bun"],
-      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "frameworks": [
+        "nextjs",
+        "remix",
+        "astro",
+        "sveltekit"
+      ]
     },
-    "integrations": ["nextjs", "remix", "astro", "sveltekit"],
+    "integrations": [
+      "nextjs",
+      "remix",
+      "astro",
+      "sveltekit"
+    ],
     "pricing": {
       "model": "free",
       "url": "https://tailwindcss.com"
@@ -705,11 +1230,25 @@
     "name": "CSS Modules",
     "categoryId": "styling",
     "description": "Locally scoped CSS with automatic unique class names",
-    "tags": ["css", "scoped", "modular"],
-    "languages": ["CSS"],
+    "tags": [
+      "css",
+      "scoped",
+      "modular"
+    ],
+    "languages": [
+      "CSS"
+    ],
     "supports": {
-      "runtime": ["node", "bun"],
-      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "frameworks": [
+        "nextjs",
+        "remix",
+        "astro",
+        "sveltekit"
+      ]
     },
     "integrations": [],
     "pricing": {
@@ -725,11 +1264,25 @@
     "name": "vanilla-extract",
     "categoryId": "styling",
     "description": "Zero-runtime CSS-in-TypeScript with type-safe styles",
-    "tags": ["css", "typescript", "zero-runtime"],
-    "languages": ["TypeScript"],
+    "tags": [
+      "css",
+      "typescript",
+      "zero-runtime"
+    ],
+    "languages": [
+      "TypeScript"
+    ],
     "supports": {
-      "runtime": ["node", "bun"],
-      "frameworks": ["nextjs", "remix", "astro", "sveltekit"]
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "frameworks": [
+        "nextjs",
+        "remix",
+        "astro",
+        "sveltekit"
+      ]
     },
     "integrations": [],
     "pricing": {
@@ -739,5 +1292,2169 @@
     "docsUrl": "https://vanilla-extract.style/documentation",
     "homepageUrl": "https://vanilla-extract.style",
     "exportRecipeId": "vanilla-extract"
+  },
+  {
+    "id": "react",
+    "name": "React",
+    "categoryId": "frontend",
+    "description": "Component library for building interactive user interfaces and application shells",
+    "tags": [
+      "frontend",
+      "components",
+      "spa",
+      "ui"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "runtime": [
+        "node",
+        "bun"
+      ]
+    },
+    "integrations": [
+      "vite",
+      "tailwind",
+      "vercel",
+      "netlify"
+    ],
+    "pricing": {
+      "model": "free",
+      "url": "https://react.dev"
+    },
+    "docsUrl": "https://react.dev/learn",
+    "homepageUrl": "https://react.dev"
+  },
+  {
+    "id": "vue",
+    "name": "Vue.js",
+    "categoryId": "frontend",
+    "description": "Progressive JavaScript framework for building approachable reactive web interfaces",
+    "tags": [
+      "frontend",
+      "components",
+      "reactive",
+      "spa"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "runtime": [
+        "node",
+        "bun"
+      ]
+    },
+    "integrations": [
+      "vite",
+      "tailwind",
+      "vercel",
+      "netlify"
+    ],
+    "pricing": {
+      "model": "free",
+      "url": "https://vuejs.org"
+    },
+    "docsUrl": "https://vuejs.org/guide/introduction.html",
+    "homepageUrl": "https://vuejs.org"
+  },
+  {
+    "id": "nuxt",
+    "name": "Nuxt",
+    "categoryId": "frontend",
+    "description": "Vue framework for full-stack applications, hybrid rendering, routing, and server APIs",
+    "tags": [
+      "vue",
+      "ssr",
+      "full-stack",
+      "meta-framework"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "runtime": [
+        "node",
+        "bun"
+      ]
+    },
+    "integrations": [
+      "vue",
+      "tailwind",
+      "vercel",
+      "netlify"
+    ],
+    "pricing": {
+      "model": "free",
+      "url": "https://nuxt.com"
+    },
+    "docsUrl": "https://nuxt.com/docs",
+    "homepageUrl": "https://nuxt.com"
+  },
+  {
+    "id": "vite",
+    "name": "Vite",
+    "categoryId": "frontend",
+    "description": "Fast frontend build tool and development server for modern web applications",
+    "tags": [
+      "build-tool",
+      "dev-server",
+      "frontend",
+      "spa"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "runtime": [
+        "node",
+        "bun"
+      ]
+    },
+    "integrations": [
+      "react",
+      "vue",
+      "tailwind",
+      "vitest"
+    ],
+    "pricing": {
+      "model": "free",
+      "url": "https://vite.dev"
+    },
+    "docsUrl": "https://vite.dev/guide/",
+    "homepageUrl": "https://vite.dev"
+  },
+  {
+    "id": "solidstart",
+    "name": "SolidStart",
+    "categoryId": "frontend",
+    "description": "SolidJS meta-framework for fine-grained reactive full-stack web applications",
+    "tags": [
+      "solid",
+      "ssr",
+      "reactive",
+      "full-stack"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "runtime": [
+        "node",
+        "bun"
+      ]
+    },
+    "integrations": [
+      "tailwind",
+      "vercel",
+      "netlify"
+    ],
+    "pricing": {
+      "model": "free",
+      "url": "https://start.solidjs.com"
+    },
+    "docsUrl": "https://docs.solidjs.com/solid-start",
+    "homepageUrl": "https://start.solidjs.com"
+  },
+  {
+    "id": "cloudflare-workers",
+    "name": "Cloudflare Workers",
+    "categoryId": "runtime",
+    "description": "Edge runtime for serverless applications deployed across Cloudflare global network",
+    "tags": [
+      "runtime",
+      "edge",
+      "serverless",
+      "web-standards"
+    ],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {},
+    "integrations": [
+      "cloudflare-pages",
+      "hono",
+      "astro"
+    ],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Free tier with paid usage-based plans",
+      "url": "https://www.cloudflare.com/developer-platform/products/workers/pricing/"
+    },
+    "docsUrl": "https://developers.cloudflare.com/workers/",
+    "homepageUrl": "https://workers.cloudflare.com"
+  },
+  {
+    "id": "deno",
+    "name": "Deno",
+    "categoryId": "runtime",
+    "description": "Secure JavaScript and TypeScript runtime with built-in tooling and web APIs",
+    "tags": [
+      "runtime",
+      "typescript",
+      "secure",
+      "web-standards"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {},
+    "integrations": [
+      "hono",
+      "postgres"
+    ],
+    "pricing": {
+      "model": "free",
+      "url": "https://deno.com"
+    },
+    "docsUrl": "https://docs.deno.com",
+    "homepageUrl": "https://deno.com"
+  },
+  {
+    "id": "cloudflare-pages",
+    "name": "Cloudflare Pages",
+    "categoryId": "hosting",
+    "description": "JAMstack and full-stack hosting platform backed by Cloudflare edge network",
+    "tags": [
+      "hosting",
+      "edge",
+      "jamstack",
+      "serverless"
+    ],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "frameworks": [
+        "nextjs",
+        "remix",
+        "astro",
+        "sveltekit"
+      ]
+    },
+    "integrations": [
+      "cloudflare-workers",
+      "hono",
+      "astro",
+      "nextjs"
+    ],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Free tier with paid plans for teams and advanced usage",
+      "url": "https://www.cloudflare.com/developer-platform/products/pages/pricing/"
+    },
+    "docsUrl": "https://developers.cloudflare.com/pages/",
+    "homepageUrl": "https://pages.cloudflare.com"
+  },
+  {
+    "id": "render",
+    "name": "Render",
+    "categoryId": "hosting",
+    "description": "Cloud application platform for web services, static sites, workers, and managed databases",
+    "tags": [
+      "hosting",
+      "paas",
+      "postgres",
+      "workers"
+    ],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": [
+      "TypeScript",
+      "JavaScript",
+      "Go",
+      "Python"
+    ],
+    "supports": {
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "dbs": [
+        "postgres"
+      ]
+    },
+    "integrations": [
+      "postgres",
+      "nextjs",
+      "node"
+    ],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Free instances available, paid plans for production workloads",
+      "url": "https://render.com/pricing"
+    },
+    "docsUrl": "https://docs.render.com",
+    "homepageUrl": "https://render.com"
+  },
+  {
+    "id": "azure-container-apps",
+    "name": "Azure Container Apps",
+    "categoryId": "hosting",
+    "description": "Serverless container platform for apps, jobs, APIs, and event-driven services on Azure",
+    "tags": [
+      "hosting",
+      "containers",
+      "serverless",
+      "azure"
+    ],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": [
+      "TypeScript",
+      "JavaScript",
+      "Python",
+      "Go",
+      "C#"
+    ],
+    "supports": {
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "dbs": [
+        "postgres",
+        "mysql"
+      ]
+    },
+    "integrations": [
+      "postgres",
+      "node",
+      "hono"
+    ],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Consumption plan includes free monthly resource grants",
+      "url": "https://azure.microsoft.com/pricing/details/container-apps/"
+    },
+    "docsUrl": "https://learn.microsoft.com/azure/container-apps/",
+    "homepageUrl": "https://azure.microsoft.com/products/container-apps"
+  },
+  {
+    "id": "supabase-db",
+    "name": "Supabase Database",
+    "categoryId": "database",
+    "description": "Hosted Postgres platform with realtime, storage, auth, edge functions, and generated APIs",
+    "tags": [
+      "database",
+      "postgres",
+      "backend-as-a-service",
+      "realtime"
+    ],
+    "hosted": true,
+    "selfHostable": true,
+    "languages": [
+      "SQL",
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "dbs": [
+        "postgres"
+      ]
+    },
+    "integrations": [
+      "postgres",
+      "supabase-auth",
+      "drizzle",
+      "prisma"
+    ],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Free project tier with paid plans for production",
+      "url": "https://supabase.com/pricing"
+    },
+    "docsUrl": "https://supabase.com/docs/guides/database",
+    "homepageUrl": "https://supabase.com/database"
+  },
+  {
+    "id": "neon",
+    "name": "Neon Postgres",
+    "categoryId": "database",
+    "description": "Serverless Postgres with branching, autoscaling, and developer-friendly workflows",
+    "tags": [
+      "database",
+      "postgres",
+      "serverless",
+      "branching"
+    ],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": [
+      "SQL",
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "dbs": [
+        "postgres"
+      ]
+    },
+    "integrations": [
+      "postgres",
+      "drizzle",
+      "prisma",
+      "vercel"
+    ],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Free tier available with paid compute and storage plans",
+      "url": "https://neon.com/pricing"
+    },
+    "docsUrl": "https://neon.com/docs",
+    "homepageUrl": "https://neon.com"
+  },
+  {
+    "id": "planetscale",
+    "name": "PlanetScale",
+    "categoryId": "database",
+    "description": "MySQL-compatible database platform with branching workflows and Vitess scalability",
+    "tags": [
+      "database",
+      "mysql",
+      "serverless",
+      "branching"
+    ],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": [
+      "SQL",
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "dbs": [
+        "mysql"
+      ]
+    },
+    "integrations": [
+      "mysql",
+      "prisma",
+      "drizzle"
+    ],
+    "pricing": {
+      "model": "paid",
+      "note": "Paid production plans",
+      "url": "https://planetscale.com/pricing"
+    },
+    "docsUrl": "https://planetscale.com/docs",
+    "homepageUrl": "https://planetscale.com"
+  },
+  {
+    "id": "turso",
+    "name": "Turso",
+    "categoryId": "database",
+    "description": "Edge SQLite database platform based on libSQL for low-latency distributed apps",
+    "tags": [
+      "database",
+      "sqlite",
+      "edge",
+      "libsql"
+    ],
+    "hosted": true,
+    "selfHostable": true,
+    "languages": [
+      "SQL",
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "dbs": [
+        "sqlite"
+      ]
+    },
+    "integrations": [
+      "drizzle",
+      "prisma"
+    ],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Free starter tier with paid scale plans",
+      "url": "https://turso.tech/pricing"
+    },
+    "docsUrl": "https://docs.turso.tech",
+    "homepageUrl": "https://turso.tech"
+  },
+  {
+    "id": "redis",
+    "name": "Redis",
+    "categoryId": "database",
+    "description": "In-memory data store for caching, queues, sessions, rate limiting, and realtime features",
+    "tags": [
+      "database",
+      "cache",
+      "key-value",
+      "realtime"
+    ],
+    "hosted": false,
+    "selfHostable": true,
+    "languages": [
+      "TypeScript",
+      "JavaScript",
+      "Python",
+      "Go"
+    ],
+    "supports": {},
+    "integrations": [
+      "bullmq",
+      "node",
+      "hono"
+    ],
+    "pricing": {
+      "model": "free",
+      "note": "Open source, hosting costs vary",
+      "url": "https://redis.io"
+    },
+    "docsUrl": "https://redis.io/docs/latest/",
+    "homepageUrl": "https://redis.io"
+  },
+  {
+    "id": "better-auth",
+    "name": "Better Auth",
+    "categoryId": "auth",
+    "description": "Framework-agnostic TypeScript authentication library with plugins and database adapters",
+    "tags": [
+      "auth",
+      "typescript",
+      "open-source",
+      "oauth"
+    ],
+    "hosted": false,
+    "selfHostable": true,
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "frameworks": [
+        "nextjs",
+        "remix",
+        "sveltekit"
+      ]
+    },
+    "integrations": [
+      "nextjs",
+      "drizzle",
+      "prisma",
+      "postgres"
+    ],
+    "pricing": {
+      "model": "free",
+      "url": "https://www.better-auth.com"
+    },
+    "docsUrl": "https://www.better-auth.com/docs",
+    "homepageUrl": "https://www.better-auth.com"
+  },
+  {
+    "id": "firebase-auth",
+    "name": "Firebase Authentication",
+    "categoryId": "auth",
+    "description": "Hosted authentication service with identity providers, phone auth, and Firebase integration",
+    "tags": [
+      "auth",
+      "firebase",
+      "oauth",
+      "hosted"
+    ],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "runtime": [
+        "node"
+      ],
+      "frameworks": [
+        "nextjs",
+        "remix",
+        "astro",
+        "sveltekit"
+      ]
+    },
+    "integrations": [
+      "react",
+      "nextjs"
+    ],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Generous free usage with paid phone auth and advanced usage",
+      "url": "https://firebase.google.com/pricing"
+    },
+    "docsUrl": "https://firebase.google.com/docs/auth",
+    "homepageUrl": "https://firebase.google.com/products/auth"
+  },
+  {
+    "id": "r2",
+    "name": "Cloudflare R2",
+    "categoryId": "storage",
+    "description": "S3-compatible object storage with no egress fees for Cloudflare applications",
+    "tags": [
+      "storage",
+      "object-storage",
+      "cloudflare",
+      "s3-compatible"
+    ],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {},
+    "integrations": [
+      "cloudflare-workers",
+      "cloudflare-pages",
+      "hono"
+    ],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Free tier with usage-based paid storage and operations",
+      "url": "https://www.cloudflare.com/developer-platform/products/r2/pricing/"
+    },
+    "docsUrl": "https://developers.cloudflare.com/r2/",
+    "homepageUrl": "https://www.cloudflare.com/developer-platform/products/r2/"
+  },
+  {
+    "id": "vercel-blob",
+    "name": "Vercel Blob",
+    "categoryId": "storage",
+    "description": "Object storage for Vercel apps with simple SDKs and public asset delivery",
+    "tags": [
+      "storage",
+      "object-storage",
+      "vercel",
+      "uploads"
+    ],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "frameworks": [
+        "nextjs"
+      ]
+    },
+    "integrations": [
+      "vercel",
+      "nextjs"
+    ],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Included usage on Vercel plans with overage pricing",
+      "url": "https://vercel.com/docs/storage/vercel-blob/usage-and-pricing"
+    },
+    "docsUrl": "https://vercel.com/docs/storage/vercel-blob",
+    "homepageUrl": "https://vercel.com/storage/blob"
+  },
+  {
+    "id": "shadcn-ui",
+    "name": "shadcn/ui",
+    "categoryId": "styling",
+    "description": "Composable copy-and-own component patterns built on Radix UI and Tailwind CSS",
+    "tags": [
+      "ui",
+      "components",
+      "tailwind",
+      "radix"
+    ],
+    "languages": [
+      "TypeScript",
+      "CSS"
+    ],
+    "supports": {
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "frameworks": [
+        "nextjs",
+        "remix",
+        "astro",
+        "sveltekit"
+      ]
+    },
+    "integrations": [
+      "tailwind",
+      "nextjs",
+      "react"
+    ],
+    "pricing": {
+      "model": "free",
+      "url": "https://ui.shadcn.com"
+    },
+    "docsUrl": "https://ui.shadcn.com/docs",
+    "homepageUrl": "https://ui.shadcn.com"
+  },
+  {
+    "id": "chakra-ui",
+    "name": "Chakra UI",
+    "categoryId": "styling",
+    "description": "Accessible React component library with style props and design-system primitives",
+    "tags": [
+      "ui",
+      "components",
+      "react",
+      "accessibility"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "runtime": [
+        "node"
+      ],
+      "frameworks": [
+        "nextjs"
+      ]
+    },
+    "integrations": [
+      "react",
+      "nextjs"
+    ],
+    "pricing": {
+      "model": "free",
+      "url": "https://chakra-ui.com"
+    },
+    "docsUrl": "https://chakra-ui.com/docs/get-started/installation",
+    "homepageUrl": "https://chakra-ui.com"
+  },
+  {
+    "id": "hono",
+    "name": "Hono",
+    "categoryId": "backend-framework",
+    "description": "Small, fast web framework for edge and server runtimes with typed handlers",
+    "tags": [
+      "api",
+      "edge",
+      "web-framework",
+      "typescript"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "runtime": [
+        "node",
+        "bun"
+      ]
+    },
+    "integrations": [
+      "cloudflare-workers",
+      "cloudflare-pages",
+      "deno",
+      "drizzle"
+    ],
+    "pricing": {
+      "model": "free",
+      "url": "https://hono.dev"
+    },
+    "docsUrl": "https://hono.dev/docs/",
+    "homepageUrl": "https://hono.dev"
+  },
+  {
+    "id": "express",
+    "name": "Express",
+    "categoryId": "backend-framework",
+    "description": "Minimal and mature Node.js web framework for HTTP APIs and middleware-based apps",
+    "tags": [
+      "api",
+      "node",
+      "middleware",
+      "web-framework"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "runtime": [
+        "node"
+      ]
+    },
+    "integrations": [
+      "node",
+      "postgres",
+      "mongodb",
+      "prisma"
+    ],
+    "pricing": {
+      "model": "free",
+      "url": "https://expressjs.com"
+    },
+    "docsUrl": "https://expressjs.com",
+    "homepageUrl": "https://expressjs.com"
+  },
+  {
+    "id": "fastify",
+    "name": "Fastify",
+    "categoryId": "backend-framework",
+    "description": "Fast Node.js web framework with schema-driven validation and plugin architecture",
+    "tags": [
+      "api",
+      "node",
+      "performance",
+      "web-framework"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "runtime": [
+        "node"
+      ]
+    },
+    "integrations": [
+      "node",
+      "postgres",
+      "mongodb",
+      "prisma"
+    ],
+    "pricing": {
+      "model": "free",
+      "url": "https://fastify.dev"
+    },
+    "docsUrl": "https://fastify.dev/docs/latest/",
+    "homepageUrl": "https://fastify.dev"
+  },
+  {
+    "id": "trpc",
+    "name": "tRPC",
+    "categoryId": "backend-framework",
+    "description": "End-to-end typesafe API framework for TypeScript clients and servers",
+    "tags": [
+      "api",
+      "rpc",
+      "typescript",
+      "type-safe"
+    ],
+    "languages": [
+      "TypeScript"
+    ],
+    "supports": {
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "frameworks": [
+        "nextjs"
+      ]
+    },
+    "integrations": [
+      "nextjs",
+      "react",
+      "prisma",
+      "drizzle"
+    ],
+    "pricing": {
+      "model": "free",
+      "url": "https://trpc.io"
+    },
+    "docsUrl": "https://trpc.io/docs",
+    "homepageUrl": "https://trpc.io"
+  },
+  {
+    "id": "nestjs",
+    "name": "NestJS",
+    "categoryId": "backend-framework",
+    "description": "Opinionated Node.js framework for scalable server-side applications with dependency injection",
+    "tags": [
+      "api",
+      "node",
+      "enterprise",
+      "dependency-injection"
+    ],
+    "languages": [
+      "TypeScript"
+    ],
+    "supports": {
+      "runtime": [
+        "node"
+      ]
+    },
+    "integrations": [
+      "postgres",
+      "mysql",
+      "mongodb",
+      "typeorm",
+      "prisma"
+    ],
+    "pricing": {
+      "model": "free",
+      "url": "https://nestjs.com"
+    },
+    "docsUrl": "https://docs.nestjs.com",
+    "homepageUrl": "https://nestjs.com"
+  },
+  {
+    "id": "langchain",
+    "name": "LangChain",
+    "categoryId": "agent-framework",
+    "description": "Framework for composing LLM applications with chains, tools, retrievers, and agents",
+    "tags": [
+      "agents",
+      "llm",
+      "rag",
+      "tools"
+    ],
+    "languages": [
+      "TypeScript",
+      "Python"
+    ],
+    "supports": {},
+    "integrations": [
+      "openai",
+      "anthropic",
+      "gemini",
+      "pinecone",
+      "langsmith"
+    ],
+    "pricing": {
+      "model": "free",
+      "note": "Open source framework; hosted services priced separately",
+      "url": "https://www.langchain.com"
+    },
+    "docsUrl": "https://js.langchain.com/docs/introduction/",
+    "homepageUrl": "https://www.langchain.com"
+  },
+  {
+    "id": "langgraph",
+    "name": "LangGraph",
+    "categoryId": "agent-framework",
+    "description": "Graph-based framework for stateful, controllable, and durable agent workflows",
+    "tags": [
+      "agents",
+      "graphs",
+      "workflow",
+      "stateful"
+    ],
+    "languages": [
+      "TypeScript",
+      "Python"
+    ],
+    "supports": {},
+    "integrations": [
+      "langchain",
+      "openai",
+      "anthropic",
+      "langsmith"
+    ],
+    "pricing": {
+      "model": "free",
+      "note": "Open source framework; hosted platform priced separately",
+      "url": "https://www.langchain.com/langgraph"
+    },
+    "docsUrl": "https://langchain-ai.github.io/langgraphjs/",
+    "homepageUrl": "https://www.langchain.com/langgraph"
+  },
+  {
+    "id": "crew-ai",
+    "name": "CrewAI",
+    "categoryId": "agent-framework",
+    "description": "Python framework for orchestrating role-based multi-agent automations and workflows",
+    "tags": [
+      "agents",
+      "multi-agent",
+      "automation",
+      "python"
+    ],
+    "languages": [
+      "Python"
+    ],
+    "supports": {},
+    "integrations": [
+      "openai",
+      "anthropic",
+      "gemini"
+    ],
+    "pricing": {
+      "model": "free",
+      "note": "Open source framework; hosted platform plans available",
+      "url": "https://www.crewai.com"
+    },
+    "docsUrl": "https://docs.crewai.com",
+    "homepageUrl": "https://www.crewai.com"
+  },
+  {
+    "id": "autogen",
+    "name": "AutoGen",
+    "categoryId": "agent-framework",
+    "description": "Microsoft framework for building event-driven distributed agent applications",
+    "tags": [
+      "agents",
+      "multi-agent",
+      "microsoft",
+      "python"
+    ],
+    "languages": [
+      "Python",
+      "C#"
+    ],
+    "supports": {},
+    "integrations": [
+      "openai",
+      "azure-openai"
+    ],
+    "pricing": {
+      "model": "free",
+      "url": "https://microsoft.github.io/autogen/"
+    },
+    "docsUrl": "https://microsoft.github.io/autogen/stable/",
+    "homepageUrl": "https://microsoft.github.io/autogen/"
+  },
+  {
+    "id": "semantic-kernel",
+    "name": "Semantic Kernel",
+    "categoryId": "agent-framework",
+    "description": "Microsoft SDK for integrating AI services, planners, plugins, and agentic workflows",
+    "tags": [
+      "agents",
+      "plugins",
+      "microsoft",
+      "orchestration"
+    ],
+    "languages": [
+      "C#",
+      "Python",
+      "Java"
+    ],
+    "supports": {},
+    "integrations": [
+      "openai",
+      "azure-openai"
+    ],
+    "pricing": {
+      "model": "free",
+      "url": "https://learn.microsoft.com/semantic-kernel/"
+    },
+    "docsUrl": "https://learn.microsoft.com/semantic-kernel/overview/",
+    "homepageUrl": "https://learn.microsoft.com/semantic-kernel/"
+  },
+  {
+    "id": "openai",
+    "name": "OpenAI API",
+    "categoryId": "ai-model",
+    "description": "Hosted models for text, vision, audio, embeddings, reasoning, and tool-calling workflows",
+    "tags": [
+      "llm",
+      "embeddings",
+      "reasoning",
+      "multimodal"
+    ],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": [
+      "TypeScript",
+      "JavaScript",
+      "Python"
+    ],
+    "supports": {},
+    "integrations": [
+      "langchain",
+      "langgraph",
+      "crew-ai",
+      "vercel-ai-sdk"
+    ],
+    "pricing": {
+      "model": "paid",
+      "note": "Usage-based pricing by model and token volume",
+      "url": "https://openai.com/api/pricing/"
+    },
+    "docsUrl": "https://platform.openai.com/docs",
+    "homepageUrl": "https://platform.openai.com"
+  },
+  {
+    "id": "anthropic",
+    "name": "Anthropic Claude",
+    "categoryId": "ai-model",
+    "description": "Claude model API for text generation, tool use, vision, and long-context reasoning",
+    "tags": [
+      "llm",
+      "reasoning",
+      "tool-use",
+      "multimodal"
+    ],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": [
+      "TypeScript",
+      "JavaScript",
+      "Python"
+    ],
+    "supports": {},
+    "integrations": [
+      "langchain",
+      "langgraph",
+      "crew-ai",
+      "vercel-ai-sdk"
+    ],
+    "pricing": {
+      "model": "paid",
+      "note": "Usage-based pricing by model and token volume",
+      "url": "https://www.anthropic.com/pricing"
+    },
+    "docsUrl": "https://docs.anthropic.com",
+    "homepageUrl": "https://www.anthropic.com/api"
+  },
+  {
+    "id": "gemini",
+    "name": "Google Gemini",
+    "categoryId": "ai-model",
+    "description": "Google model family for multimodal generation, reasoning, embeddings, and long context",
+    "tags": [
+      "llm",
+      "google",
+      "multimodal",
+      "embeddings"
+    ],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": [
+      "TypeScript",
+      "JavaScript",
+      "Python"
+    ],
+    "supports": {},
+    "integrations": [
+      "langchain",
+      "crew-ai",
+      "vercel-ai-sdk"
+    ],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Free tier and paid usage-based API access",
+      "url": "https://ai.google.dev/pricing"
+    },
+    "docsUrl": "https://ai.google.dev/gemini-api/docs",
+    "homepageUrl": "https://ai.google.dev"
+  },
+  {
+    "id": "azure-openai",
+    "name": "Azure OpenAI Service",
+    "categoryId": "ai-model",
+    "description": "Azure-hosted OpenAI models with enterprise networking, governance, and regional controls",
+    "tags": [
+      "llm",
+      "azure",
+      "enterprise",
+      "openai"
+    ],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": [
+      "TypeScript",
+      "JavaScript",
+      "Python",
+      "C#"
+    ],
+    "supports": {},
+    "integrations": [
+      "openai",
+      "semantic-kernel",
+      "autogen"
+    ],
+    "pricing": {
+      "model": "paid",
+      "note": "Usage-based pricing by deployment and model",
+      "url": "https://azure.microsoft.com/pricing/details/cognitive-services/openai-service/"
+    },
+    "docsUrl": "https://learn.microsoft.com/azure/ai-services/openai/",
+    "homepageUrl": "https://azure.microsoft.com/products/ai-services/openai-service"
+  },
+  {
+    "id": "mistral-ai",
+    "name": "Mistral AI",
+    "categoryId": "ai-model",
+    "description": "Hosted and open-weight models for generation, coding, embeddings, and enterprise AI apps",
+    "tags": [
+      "llm",
+      "open-weights",
+      "embeddings",
+      "coding"
+    ],
+    "hosted": true,
+    "selfHostable": true,
+    "languages": [
+      "TypeScript",
+      "JavaScript",
+      "Python"
+    ],
+    "supports": {},
+    "integrations": [
+      "langchain",
+      "vercel-ai-sdk"
+    ],
+    "pricing": {
+      "model": "paid",
+      "note": "Usage-based API pricing with open-weight self-hosting options",
+      "url": "https://mistral.ai/products/la-plateforme#pricing"
+    },
+    "docsUrl": "https://docs.mistral.ai",
+    "homepageUrl": "https://mistral.ai"
+  },
+  {
+    "id": "vercel-ai-sdk",
+    "name": "Vercel AI SDK",
+    "categoryId": "agent-framework",
+    "description": "TypeScript toolkit for building AI-powered web apps with provider adapters and streaming UI",
+    "tags": [
+      "ai",
+      "typescript",
+      "streaming",
+      "sdk"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "frameworks": [
+        "nextjs"
+      ]
+    },
+    "integrations": [
+      "nextjs",
+      "openai",
+      "anthropic",
+      "gemini",
+      "mistral-ai"
+    ],
+    "pricing": {
+      "model": "free",
+      "url": "https://ai-sdk.dev"
+    },
+    "docsUrl": "https://ai-sdk.dev/docs",
+    "homepageUrl": "https://ai-sdk.dev"
+  },
+  {
+    "id": "pinecone",
+    "name": "Pinecone",
+    "categoryId": "vector-database",
+    "description": "Managed vector database for production semantic search and retrieval-augmented generation",
+    "tags": [
+      "vector-search",
+      "rag",
+      "managed",
+      "embeddings"
+    ],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": [
+      "TypeScript",
+      "JavaScript",
+      "Python"
+    ],
+    "supports": {},
+    "integrations": [
+      "langchain",
+      "openai"
+    ],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Serverless free tier with usage-based paid plans",
+      "url": "https://www.pinecone.io/pricing/"
+    },
+    "docsUrl": "https://docs.pinecone.io",
+    "homepageUrl": "https://www.pinecone.io"
+  },
+  {
+    "id": "weaviate",
+    "name": "Weaviate",
+    "categoryId": "vector-database",
+    "description": "Open-source vector database with hybrid search, modules, and managed cloud hosting",
+    "tags": [
+      "vector-search",
+      "hybrid-search",
+      "rag",
+      "open-source"
+    ],
+    "hosted": true,
+    "selfHostable": true,
+    "languages": [
+      "TypeScript",
+      "JavaScript",
+      "Python",
+      "Go"
+    ],
+    "supports": {},
+    "integrations": [
+      "langchain",
+      "openai"
+    ],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Open source self-hosting and managed cloud plans",
+      "url": "https://weaviate.io/pricing"
+    },
+    "docsUrl": "https://weaviate.io/developers/weaviate",
+    "homepageUrl": "https://weaviate.io"
+  },
+  {
+    "id": "qdrant",
+    "name": "Qdrant",
+    "categoryId": "vector-database",
+    "description": "Vector database and similarity search engine with filtering and distributed deployment options",
+    "tags": [
+      "vector-search",
+      "rag",
+      "open-source",
+      "similarity-search"
+    ],
+    "hosted": true,
+    "selfHostable": true,
+    "languages": [
+      "TypeScript",
+      "JavaScript",
+      "Python",
+      "Rust"
+    ],
+    "supports": {},
+    "integrations": [
+      "langchain",
+      "openai"
+    ],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Open source self-hosting and managed cloud plans",
+      "url": "https://qdrant.tech/pricing/"
+    },
+    "docsUrl": "https://qdrant.tech/documentation/",
+    "homepageUrl": "https://qdrant.tech"
+  },
+  {
+    "id": "milvus",
+    "name": "Milvus",
+    "categoryId": "vector-database",
+    "description": "Open-source vector database designed for scalable similarity search and AI workloads",
+    "tags": [
+      "vector-search",
+      "open-source",
+      "distributed",
+      "rag"
+    ],
+    "hosted": false,
+    "selfHostable": true,
+    "languages": [
+      "Python",
+      "Go",
+      "Java",
+      "TypeScript"
+    ],
+    "supports": {},
+    "integrations": [
+      "langchain",
+      "openai"
+    ],
+    "pricing": {
+      "model": "free",
+      "note": "Open source self-hosted project; managed Zilliz Cloud priced separately",
+      "url": "https://milvus.io"
+    },
+    "docsUrl": "https://milvus.io/docs",
+    "homepageUrl": "https://milvus.io"
+  },
+  {
+    "id": "chroma",
+    "name": "Chroma",
+    "categoryId": "vector-database",
+    "description": "Embedding database for local and hosted AI applications with simple developer ergonomics",
+    "tags": [
+      "vector-search",
+      "embeddings",
+      "local-first",
+      "rag"
+    ],
+    "hosted": true,
+    "selfHostable": true,
+    "languages": [
+      "Python",
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {},
+    "integrations": [
+      "langchain",
+      "openai"
+    ],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Open source package and managed cloud plans",
+      "url": "https://www.trychroma.com/pricing"
+    },
+    "docsUrl": "https://docs.trychroma.com",
+    "homepageUrl": "https://www.trychroma.com"
+  },
+  {
+    "id": "langsmith",
+    "name": "LangSmith",
+    "categoryId": "eval-observability",
+    "description": "Tracing, evaluation, prompt management, and monitoring platform for LLM applications",
+    "tags": [
+      "tracing",
+      "evals",
+      "monitoring",
+      "prompts"
+    ],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": [
+      "TypeScript",
+      "Python"
+    ],
+    "supports": {},
+    "integrations": [
+      "langchain",
+      "langgraph",
+      "openai"
+    ],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Free developer plan with paid team and enterprise tiers",
+      "url": "https://www.langchain.com/pricing"
+    },
+    "docsUrl": "https://docs.smith.langchain.com",
+    "homepageUrl": "https://www.langchain.com/langsmith"
+  },
+  {
+    "id": "langfuse",
+    "name": "Langfuse",
+    "categoryId": "eval-observability",
+    "description": "Open-source LLM engineering platform for traces, evals, prompt management, and metrics",
+    "tags": [
+      "tracing",
+      "evals",
+      "open-source",
+      "observability"
+    ],
+    "hosted": true,
+    "selfHostable": true,
+    "languages": [
+      "TypeScript",
+      "Python"
+    ],
+    "supports": {},
+    "integrations": [
+      "openai",
+      "langchain",
+      "langgraph"
+    ],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Open source self-hosting and managed cloud plans",
+      "url": "https://langfuse.com/pricing"
+    },
+    "docsUrl": "https://langfuse.com/docs",
+    "homepageUrl": "https://langfuse.com"
+  },
+  {
+    "id": "helicone",
+    "name": "Helicone",
+    "categoryId": "eval-observability",
+    "description": "Open-source LLM observability gateway for logging, caching, rate limits, and analytics",
+    "tags": [
+      "observability",
+      "gateway",
+      "analytics",
+      "open-source"
+    ],
+    "hosted": true,
+    "selfHostable": true,
+    "languages": [
+      "TypeScript",
+      "JavaScript",
+      "Python"
+    ],
+    "supports": {},
+    "integrations": [
+      "openai",
+      "anthropic",
+      "vercel-ai-sdk"
+    ],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Free cloud tier, paid scale plans, and self-hosting",
+      "url": "https://www.helicone.ai/pricing"
+    },
+    "docsUrl": "https://docs.helicone.ai",
+    "homepageUrl": "https://www.helicone.ai"
+  },
+  {
+    "id": "braintrust",
+    "name": "Braintrust",
+    "categoryId": "eval-observability",
+    "description": "Platform for evaluations, prompt experiments, datasets, logs, and AI product observability",
+    "tags": [
+      "evals",
+      "datasets",
+      "experiments",
+      "observability"
+    ],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": [
+      "TypeScript",
+      "Python"
+    ],
+    "supports": {},
+    "integrations": [
+      "openai",
+      "anthropic",
+      "langchain"
+    ],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Free developer usage with paid team plans",
+      "url": "https://www.braintrust.dev/pricing"
+    },
+    "docsUrl": "https://www.braintrust.dev/docs",
+    "homepageUrl": "https://www.braintrust.dev"
+  },
+  {
+    "id": "bullmq",
+    "name": "BullMQ",
+    "categoryId": "queue-workflow",
+    "description": "Redis-backed queue and background job library for Node.js and TypeScript applications",
+    "tags": [
+      "queues",
+      "jobs",
+      "redis",
+      "node"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "runtime": [
+        "node"
+      ]
+    },
+    "integrations": [
+      "redis",
+      "node"
+    ],
+    "requires": {
+      "anyOfToolIds": [
+        "redis"
+      ]
+    },
+    "pricing": {
+      "model": "free",
+      "url": "https://bullmq.io"
+    },
+    "docsUrl": "https://docs.bullmq.io",
+    "homepageUrl": "https://bullmq.io"
+  },
+  {
+    "id": "inngest",
+    "name": "Inngest",
+    "categoryId": "queue-workflow",
+    "description": "Durable function and event-driven workflow platform for serverless applications",
+    "tags": [
+      "workflows",
+      "events",
+      "serverless",
+      "durable-functions"
+    ],
+    "hosted": true,
+    "selfHostable": true,
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "runtime": [
+        "node",
+        "bun"
+      ],
+      "frameworks": [
+        "nextjs"
+      ]
+    },
+    "integrations": [
+      "nextjs",
+      "vercel",
+      "hono"
+    ],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Free tier with paid scale plans",
+      "url": "https://www.inngest.com/pricing"
+    },
+    "docsUrl": "https://www.inngest.com/docs",
+    "homepageUrl": "https://www.inngest.com"
+  },
+  {
+    "id": "trigger-dev",
+    "name": "Trigger.dev",
+    "categoryId": "queue-workflow",
+    "description": "Open-source background job platform for long-running tasks, schedules, and retries",
+    "tags": [
+      "jobs",
+      "scheduling",
+      "background-tasks",
+      "open-source"
+    ],
+    "hosted": true,
+    "selfHostable": true,
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "runtime": [
+        "node"
+      ]
+    },
+    "integrations": [
+      "nextjs",
+      "node",
+      "vercel"
+    ],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Free cloud tier and self-hosting support",
+      "url": "https://trigger.dev/pricing"
+    },
+    "docsUrl": "https://trigger.dev/docs",
+    "homepageUrl": "https://trigger.dev"
+  },
+  {
+    "id": "temporal",
+    "name": "Temporal",
+    "categoryId": "queue-workflow",
+    "description": "Durable execution platform for reliable long-running workflows and distributed systems",
+    "tags": [
+      "workflows",
+      "durable-execution",
+      "distributed-systems",
+      "retries"
+    ],
+    "hosted": true,
+    "selfHostable": true,
+    "languages": [
+      "TypeScript",
+      "Python",
+      "Go",
+      "Java"
+    ],
+    "supports": {
+      "runtime": [
+        "node"
+      ]
+    },
+    "integrations": [
+      "node",
+      "postgres"
+    ],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Open source self-hosting and managed Temporal Cloud plans",
+      "url": "https://temporal.io/pricing"
+    },
+    "docsUrl": "https://docs.temporal.io",
+    "homepageUrl": "https://temporal.io"
+  },
+  {
+    "id": "vitest",
+    "name": "Vitest",
+    "categoryId": "testing",
+    "description": "Fast Vite-native unit testing framework with TypeScript, ESM, and Jest-compatible APIs",
+    "tags": [
+      "testing",
+      "unit-testing",
+      "vite",
+      "typescript"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "runtime": [
+        "node",
+        "bun"
+      ]
+    },
+    "integrations": [
+      "vite",
+      "react",
+      "vue"
+    ],
+    "pricing": {
+      "model": "free",
+      "url": "https://vitest.dev"
+    },
+    "docsUrl": "https://vitest.dev/guide/",
+    "homepageUrl": "https://vitest.dev"
+  },
+  {
+    "id": "playwright",
+    "name": "Playwright",
+    "categoryId": "testing",
+    "description": "End-to-end browser automation and testing framework across Chromium, Firefox, and WebKit",
+    "tags": [
+      "testing",
+      "e2e",
+      "browser",
+      "automation"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript",
+      "Python",
+      "C#",
+      "Java"
+    ],
+    "supports": {
+      "runtime": [
+        "node"
+      ]
+    },
+    "integrations": [
+      "nextjs",
+      "react",
+      "vite"
+    ],
+    "pricing": {
+      "model": "free",
+      "url": "https://playwright.dev"
+    },
+    "docsUrl": "https://playwright.dev/docs/intro",
+    "homepageUrl": "https://playwright.dev"
+  },
+  {
+    "id": "cypress",
+    "name": "Cypress",
+    "categoryId": "testing",
+    "description": "Browser-based end-to-end and component testing framework with interactive debugging",
+    "tags": [
+      "testing",
+      "e2e",
+      "component-testing",
+      "browser"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "runtime": [
+        "node"
+      ]
+    },
+    "integrations": [
+      "react",
+      "vue",
+      "vite"
+    ],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Open source runner with paid Cypress Cloud plans",
+      "url": "https://www.cypress.io/pricing"
+    },
+    "docsUrl": "https://docs.cypress.io",
+    "homepageUrl": "https://www.cypress.io"
+  },
+  {
+    "id": "jest",
+    "name": "Jest",
+    "categoryId": "testing",
+    "description": "JavaScript testing framework with assertions, mocking, snapshots, and broad ecosystem support",
+    "tags": [
+      "testing",
+      "unit-testing",
+      "snapshots",
+      "mocking"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "runtime": [
+        "node"
+      ]
+    },
+    "integrations": [
+      "react",
+      "nextjs",
+      "node"
+    ],
+    "pricing": {
+      "model": "free",
+      "url": "https://jestjs.io"
+    },
+    "docsUrl": "https://jestjs.io/docs/getting-started",
+    "homepageUrl": "https://jestjs.io"
+  },
+  {
+    "id": "turborepo",
+    "name": "Turborepo",
+    "categoryId": "monorepo",
+    "description": "High-performance build system for JavaScript and TypeScript monorepos with remote caching",
+    "tags": [
+      "monorepo",
+      "task-runner",
+      "cache",
+      "build-system"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "runtime": [
+        "node",
+        "bun"
+      ]
+    },
+    "integrations": [
+      "nextjs",
+      "vercel",
+      "pnpm-workspaces"
+    ],
+    "pricing": {
+      "model": "free",
+      "note": "Open source locally; Vercel Remote Cache available on Vercel plans",
+      "url": "https://turbo.build/repo"
+    },
+    "docsUrl": "https://turbo.build/repo/docs",
+    "homepageUrl": "https://turbo.build/repo"
+  },
+  {
+    "id": "nx",
+    "name": "Nx",
+    "categoryId": "monorepo",
+    "description": "Smart monorepo build platform with project graph, generators, affected commands, and caching",
+    "tags": [
+      "monorepo",
+      "task-graph",
+      "generators",
+      "cache"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "runtime": [
+        "node"
+      ]
+    },
+    "integrations": [
+      "nextjs",
+      "react",
+      "nestjs",
+      "vitest",
+      "playwright"
+    ],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Open source tooling with paid Nx Cloud features",
+      "url": "https://nx.dev/pricing"
+    },
+    "docsUrl": "https://nx.dev/docs",
+    "homepageUrl": "https://nx.dev"
+  },
+  {
+    "id": "pnpm-workspaces",
+    "name": "pnpm Workspaces",
+    "categoryId": "monorepo",
+    "description": "Workspace feature of pnpm for linking local packages and managing multi-package repositories",
+    "tags": [
+      "monorepo",
+      "package-manager",
+      "workspace",
+      "node"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "runtime": [
+        "node"
+      ]
+    },
+    "integrations": [
+      "node",
+      "turborepo",
+      "nx"
+    ],
+    "pricing": {
+      "model": "free",
+      "url": "https://pnpm.io/workspaces"
+    },
+    "docsUrl": "https://pnpm.io/workspaces",
+    "homepageUrl": "https://pnpm.io"
+  },
+  {
+    "id": "sanity",
+    "name": "Sanity",
+    "categoryId": "cms",
+    "description": "Composable content platform with structured content, real-time editing, and developer tooling",
+    "tags": [
+      "cms",
+      "content",
+      "studio",
+      "structured-content"
+    ],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "frameworks": [
+        "nextjs",
+        "astro",
+        "sveltekit"
+      ]
+    },
+    "integrations": [
+      "nextjs",
+      "react",
+      "astro"
+    ],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Free developer tier with paid growth and enterprise plans",
+      "url": "https://www.sanity.io/pricing"
+    },
+    "docsUrl": "https://www.sanity.io/docs",
+    "homepageUrl": "https://www.sanity.io"
+  },
+  {
+    "id": "contentful",
+    "name": "Contentful",
+    "categoryId": "cms",
+    "description": "API-first composable content platform for digital experiences and editorial workflows",
+    "tags": [
+      "cms",
+      "content",
+      "api-first",
+      "enterprise"
+    ],
+    "hosted": true,
+    "selfHostable": false,
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "frameworks": [
+        "nextjs",
+        "astro",
+        "sveltekit"
+      ]
+    },
+    "integrations": [
+      "nextjs",
+      "react",
+      "astro"
+    ],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Free space for learning and paid plans for teams",
+      "url": "https://www.contentful.com/pricing/"
+    },
+    "docsUrl": "https://www.contentful.com/developers/docs/",
+    "homepageUrl": "https://www.contentful.com"
+  },
+  {
+    "id": "strapi",
+    "name": "Strapi",
+    "categoryId": "cms",
+    "description": "Open-source headless CMS with REST and GraphQL APIs, roles, and plugin ecosystem",
+    "tags": [
+      "cms",
+      "headless",
+      "open-source",
+      "api"
+    ],
+    "hosted": true,
+    "selfHostable": true,
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "runtime": [
+        "node"
+      ],
+      "dbs": [
+        "postgres",
+        "mysql",
+        "sqlite"
+      ]
+    },
+    "integrations": [
+      "postgres",
+      "mysql",
+      "nextjs",
+      "react"
+    ],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Open source self-hosting and paid Strapi Cloud plans",
+      "url": "https://strapi.io/pricing"
+    },
+    "docsUrl": "https://docs.strapi.io",
+    "homepageUrl": "https://strapi.io"
+  },
+  {
+    "id": "payload-cms",
+    "name": "Payload CMS",
+    "categoryId": "cms",
+    "description": "TypeScript-first headless CMS and application framework with code-based configuration",
+    "tags": [
+      "cms",
+      "typescript",
+      "headless",
+      "nextjs"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "runtime": [
+        "node"
+      ],
+      "dbs": [
+        "postgres",
+        "mongodb"
+      ],
+      "frameworks": [
+        "nextjs"
+      ]
+    },
+    "integrations": [
+      "nextjs",
+      "postgres",
+      "mongodb"
+    ],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Open source self-hosting and paid cloud plans",
+      "url": "https://payloadcms.com/pricing"
+    },
+    "docsUrl": "https://payloadcms.com/docs",
+    "homepageUrl": "https://payloadcms.com"
+  },
+  {
+    "id": "react-native",
+    "name": "React Native",
+    "categoryId": "mobile",
+    "description": "Framework for building native iOS and Android applications with React",
+    "tags": [
+      "mobile",
+      "ios",
+      "android",
+      "react"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "runtime": [
+        "node"
+      ]
+    },
+    "integrations": [
+      "react",
+      "expo"
+    ],
+    "pricing": {
+      "model": "free",
+      "url": "https://reactnative.dev"
+    },
+    "docsUrl": "https://reactnative.dev/docs/getting-started",
+    "homepageUrl": "https://reactnative.dev"
+  },
+  {
+    "id": "expo",
+    "name": "Expo",
+    "categoryId": "mobile",
+    "description": "React Native platform and tooling for universal native apps, builds, updates, and routing",
+    "tags": [
+      "mobile",
+      "react-native",
+      "ios",
+      "android"
+    ],
+    "languages": [
+      "TypeScript",
+      "JavaScript"
+    ],
+    "supports": {
+      "runtime": [
+        "node"
+      ]
+    },
+    "integrations": [
+      "react-native",
+      "react"
+    ],
+    "pricing": {
+      "model": "free-tier",
+      "note": "Open source tooling with paid EAS build and update plans",
+      "url": "https://expo.dev/pricing"
+    },
+    "docsUrl": "https://docs.expo.dev",
+    "homepageUrl": "https://expo.dev"
+  },
+  {
+    "id": "flutter",
+    "name": "Flutter",
+    "categoryId": "mobile",
+    "description": "Google UI toolkit for building compiled multi-platform apps from a single Dart codebase",
+    "tags": [
+      "mobile",
+      "ios",
+      "android",
+      "cross-platform"
+    ],
+    "languages": [
+      "Dart"
+    ],
+    "supports": {},
+    "integrations": [],
+    "pricing": {
+      "model": "free",
+      "url": "https://flutter.dev"
+    },
+    "docsUrl": "https://docs.flutter.dev",
+    "homepageUrl": "https://flutter.dev"
   }
 ]

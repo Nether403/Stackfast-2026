@@ -1,12 +1,66 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useEvaluationContext } from '@/context';
 import { evaluateRulesWithFallback } from '@/engine';
-import type { Tool, Rule } from '@/types';
+import { apiClient } from '@/lib/api-client';
+import type { StackAnalyzeResponse } from '@stackfast/schemas';
+import type { Tool, Rule, EvaluationResult, Diagnostic } from '@/types';
 
 /**
  * Debounce delay for rapid selections (in milliseconds)
  */
 const DEBOUNCE_DELAY_MS = 100;
+
+function diagnosticsFromApiResponse(response: StackAnalyzeResponse): Diagnostic[] {
+  const diagnostics = new Map<string, Diagnostic>();
+
+  for (const diagnostic of [
+    ...response.conflicts,
+    ...response.warnings,
+    ...response.synergies,
+  ] as Diagnostic[]) {
+    diagnostics.set(diagnostic.id, diagnostic);
+  }
+
+  response.recommendations.forEach((message, index) => {
+    const id = `api-recommendation-${index}`;
+    if (!diagnostics.has(id)) {
+      diagnostics.set(id, {
+        id,
+        level: 'info',
+        category: 'coverage',
+        message,
+        weight: 0,
+      });
+    }
+  });
+
+  return Array.from(diagnostics.values());
+}
+
+function buildEvaluationResultFromApi(
+  response: StackAnalyzeResponse,
+  evaluationTimeMs: number
+): EvaluationResult {
+  const diagnostics = diagnosticsFromApiResponse(response);
+  const bonuses = diagnostics
+    .filter((diagnostic) => (diagnostic.weight ?? 0) > 0)
+    .map((diagnostic) => ({ reason: diagnostic.message, weight: diagnostic.weight ?? 0 }));
+  const penalties = diagnostics
+    .filter((diagnostic) => (diagnostic.weight ?? 0) < 0)
+    .map((diagnostic) => ({ reason: diagnostic.message, weight: diagnostic.weight ?? 0 }));
+
+  return {
+    score: response.harmonyScore,
+    diagnostics,
+    evaluationTimeMs,
+    breakdown: {
+      base: 50,
+      bonuses,
+      penalties,
+      total: response.harmonyScore,
+    },
+  };
+}
 
 /**
  * Hook for managing rules engine evaluation with async handling
@@ -59,11 +113,25 @@ export function useRulesEngine(
         // Track performance
         const startTime = performance.now();
 
-        // Evaluate rules (with Worker fallback)
-        const evaluationResult = await evaluateRulesWithFallback(selections, rules);
+        let evaluationResult: EvaluationResult;
+
+        if (selections.length > 0) {
+          try {
+            const apiResult = await apiClient.analyzeStack({
+              toolIds: selections.map((tool) => tool.id),
+            });
+            evaluationResult = buildEvaluationResultFromApi(apiResult, performance.now() - startTime);
+          } catch (apiError) {
+            console.warn('[Rules Engine] API analysis failed; falling back to local evaluation:', apiError);
+            evaluationResult = await evaluateRulesWithFallback(selections, rules);
+          }
+        } else {
+          evaluationResult = await evaluateRulesWithFallback(selections, rules);
+        }
 
         const endTime = performance.now();
         const evaluationTime = endTime - startTime;
+        evaluationResult.evaluationTimeMs = evaluationTime;
 
         // Log performance in dev mode (only log if not in production)
         if (typeof window !== 'undefined' && !window.location.hostname.includes('vercel')) {

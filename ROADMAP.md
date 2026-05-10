@@ -125,7 +125,7 @@ Build the canonical API that replaces the messy root server.
 Ship a polished frontend that makes the API accessible and delightful.
 
 ### Deliverables
-- [ ] **Stack Builder** page (from StackfastPro) — fully connected to API
+- [x] **Stack Builder** page (from StackfastPro) — fully connected to API
 - [x] **Tool Catalog** page — search, filter, detail views
 - [x] **Blueprint Builder** page (ported from root, rebuilt)
   - [ ] Multi-step wizard UI
@@ -136,12 +136,12 @@ Ship a polished frontend that makes the API accessible and delightful.
 - [x] **Migration Explorer** — Basic tool-to-tool migration paths
 - [x] **Export Dialog** — Downloads scaffold files
 - [ ] All API integrations via TanStack Query
-- [ ] Error boundaries and loading states
+- [x] Error boundaries and loading states
 - [x] Responsive design (mobile-friendly)
 - [x] Dark theme with neon-orange accent
 
 ### Current Status
-**Partially complete.** Tool catalog, blueprint generation, migration explorer, catalog loading, and scaffold export are API-backed. Stack Builder still has local compatibility/evaluation paths, auth UI/session handling is not wired, and error boundary coverage remains incomplete.
+**Mostly complete.** Tool catalog, blueprint generation, migration explorer, catalog loading, scaffold export, compatibility view, and Stack Builder analysis are API-backed. Stack Builder keeps a local rules-engine fallback for offline/API failure cases. Auth/session controls are wired in the shared layout. Remaining gaps are deeper auth-required UX for generation failures and converting every API call path to TanStack Query where direct calls remain appropriate.
 
 ### Risk
 **Medium-High.** This is the largest phase. Blueprint Builder is the most complex UI piece. Compatibility heatmap requires careful data normalization.
@@ -179,14 +179,14 @@ Make the blueprint generator actually valuable with LLM-powered explanations.
 Build a registry that's genuinely useful for 2026 technology decisions.
 
 ### Deliverables
-- [ ] Expand catalog from 33 → 80 curated tools
-- [ ] Add 2026 AI categories: agent frameworks, vector DBs, eval tooling
-- [ ] Add observability, auth, billing, queues, workflow engines categories
-- [ ] New fields: `lastVerified`, `sourceUrls`, `confidence`, `capabilities[]`
-- [ ] Capability-based matching (primary matching layer)
-- [ ] Evidence-based compatibility rules with versioning
+- [x] Expand catalog from 33 → 80 curated tools *(now 97 curated tools)*
+- [x] Add 2026 AI categories: agent frameworks, vector DBs, eval tooling
+- [x] Add observability, auth, billing, queues, workflow engines categories
+- [x] New fields: `lastVerified`, `sourceUrls`, `confidence`, `capabilities[]`
+- [x] Capability-based matching (primary matching layer)
+- [x] Evidence-based compatibility rules with versioning
 - [ ] Admin enrichment scripts (CLI-based)
-- [ ] All 80 tools pass schema validation
+- [x] All 80 tools pass schema validation *(97 tools pass registry validation)*
 - [ ] WebAILyzer deferred to post-MVP (code preserved in `workers/webailyzer/`)
 
 ### Tools to Add (Priority List)
@@ -209,8 +209,11 @@ Build a registry that's genuinely useful for 2026 technology decisions.
 | Email | Resend, Postmark, SendGrid |
 | Queues | BullMQ, Inngest, Trigger.dev, Temporal |
 
+### Current Status
+**Substantially complete.** The canonical registry and static web fallback are synchronized at version `1.1.0` with 20 categories, 97 tools, and 93 rules. New schema-supported categories cover agent frameworks, AI model providers, vector databases, eval/observability, backend frameworks, queues/workflows, testing, monorepos, CMS, and mobile. Registry validation, linting, type-checks, and tests pass after the expansion. Remaining work is CLI/admin enrichment automation and any post-MVP WebAILyzer integration.
+
 ### Risk
-**Low-Medium.** Data quality is the main risk. Each tool needs accurate metadata. Automation scripts can help, but manual curation is needed for quality.
+**Low-Medium.** Data quality remains the main risk. Each tool has curated metadata and source URLs, but pricing and compatibility should be periodically reverified as vendors change APIs and plans.
 
 ---
 

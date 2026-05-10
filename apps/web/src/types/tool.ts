@@ -34,9 +34,9 @@ export interface ToolRequirements {
  * Tool capabilities and compatibility
  */
 export interface ToolSupports {
-  runtime?: ('node' | 'bun')[];
+  runtime?: ('node' | 'bun' | 'deno' | 'cloudflare-workers')[];
   dbs?: ('postgres' | 'mysql' | 'sqlite' | 'mongodb')[];
-  frameworks?: ('nextjs' | 'remix' | 'astro' | 'sveltekit')[];
+  frameworks?: ('nextjs' | 'remix' | 'astro' | 'sveltekit' | 'react' | 'vue')[];
 }
 
 /**
@@ -98,9 +98,9 @@ export const ToolRequirementsSchema = z.object({
  * Zod schema for ToolSupports validation
  */
 export const ToolSupportsSchema = z.object({
-  runtime: z.array(z.enum(['node', 'bun'])).optional(),
+  runtime: z.array(z.enum(['node', 'bun', 'deno', 'cloudflare-workers'])).optional(),
   dbs: z.array(z.enum(['postgres', 'mysql', 'sqlite', 'mongodb'])).optional(),
-  frameworks: z.array(z.enum(['nextjs', 'remix', 'astro', 'sveltekit'])).optional(),
+  frameworks: z.array(z.enum(['nextjs', 'remix', 'astro', 'sveltekit', 'react', 'vue'])).optional(),
 });
 
 /**
