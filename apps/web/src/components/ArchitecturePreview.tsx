@@ -1,5 +1,6 @@
 import { Tool } from "@stackfast/schemas";
 import { Server, Database, Globe, Cpu, ArrowDown } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 interface ArchitecturePreviewProps {
   tools: Tool[];
@@ -21,7 +22,7 @@ export function ArchitecturePreview({ tools }: ArchitecturePreviewProps) {
     data: tools.filter(t => getTier(t) === "data"),
   };
 
-  const TierBlock = ({ title, icon: Icon, items }: { title: string, icon: any, items: Tool[] }) => {
+  const TierBlock = ({ title, icon: Icon, items }: { title: string, icon: LucideIcon, items: Tool[] }) => {
     if (items.length === 0) return null;
     return (
       <div className="p-4 rounded-xl border border-border bg-card/50 flex flex-col items-center">

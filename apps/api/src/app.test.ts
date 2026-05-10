@@ -18,6 +18,42 @@ describe("api", () => {
     expect(body.paths["/api/v1/blueprints"].post).toBeDefined();
   });
 
+  it("sets a configured CORS origin instead of wildcard", async () => {
+    const response = await app.request("/api/v1/tools/search", {
+      headers: { Origin: "http://localhost:5173" },
+    });
+
+    expect(response.headers.get("access-control-allow-origin")).toBe("http://localhost:5173");
+    expect(response.headers.get("access-control-allow-credentials")).toBe("true");
+  });
+
+  it("returns the canonical catalog for web clients", async () => {
+    const response = await app.request("/api/v1/catalog");
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.version).toBeTruthy();
+    expect(body.tools.some((tool: { id: string }) => tool.id === "nextjs")).toBe(true);
+    expect(body.categories.length).toBeGreaterThan(0);
+    expect(body.rules.length).toBeGreaterThan(0);
+  });
+
+  it("fails protected generation closed in production when auth is unavailable", async () => {
+    const response = await app.request(
+      "/api/v1/blueprints",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-forwarded-for": "prod-auth-test" },
+        body: JSON.stringify({ idea: "a production-only auth test" }),
+      },
+      { NODE_ENV: "production" },
+    );
+
+    expect(response.status).toBe(503);
+    const body = await response.json();
+    expect(body.error).toContain("Authentication is not configured");
+  });
+
   it("searches tools with pagination", async () => {
     const response = await app.request("/api/v1/tools/search?q=next&limit=5");
     const body = await response.json();
@@ -267,6 +303,7 @@ describe("api", () => {
       "/api/v1/stacks/analyze",
       "/api/v1/tools/search",
       "/api/v1/tools/{id}",
+      "/api/v1/catalog",
       "/api/v1/categories",
       "/api/v1/compatibility/{a}/{b}",
       "/api/v1/scaffolds",

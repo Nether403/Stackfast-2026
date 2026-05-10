@@ -71,10 +71,18 @@ type AuthVariables = {
   user?: SessionUser;
 };
 
+function isProduction(env?: AuthBindings): boolean {
+  return (env?.NODE_ENV ?? process.env.NODE_ENV) === "production";
+}
+
+function canBypassAuthForLocalDev(env?: AuthBindings): boolean {
+  return !isProduction(env) && process.env.ALLOW_AUTH_BYPASS !== "false";
+}
+
 /**
  * Middleware that requires a valid Better Auth session.
  * Returns 401 if the user is not authenticated.
- * Falls through if DATABASE_URL is not set (catalog-only mode).
+ * Falls through only in non-production catalog-only local dev mode.
  */
 export function requireSession(): MiddlewareHandler<{
   Bindings: AuthBindings;
@@ -83,8 +91,13 @@ export function requireSession(): MiddlewareHandler<{
   return async (c, next) => {
     const auth = getAuth();
 
-    // If no database, skip auth (catalog-only local dev mode)
     if (!auth) {
+      if (!canBypassAuthForLocalDev(c.env)) {
+        return c.json(
+          { error: "Authentication is not configured", requestId: c.get("requestId") },
+          503 as ContentfulStatusCode,
+        );
+      }
       await next();
       return;
     }

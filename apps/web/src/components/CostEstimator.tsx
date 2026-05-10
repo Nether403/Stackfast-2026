@@ -1,14 +1,12 @@
-import type { BlueprintCostEstimate, Tool } from "@stackfast/schemas";
-import { DollarSign, Check, Info, TrendingUp, TrendingDown } from "lucide-react";
+import type { BlueprintCostEstimate } from "@stackfast/schemas";
+import { DollarSign, TrendingUp, TrendingDown } from "lucide-react";
 
 interface CostEstimatorProps {
   /** Structured cost estimate from the API (Phase 5). */
   costEstimate: BlueprintCostEstimate;
-  /** Full tool list for fallback display. */
-  tools: Tool[];
 }
 
-export function CostEstimator({ costEstimate, tools }: CostEstimatorProps) {
+export function CostEstimator({ costEstimate }: CostEstimatorProps) {
   const freeItems = costEstimate.items.filter(
     (item) => item.pricingModel === "free" || item.pricingModel === "free-tier",
   );

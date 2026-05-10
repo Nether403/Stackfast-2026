@@ -379,10 +379,8 @@ export type StackAnalyzeRequest = z.infer<typeof StackAnalyzeRequestSchema>;
 export type StackAnalyzeResponse = z.infer<typeof StackAnalyzeResponseSchema>;
 export type ScaffoldRequest = z.infer<typeof ScaffoldRequestSchema>;
 
-export const ScaffoldResponseSchema = z.object({
-  id: z.string(),
-  url: z.string().optional(),
-  files: z.array(z.object({ path: z.string(), content: z.string() })).optional()
+export const ScaffoldResponseSchema = ExportDataSchema.extend({
+  delivery: z.literal("file-list"),
 });
 export type ScaffoldResponse = z.infer<typeof ScaffoldResponseSchema>;
 

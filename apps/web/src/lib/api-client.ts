@@ -9,13 +9,20 @@ import {
   EnhancedBlueprintResponse,
   CompatibilityResponse,
   MigrationResponse,
+  Catalog,
 } from "@stackfast/schemas";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
 
+type ApiErrorData = {
+  error?: string;
+  requestId?: string;
+  [key: string]: unknown;
+};
+
 class ApiError extends Error {
-  constructor(public status: number, public data: any) {
-    super(data.error || `API Error: ${status}`);
+  constructor(public status: number, public data: ApiErrorData | string) {
+    super(typeof data === "string" ? data : data.error || `API Error: ${status}`);
     this.name = "ApiError";
   }
 }
@@ -24,6 +31,7 @@ async function fetchApi<T>(path: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE}${path}`;
   const response = await fetch(url, {
     ...options,
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
       ...options?.headers,
@@ -65,6 +73,9 @@ export const apiClient = {
 
   // Categories
   getCategories: () => fetchApi<{ items: Category[]; total: number }>("/categories"),
+
+  // Complete catalog for client-side stack evaluation
+  getCatalog: () => fetchApi<Catalog>("/catalog"),
 
   // Compatibility
   getCompatibility: (a: string, b: string) => fetchApi<CompatibilityResponse>(`/compatibility/${a}/${b}`),

@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";
 import { BlueprintRequest, ScaffoldRequest, StackAnalyzeRequest } from "@stackfast/schemas";
 

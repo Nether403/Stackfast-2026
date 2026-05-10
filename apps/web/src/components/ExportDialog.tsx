@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react';
-import type { ExportData, ExportFormat } from '@/types';
+import type { ExportData, ExportFormat } from '@stackfast/schemas';
 import {
   Dialog,
   DialogContent,
@@ -16,9 +16,14 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useSelectionsContext } from '@/context/SelectionsContext';
-import { useEvaluationContext } from '@/context/EvaluationContext';
-import { generateExport, generateExportAsText } from '@/lib/export-generator';
+import { apiClient } from '@/lib/api-client';
 import { generateArchive, downloadArchive } from '@/lib/archive-generator';
+
+function generateExportAsText(exportData: ExportData): string {
+  return exportData.files
+    .map((file) => [`## File: ${file.path}`, '', '```', file.content, '```'].join('\n'))
+    .join('\n\n');
+}
 
 export interface ExportDialogProps {
   open: boolean;
@@ -31,10 +36,8 @@ export function ExportDialog({
 }: ExportDialogProps) {
   // Get data from context
   const { getAllSelectedTools } = useSelectionsContext();
-  const { result } = useEvaluationContext();
   
   const selectedTools = getAllSelectedTools();
-  const diagnostics = result?.diagnostics ?? [];
   const [isGenerating, setIsGenerating] = useState(false);
   const [exportData, setExportData] = useState<ExportData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -46,11 +49,10 @@ export function ExportDialog({
     setError(null);
     
     try {
-      const data = await generateExport(
-        selectedTools,
-        diagnostics,
-        selectedFormat
-      );
+      const data = await apiClient.generateScaffold({
+        toolIds: selectedTools.map((tool) => tool.id),
+        projectName: 'stackfast-app',
+      });
       setExportData(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate export');

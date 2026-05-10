@@ -1,5 +1,5 @@
 import type { ImplementationRoadmap as RoadmapType } from "@stackfast/schemas";
-import { Clock, CheckCircle2, ArrowRight } from "lucide-react";
+import { Clock, CheckCircle2 } from "lucide-react";
 
 interface ImplementationRoadmapProps {
   roadmap: RoadmapType;

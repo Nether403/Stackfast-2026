@@ -25,14 +25,14 @@ Week 1          Week 2          Week 3          Week 4          Week 5          
 Secure existing work and remove dead weight before building anything new.
 
 ### Deliverables
-- [ ] Archive branch `archive/pre-rebuild` created
-- [ ] Salvage manifest finalized (SALVAGE_MANIFEST.md)
+- [x] Archive branch `archive/pre-rebuild` created
+- [x] Salvage manifest finalized (SALVAGE_MANIFEST.md)
 - [ ] Old branches deleted (StackFastold, StackFast1)
 - [ ] developer-tools-api deleted
 - [ ] Stale docs deleted (5 files)
-- [ ] `.env` files removed from source
-- [ ] `desktop.ini` files removed recursively
-- [ ] `.gitignore` updated with comprehensive exclusions
+- [x] `.env` files removed from source
+- [x] `desktop.ini` files removed recursively
+- [x] `.gitignore` updated with comprehensive exclusions
 - [ ] Clean commit: "Phase 0: Repository cleanup for 2026 rebuild"
 
 ### Risk
@@ -46,21 +46,21 @@ Secure existing work and remove dead weight before building anything new.
 Establish the new project structure that all subsequent work builds on.
 
 ### Deliverables
-- [ ] `pnpm-workspace.yaml` with apps and packages
-- [ ] Root `package.json` with workspace scripts
-- [ ] `tsconfig.base.json` with strict TypeScript config
-- [ ] `apps/web/` — StackfastPro migrated in, `pnpm dev` works
-- [ ] `apps/api/` — Hono server skeleton, `/health` responds
-- [ ] Neon Auth (Better Auth) configured with GitHub OAuth
-- [ ] `packages/schemas/` — Package stub
-- [ ] `packages/registry/` — Package stub
-- [ ] `packages/rules-engine/` — Package stub
-- [ ] `packages/exporter/` — Package stub
-- [ ] `packages/ai/` — Package stub
-- [ ] `packages/shared/` — Package stub
-- [ ] ESLint config (shared)
-- [ ] `pnpm install && pnpm -r type-check` succeeds
-- [ ] `.github/workflows/ci.yml` — Basic CI pipeline
+- [x] `pnpm-workspace.yaml` with apps and packages
+- [x] Root `package.json` with workspace scripts
+- [x] `tsconfig.base.json` with strict TypeScript config
+- [x] `apps/web/` — StackfastPro migrated in, `pnpm dev` works
+- [x] `apps/api/` — Hono server skeleton, `/health` responds
+- [x] Neon Auth (Better Auth) configured with GitHub OAuth
+- [x] `packages/schemas/` — Package stub
+- [x] `packages/registry/` — Package stub
+- [x] `packages/rules-engine/` — Package stub
+- [x] `packages/exporter/` — Package stub
+- [x] `packages/ai/` — Package stub
+- [x] `packages/shared/` — Package stub
+- [x] ESLint config (shared)
+- [x] `pnpm install && pnpm -r type-check` succeeds
+- [x] `.github/workflows/ci.yml` — Basic CI pipeline
 
 ### Risk
 **Low.** Mostly scaffolding. The StackfastPro migration may require path alias adjustments.
@@ -73,15 +73,15 @@ Establish the new project structure that all subsequent work builds on.
 Port the proven rules engine, registry, and export system into self-contained packages.
 
 ### Deliverables
-- [ ] `packages/registry/` — Catalog files migrated + Zod validation
-- [ ] `packages/rules-engine/` — Rules engine + score calculator + tests
-- [ ] `packages/exporter/` — Export generator + recipes + archive builder
-- [ ] `packages/schemas/` — Drizzle schemas + Zod API schemas + types
-- [ ] `packages/shared/` — Common utilities and constants
-- [ ] All packages compile independently
-- [ ] Determinism tests pass (same input → same score)
-- [ ] Registry validation script passes
-- [ ] Export generator produces valid file structures
+- [x] `packages/registry/` — Catalog files migrated + Zod validation
+- [x] `packages/rules-engine/` — Rules engine + score calculator + tests
+- [x] `packages/exporter/` — Export generator + recipes + archive builder
+- [x] `packages/schemas/` — Drizzle schemas + Zod API schemas + types
+- [x] `packages/shared/` — Common utilities and constants
+- [x] All packages compile independently
+- [x] Determinism tests pass (same input → same score)
+- [x] Registry validation script passes
+- [x] Export generator produces valid file structures
 
 ### Risk
 **Medium.** The rules engine has implicit dependencies on type definitions that need careful extraction. Recipe files reference tool IDs that must match the normalized registry.
@@ -94,22 +94,25 @@ Port the proven rules engine, registry, and export system into self-contained pa
 Build the canonical API that replaces the messy root server.
 
 ### Deliverables
-- [ ] `POST /api/v1/blueprints` — Blueprint generation
-- [ ] `POST /api/v1/stacks/analyze` — Stack validation
-- [ ] `GET /api/v1/tools/search` — Tool search with filters
-- [ ] `GET /api/v1/tools/:id` — Tool details
-- [ ] `GET /api/v1/categories` — Categories
-- [ ] `GET /api/v1/compatibility/:a/:b` — Pairwise compatibility
-- [ ] `POST /api/v1/scaffolds` — Starter file generation
-- [ ] `GET /api/v1/migrations/:from/:to` — Migration paths
-- [ ] `GET /health` — Health check
-- [ ] Admin routes with API key protection
-- [ ] Rate limiting on generation endpoints
-- [ ] Zod request validation middleware
-- [ ] Drizzle + Neon Postgres connection
-- [ ] Neon Auth (Better Auth) + GitHub OAuth integration
-- [ ] Admin API key for protected routes
-- [ ] Seed script for local dev
+- [x] `POST /api/v1/blueprints` — Blueprint generation
+- [x] `POST /api/v1/stacks/analyze` — Stack validation
+- [x] `GET /api/v1/tools/search` — Tool search with filters
+- [x] `GET /api/v1/tools/:id` — Tool details
+- [x] `GET /api/v1/categories` — Categories
+- [x] `GET /api/v1/compatibility/:a/:b` — Pairwise compatibility
+- [x] `POST /api/v1/scaffolds` — Starter file generation
+- [x] `GET /api/v1/migrations/:from/:to` — Migration paths
+- [x] `GET /health` — Health check
+- [x] Admin routes with API key protection
+- [x] Rate limiting on generation endpoints
+- [x] Zod request validation middleware
+- [x] Drizzle + Neon Postgres connection
+- [x] Neon Auth (Better Auth) + GitHub OAuth integration
+- [x] Admin API key for protected routes
+- [x] Seed script for local dev
+
+### Current Status
+**Functionally complete for MVP API coverage.** Remaining production hardening includes persistent/distributed rate limiting, fuller OpenAPI response schemas, and deployment-environment verification.
 
 ### Risk
 **Medium.** Database schema migration from root app needs careful handling. Blueprint generation logic is the most complex route.
@@ -123,19 +126,22 @@ Ship a polished frontend that makes the API accessible and delightful.
 
 ### Deliverables
 - [ ] **Stack Builder** page (from StackfastPro) — fully connected to API
-- [ ] **Tool Catalog** page — search, filter, detail views
-- [ ] **Blueprint Builder** page (ported from root, rebuilt)
+- [x] **Tool Catalog** page — search, filter, detail views
+- [x] **Blueprint Builder** page (ported from root, rebuilt)
   - [ ] Multi-step wizard UI
-  - [ ] "Why this stack" explanation panel
-  - [ ] Alternatives comparison table
-  - [ ] Cost/risk indicators
+  - [x] "Why this stack" explanation panel
+  - [x] Alternatives comparison table
+  - [x] Cost/risk indicators
 - [ ] **Compatibility View** — Heatmap visualization
-- [ ] **Migration Explorer** — Basic tool-to-tool migration paths
-- [ ] **Export Dialog** — Downloads scaffold files
+- [x] **Migration Explorer** — Basic tool-to-tool migration paths
+- [x] **Export Dialog** — Downloads scaffold files
 - [ ] All API integrations via TanStack Query
 - [ ] Error boundaries and loading states
-- [ ] Responsive design (mobile-friendly)
-- [ ] Dark theme with neon-orange accent
+- [x] Responsive design (mobile-friendly)
+- [x] Dark theme with neon-orange accent
+
+### Current Status
+**Partially complete.** Tool catalog, blueprint generation, migration explorer, catalog loading, and scaffold export are API-backed. Stack Builder still has local compatibility/evaluation paths, auth UI/session handling is not wired, and error boundary coverage remains incomplete.
 
 ### Risk
 **Medium-High.** This is the largest phase. Blueprint Builder is the most complex UI piece. Compatibility heatmap requires careful data normalization.
@@ -149,15 +155,18 @@ Make the blueprint generator actually valuable with LLM-powered explanations.
 
 ### Deliverables
 - [ ] `packages/ai/` — Provider abstraction (OpenAI/Gemini/Anthropic)
-- [ ] Deterministic rules remain source of truth for scoring
-- [ ] LLM adds explanation and synthesis layer
-- [ ] Every AI response validated with Zod
-- [ ] Multiple stack options returned (not just one)
-- [ ] "Why not" explanations for rejected alternatives
+- [x] Deterministic rules remain source of truth for scoring
+- [x] LLM adds explanation and synthesis layer
+- [x] Every AI response validated with Zod
+- [x] Multiple stack options returned (not just one)
+- [x] "Why not" explanations for rejected alternatives
 - [ ] Architecture Decision Records in output
-- [ ] Cost estimates per stack option
-- [ ] Implementation roadmap per stack option
-- [ ] Fallback to deterministic-only mode if AI unavailable
+- [x] Cost estimates per stack option
+- [x] Implementation roadmap per stack option
+- [x] Fallback to deterministic-only mode if AI unavailable
+
+### Current Status
+**Started/in progress.** Gemini-backed explanation and deterministic fallback paths exist, but the provider abstraction is incomplete and OpenAI/Anthropic support remains stubbed or not implemented.
 
 ### Risk
 **Medium.** LLM integration introduces latency and cost. Provider API changes can break things. Zod validation of AI output needs thorough testing.
@@ -208,13 +217,16 @@ Build a registry that's genuinely useful for 2026 technology decisions.
 ## Phase 7: Quality Gate *(Days 26-28)*
 
 ### Deliverables
-- [ ] Zero type errors across all packages
-- [ ] All unit tests pass (rules, scoring, registry, exporter, schemas)
-- [ ] API contract tests for every public endpoint
+- [x] Zero type errors across all packages
+- [x] All unit tests pass (rules, scoring, registry, exporter, schemas)
+- [x] API contract tests for every public endpoint
 - [ ] Playwright E2E tests for primary flows
-- [ ] Security tests for admin routes and rate limiting
-- [ ] CI pipeline blocks merge on any failure
-- [ ] Small seed dataset for database-free local dev
+- [x] Security tests for admin routes and rate limiting
+- [x] CI pipeline blocks merge on any failure
+- [x] Small seed dataset for database-free local dev
+
+### Current Status
+**Basic quality gate is green.** Lint, type-check, unit tests, builds, registry validation, API contract coverage, admin protection checks, and rate-limit tests pass. E2E and deeper security testing remain open.
 
 ---
 

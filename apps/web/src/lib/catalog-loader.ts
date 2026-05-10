@@ -1,7 +1,6 @@
 import { z } from 'zod';
-import { CategorySchema, type Category } from '@/types/category';
-import { ToolSchema, type Tool } from '@/types/tool';
-import { RuleSchema, type Rule } from '@/types/rule';
+import { CategorySchema, ToolSchema, RuleSchema, type Category, type Tool, type Rule } from '@stackfast/schemas';
+import { apiClient } from '@/lib/api-client';
 
 /**
  * Manifest schema for catalog metadata
@@ -148,6 +147,26 @@ export async function loadCatalog(): Promise<CatalogData> {
   if (cached) {
     console.log('Using cached catalog data');
     return cached;
+  }
+
+  try {
+    console.log('Loading catalog from Stackfast API');
+    const apiCatalog = await apiClient.getCatalog();
+    const catalogData: CatalogData = {
+      categories: apiCatalog.categories,
+      tools: apiCatalog.tools,
+      rules: apiCatalog.rules,
+      manifest: {
+        version: apiCatalog.manifest.version,
+        updatedAt: apiCatalog.manifest.updatedAt,
+        files: apiCatalog.manifest.files,
+        etag: apiCatalog.manifest.etag ?? apiCatalog.version,
+      },
+    };
+    setCachedCatalog(catalogData);
+    return catalogData;
+  } catch (error) {
+    console.warn('API catalog unavailable, falling back to static catalog:', error);
   }
   
   console.log('Loading fresh catalog data');

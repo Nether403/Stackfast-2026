@@ -11,7 +11,6 @@ import {
   Globe,
   Sparkles,
   Brain,
-  Clock,
 } from "lucide-react";
 import { AlternativesComparison } from "./AlternativesComparison";
 import { CostEstimator } from "./CostEstimator";
@@ -185,7 +184,7 @@ export function BlueprintOutputCard({ blueprint }: BlueprintOutputCardProps) {
         {/* Additional Previews */}
         <div className="p-6 border-t border-primary/10 grid gap-6 md:grid-cols-2 bg-muted/5">
           <ArchitecturePreview tools={recommendedStack.tools} />
-          <CostEstimator costEstimate={costEstimate} tools={recommendedStack.tools} />
+          <CostEstimator costEstimate={costEstimate} />
         </div>
 
         {/* Implementation Roadmap */}

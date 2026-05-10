@@ -181,6 +181,17 @@ export const openApiDocument = {
       },
     },
 
+    "/api/v1/catalog": {
+      get: {
+        summary: "Get the complete validated catalog",
+        operationId: "getCatalog",
+        tags: ["tools"],
+        responses: {
+          "200": { description: "Complete catalog for client-side evaluation" },
+        },
+      },
+    },
+
     // ── Categories ────────────────────────────────────────────────────
     "/api/v1/categories": {
       get: {

@@ -58,6 +58,7 @@ const WINDOW_MS = 60_000;
 export const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
 
 const catalogLoader = new CatalogLoader();
+const configuredCorsOrigin = process.env.CORS_ORIGIN ?? process.env.WEB_ORIGIN ?? "http://localhost:5173";
 
 // Initialize AI explainer from env config (defaults to heuristic if no key)
 const aiProvider = (process.env.AI_PROVIDER ?? "heuristic") as "gemini" | "openai" | "heuristic";
@@ -75,7 +76,11 @@ const explainer = createExplainer({
 export const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 app.use("*", logger());
-app.use("*", cors({ origin: "*", allowHeaders: ["Content-Type", "Authorization", "X-Admin-API-Key", "X-Request-ID", "X-AI-Provider"] }));
+app.use("*", cors({
+  origin: configuredCorsOrigin,
+  credentials: true,
+  allowHeaders: ["Content-Type", "Authorization", "X-Admin-API-Key", "X-Request-ID", "X-AI-Provider"],
+}));
 app.use("*", async (c, next) => {
   const requestId = c.req.header("X-Request-ID") ?? crypto.randomUUID();
   c.set("requestId", requestId);
@@ -222,6 +227,18 @@ app.get("/api/v1/categories", (c) => {
     toolCount: catalogLoader.getToolsByCategory(category.id).length,
   }));
   return c.json({ items: categories, total: categories.length });
+});
+
+app.get("/api/v1/catalog", (c) => {
+  const catalog = catalogLoader.getCatalog();
+  return c.json({
+    version: catalog.version,
+    updatedAt: catalog.updatedAt,
+    manifest: catalog.manifest,
+    categories: catalog.categories,
+    tools: catalog.tools,
+    rules: catalog.rules,
+  });
 });
 
 app.get("/api/v1/compatibility/:a/:b", (c) => {
