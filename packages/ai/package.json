@@ -10,8 +10,10 @@
     "test": "vitest run --config ../../vitest.package.config.ts"
   },
   "dependencies": {
+    "@ai-sdk/google": "^3.0.71",
+    "@stackfast/schemas": "workspace:*",
     "@stackfast/shared": "workspace:*",
-    "@stackfast/schemas": "workspace:*"
+    "ai": "^6.0.177"
   },
   "devDependencies": {
     "typescript": "^5.6.3"

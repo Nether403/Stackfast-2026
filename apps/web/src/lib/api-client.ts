@@ -6,7 +6,7 @@ import {
   ScaffoldRequest, 
   ScaffoldResponse,
   BlueprintRequest,
-  BlueprintResponse,
+  EnhancedBlueprintResponse,
   CompatibilityResponse,
   MigrationResponse,
 } from "@stackfast/schemas";
@@ -78,7 +78,7 @@ export const apiClient = {
 
   // Blueprints
   generateBlueprint: (data: BlueprintRequest) =>
-    fetchApi<BlueprintResponse>("/blueprints", {
+    fetchApi<EnhancedBlueprintResponse>("/blueprints", {
       method: "POST",
       body: JSON.stringify(data),
     }),

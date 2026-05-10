@@ -93,7 +93,7 @@ export function ToolCatalog() {
             >
               All Categories
             </button>
-            {categoriesData?.map((cat) => (
+            {categoriesData?.items?.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}

@@ -427,3 +427,75 @@ export const MigrationResponseSchema = z.object({
 });
 export type MigrationResponse = z.infer<typeof MigrationResponseSchema>;
 
+// ---------------------------------------------------------------------------
+// Phase 5 — AI-enhanced blueprint schemas
+// ---------------------------------------------------------------------------
+
+export const ToolCostEstimateSchema = z.object({
+  toolId: z.string(),
+  toolName: z.string(),
+  pricingModel: PricingModelSchema,
+  estimatedMonthlyCost: z.number().nullable(),
+  note: z.string(),
+});
+export type ToolCostEstimate = z.infer<typeof ToolCostEstimateSchema>;
+
+export const BlueprintCostEstimateSchema = z.object({
+  items: z.array(ToolCostEstimateSchema),
+  totalMonthlyEstimate: z.number(),
+  totalAnnualEstimate: z.number(),
+  currency: z.literal("USD"),
+});
+export type BlueprintCostEstimate = z.infer<typeof BlueprintCostEstimateSchema>;
+
+export const RoadmapPhaseSchema = z.object({
+  name: z.string(),
+  duration: z.string(),
+  tasks: z.array(z.string()).min(1),
+});
+export type RoadmapPhase = z.infer<typeof RoadmapPhaseSchema>;
+
+export const ImplementationRoadmapSchema = z.object({
+  phases: z.array(RoadmapPhaseSchema).min(2).max(5),
+  totalEstimate: z.string(),
+});
+export type ImplementationRoadmap = z.infer<typeof ImplementationRoadmapSchema>;
+
+export const WhyNotExplanationSchema = z.object({
+  reason: z.string(),
+  betterFor: z.string().optional(),
+});
+export type WhyNotExplanation = z.infer<typeof WhyNotExplanationSchema>;
+
+export const EnhancedAlternativeSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  toolIds: z.array(z.string()),
+  harmonyScore: z.number(),
+  tradeoffs: z.array(z.string()),
+  tradeoffSource: z.enum(["heuristic", "ai"]),
+  whyNot: WhyNotExplanationSchema.optional(),
+});
+export type EnhancedAlternative = z.infer<typeof EnhancedAlternativeSchema>;
+
+export const EnhancedBlueprintResponseSchema = z.object({
+  idea: z.string(),
+  recommendedStack: z.object({
+    toolIds: z.array(z.string()),
+    tools: z.array(ToolSchema),
+    harmonyScore: z.number(),
+    diagnostics: z.array(DiagnosticSchema),
+    rationale: z.string(),
+    explanationSource: z.enum(["heuristic", "ai"]),
+    keyReasons: z.array(z.string()).optional(),
+    confidence: z.number().min(0).max(1).optional(),
+  }),
+  alternatives: z.array(EnhancedAlternativeSchema),
+  risks: z.array(z.string()),
+  costEstimate: BlueprintCostEstimateSchema,
+  roadmap: ImplementationRoadmapSchema.optional(),
+  files: z.array(ExportFileSchema),
+  export: ExportDataSchema,
+});
+export type EnhancedBlueprintResponse = z.infer<typeof EnhancedBlueprintResponseSchema>;
+

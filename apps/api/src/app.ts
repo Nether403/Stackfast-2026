@@ -1,4 +1,4 @@
-import { createExplainer } from "@stackfast/ai";
+import { createExplainer, estimateCosts } from "@stackfast/ai";
 import { generateExport, type ExportError } from "@stackfast/exporter";
 import { CatalogLoader } from "@stackfast/registry";
 import { evaluateRulesSync } from "@stackfast/rules-engine";
@@ -58,12 +58,24 @@ const WINDOW_MS = 60_000;
 export const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
 
 const catalogLoader = new CatalogLoader();
-const explainer = createExplainer();
+
+// Initialize AI explainer from env config (defaults to heuristic if no key)
+const aiProvider = (process.env.AI_PROVIDER ?? "heuristic") as "gemini" | "openai" | "heuristic";
+const explainer = createExplainer({
+  provider: aiProvider,
+  apiKey:
+    aiProvider === "gemini" ? process.env.GEMINI_API_KEY :
+    aiProvider === "openai" ? process.env.OPENAI_API_KEY :
+    undefined,
+  model: process.env.AI_MODEL || undefined,
+  maxTokens: process.env.AI_MAX_TOKENS ? Number(process.env.AI_MAX_TOKENS) : undefined,
+  timeoutMs: process.env.AI_TIMEOUT_MS ? Number(process.env.AI_TIMEOUT_MS) : undefined,
+});
 
 export const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 app.use("*", logger());
-app.use("*", cors({ origin: "*", allowHeaders: ["Content-Type", "Authorization", "X-Admin-API-Key", "X-Request-ID"] }));
+app.use("*", cors({ origin: "*", allowHeaders: ["Content-Type", "Authorization", "X-Admin-API-Key", "X-Request-ID", "X-AI-Provider"] }));
 app.use("*", async (c, next) => {
   const requestId = c.req.header("X-Request-ID") ?? crypto.randomUUID();
   c.set("requestId", requestId);
@@ -113,8 +125,11 @@ app.post("/api/v1/blueprints", async (c) => {
   const primaryEvaluation = evaluateRulesSync(primaryTools, catalogLoader.getRules());
   const primaryExport = await generateSafeExport(primaryTools, primaryEvaluation.diagnostics, "blueprint-app");
 
-  // Use AI explainer interface (heuristic in Phase 3, swappable in Phase 5)
+  // AI explainer — uses configured provider with automatic heuristic fallback
   const explanation = await explainer.explainStack(primaryTools, body.idea);
+
+  // Static cost estimation from registry pricing data
+  const costEstimate = estimateCosts(primaryTools);
 
   const alternatives = await Promise.all(
     buildAlternatives(primaryToolIds).map(async (toolIds) => {
@@ -141,11 +156,14 @@ app.post("/api/v1/blueprints", async (c) => {
       diagnostics: primaryEvaluation.diagnostics,
       rationale: explanation.text,
       explanationSource: explanation.source,
+      keyReasons: explanation.keyReasons,
+      confidence: explanation.confidence,
     },
     alternatives,
     risks: primaryEvaluation.diagnostics
       .filter((diagnostic) => diagnostic.level === "error" || diagnostic.level === "warning")
       .map((diagnostic) => diagnostic.message),
+    costEstimate,
     files: primaryExport.files,
     export: primaryExport,
   });
