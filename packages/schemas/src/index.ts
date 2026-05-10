@@ -1,2 +1,2 @@
-export * from "./db";
-export * from "./domain";
+export * from "./db.js";
+export * from "./domain.js";

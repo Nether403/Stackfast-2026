@@ -378,4 +378,52 @@ export const BlueprintRequestSchema = z.object({
 export type StackAnalyzeRequest = z.infer<typeof StackAnalyzeRequestSchema>;
 export type StackAnalyzeResponse = z.infer<typeof StackAnalyzeResponseSchema>;
 export type ScaffoldRequest = z.infer<typeof ScaffoldRequestSchema>;
+
+export const ScaffoldResponseSchema = z.object({
+  id: z.string(),
+  url: z.string().optional(),
+  files: z.array(z.object({ path: z.string(), content: z.string() })).optional()
+});
+export type ScaffoldResponse = z.infer<typeof ScaffoldResponseSchema>;
+
 export type BlueprintRequest = z.infer<typeof BlueprintRequestSchema>;
+
+export const BlueprintAlternativeSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  tools: z.array(ToolSchema),
+  score: z.number(),
+  tradeoffs: z.array(z.string()),
+});
+export type BlueprintAlternative = z.infer<typeof BlueprintAlternativeSchema>;
+
+export const BlueprintResponseSchema = z.object({
+  id: z.string(),
+  idea: z.string(),
+  primaryStack: z.object({
+    tools: z.array(ToolSchema),
+    score: z.number(),
+    diagnostics: z.array(DiagnosticSchema),
+  }),
+  alternatives: z.array(BlueprintAlternativeSchema),
+  rationale: z.string(),
+});
+export type BlueprintResponse = z.infer<typeof BlueprintResponseSchema>;
+
+export const CompatibilityResponseSchema = z.object({
+  toolA: z.string(),
+  toolB: z.string(),
+  score: z.number(),
+  diagnostics: z.array(DiagnosticSchema),
+});
+export type CompatibilityResponse = z.infer<typeof CompatibilityResponseSchema>;
+
+export const MigrationResponseSchema = z.object({
+  from: z.string(),
+  to: z.string(),
+  steps: z.array(z.string()),
+  complexity: z.enum(["low", "medium", "high"]),
+  estimatedTime: z.string(),
+});
+export type MigrationResponse = z.infer<typeof MigrationResponseSchema>;
+
