@@ -46,6 +46,28 @@ test.describe("Stackfast MVP flows", () => {
     await expect(page.getByRole("heading", { name: "Integration Analysis" })).toBeVisible();
   });
 
+  test("shows a compatibility matrix across two categories", async ({ page }) => {
+    await page.goto("/compatibility");
+
+    await page.getByTestId("compat-tab-matrix").click();
+
+    const heatmap = page.getByTestId("compatibility-heatmap");
+    await expect(heatmap).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByRole("heading", { name: "Compatibility Matrix" })).toBeVisible();
+
+    await page.getByTestId("heatmap-row-select").selectOption("frontend");
+    await page.getByTestId("heatmap-col-select").selectOption("hosting");
+
+    const table = page.getByTestId("heatmap-table");
+    await expect(table).toBeVisible();
+    // At least one cell should render a harmony score. The initial load has
+    // frontend × hosting so we expect Next.js × Vercel to be excellent.
+    await expect(table.locator("td[data-score]").first()).toBeVisible();
+    await expect(table).toContainText("Next.js");
+    await expect(table).toContainText("Vercel");
+    await page.screenshot({ path: "test-results/compat-matrix.png", fullPage: true });
+  });
+
   test("shows a basic migration path", async ({ page }) => {
     await page.goto("/migration");
 
