@@ -61,14 +61,19 @@ const catalogLoader = new CatalogLoader();
 const configuredCorsOrigin = process.env.CORS_ORIGIN ?? process.env.WEB_ORIGIN ?? "http://localhost:5173";
 
 // Initialize AI explainer from env config (defaults to heuristic if no key)
-const aiProvider = (process.env.AI_PROVIDER ?? "heuristic") as "gemini" | "openai" | "heuristic";
+const aiProvider = (process.env.AI_PROVIDER ?? "heuristic") as "gemini" | "azure-openai" | "heuristic";
 const explainer = createExplainer({
   provider: aiProvider,
   apiKey:
     aiProvider === "gemini" ? process.env.GEMINI_API_KEY :
-    aiProvider === "openai" ? process.env.OPENAI_API_KEY :
+    aiProvider === "azure-openai" ? process.env.AZURE_OPENAI_API_KEY :
     undefined,
-  model: process.env.AI_MODEL || undefined,
+  model:
+    aiProvider === "azure-openai"
+      ? process.env.AZURE_OPENAI_DEPLOYMENT || process.env.AI_MODEL || undefined
+      : process.env.AI_MODEL || undefined,
+  azureResourceName: process.env.AZURE_OPENAI_RESOURCE_NAME,
+  azureApiVersion: process.env.AZURE_OPENAI_API_VERSION,
   maxTokens: process.env.AI_MAX_TOKENS ? Number(process.env.AI_MAX_TOKENS) : undefined,
   timeoutMs: process.env.AI_TIMEOUT_MS ? Number(process.env.AI_TIMEOUT_MS) : undefined,
 });

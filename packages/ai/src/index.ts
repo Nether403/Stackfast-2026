@@ -1,4 +1,5 @@
 import type { Diagnostic, ImplementationRoadmap, Tool, WhyNotExplanation } from "@stackfast/schemas";
+import { AzureOpenAIExplainer } from "./providers/azure-openai.js";
 import { GeminiExplainer } from "./providers/gemini.js";
 
 // ---------------------------------------------------------------------------
@@ -254,15 +255,19 @@ class FallbackExplainer implements BlueprintExplainer {
 
 export interface ExplainerConfig {
   /** Which provider to use. Defaults to "heuristic". */
-  provider?: "heuristic" | "gemini" | "openai";
+  provider?: "heuristic" | "gemini" | "azure-openai";
   /** API key for the selected AI provider (unused for heuristic). */
   apiKey?: string;
-  /** Model ID override (e.g., "gemini-2.0-flash", "gpt-4o-mini"). */
+  /** Model ID (Gemini) or deployment name (Azure OpenAI). */
   model?: string;
   /** Max tokens per AI response. Default: 2048. */
   maxTokens?: number;
   /** Timeout in ms before falling back to heuristic. Default: 30000. */
   timeoutMs?: number;
+  /** Azure resource name — required when provider === "azure-openai". */
+  azureResourceName?: string;
+  /** Azure API version override — only used by the Azure provider. */
+  azureApiVersion?: string;
 }
 
 /**
@@ -272,10 +277,18 @@ export interface ExplainerConfig {
  * // Heuristic (no API key needed)
  * const explainer = createExplainer();
  *
- * // Gemini AI (default provider)
+ * // Gemini (Google Generative AI)
  * const explainer = createExplainer({
  *   provider: "gemini",
  *   apiKey: process.env.GEMINI_API_KEY,
+ * });
+ *
+ * // Azure OpenAI (model is the Azure deployment name)
+ * const explainer = createExplainer({
+ *   provider: "azure-openai",
+ *   apiKey: process.env.AZURE_OPENAI_API_KEY,
+ *   azureResourceName: process.env.AZURE_OPENAI_RESOURCE_NAME,
+ *   model: process.env.AZURE_OPENAI_DEPLOYMENT, // e.g. "gpt-5.5"
  * });
  * ```
  *
@@ -304,10 +317,24 @@ export function createExplainer(config?: ExplainerConfig): BlueprintExplainer {
     return new FallbackExplainer(gemini);
   }
 
-  if (provider === "openai") {
-    // OpenAI support will be added later (user will add via Azure)
-    console.warn("[ai] OpenAI provider is not yet implemented. Falling back to heuristic.");
-    return new HeuristicExplainer();
+  if (provider === "azure-openai") {
+    if (!config?.apiKey || !config.azureResourceName || !config.model) {
+      console.warn(
+        "[ai] Azure OpenAI selected but missing apiKey, azureResourceName, or model (deployment). Falling back to heuristic.",
+      );
+      return new HeuristicExplainer();
+    }
+
+    const azureOpenAI = new AzureOpenAIExplainer({
+      resourceName: config.azureResourceName,
+      apiKey: config.apiKey,
+      deployment: config.model,
+      ...(config.azureApiVersion ? { apiVersion: config.azureApiVersion } : {}),
+      maxTokens: config.maxTokens,
+      timeoutMs: config.timeoutMs,
+    });
+
+    return new FallbackExplainer(azureOpenAI);
   }
 
   console.warn(`[ai] Unknown provider "${provider}". Falling back to heuristic.`);

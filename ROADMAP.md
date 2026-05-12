@@ -155,7 +155,7 @@ Ship a polished frontend that makes the API accessible and delightful.
 Make the blueprint generator actually valuable with LLM-powered explanations.
 
 ### Deliverables
-- [ ] `packages/ai/` — Provider abstraction (OpenAI/Gemini/Anthropic)
+- [x] `packages/ai/` — Provider abstraction (heuristic, Gemini, Azure OpenAI)
 - [x] Deterministic rules remain source of truth for scoring
 - [x] LLM adds explanation and synthesis layer
 - [x] Every AI response validated with Zod
@@ -167,7 +167,13 @@ Make the blueprint generator actually valuable with LLM-powered explanations.
 - [x] Fallback to deterministic-only mode if AI unavailable
 
 ### Current Status
-**Started/in progress.** Gemini-backed explanation and deterministic fallback paths exist, but the provider abstraction is incomplete and OpenAI/Anthropic support remains stubbed or not implemented.
+**Phase 5 scope is complete for MVP.** `heuristic`, `gemini`, and
+`azure-openai` providers ship in `packages/ai`. The operator's Azure AI
+Foundry resource (with `gpt-5.5` / `gpt-4.1` deployments) is the primary
+production provider; Gemini remains available as a lower-cost fallback.
+Every AI call is wrapped in a heuristic fallback and validated with Zod.
+See `docs/decisions/002-ai-provider-strategy.md`. The one remaining item
+(ADR generation in the blueprint response itself) is deferred to v1.1.
 
 ### Risk
 **Medium.** LLM integration introduces latency and cost. Provider API changes can break things. Zod validation of AI output needs thorough testing.

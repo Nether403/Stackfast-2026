@@ -78,8 +78,11 @@ Common local variables are documented in `.env.example`:
 | `ALLOW_AUTH_BYPASS` | Local non-production auth bypass when no database is configured |
 | `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | GitHub OAuth credentials |
 | `ADMIN_API_KEY` | Protects `/admin/*` and `/internal/*` routes |
-| `AI_PROVIDER` | `heuristic`, `gemini`, or `openai` |
-| `GEMINI_API_KEY`, `OPENAI_API_KEY` | Optional AI provider keys |
+| `AI_PROVIDER` | `heuristic`, `gemini`, or `azure-openai` |
+| `GEMINI_API_KEY` | Gemini API key (when `AI_PROVIDER=gemini`) |
+| `AZURE_OPENAI_RESOURCE_NAME` | Azure Foundry resource subdomain (when `AI_PROVIDER=azure-openai`) |
+| `AZURE_OPENAI_API_KEY` | Azure OpenAI API key |
+| `AZURE_OPENAI_DEPLOYMENT` | Azure deployment name, e.g. `gpt-5.5` or `gpt-4.1` |
 | `VITE_API_URL` | Web build-time API URL, e.g. `http://localhost:3000/api/v1` |
 | `VITE_AUTH_URL` | Optional web build-time auth origin override |
 

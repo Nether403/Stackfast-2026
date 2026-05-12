@@ -11,6 +11,7 @@
     "test": "vitest run --config ../../vitest.package.config.ts"
   },
   "dependencies": {
+    "@ai-sdk/azure": "^3.0.64",
     "@ai-sdk/google": "^3.0.71",
     "@stackfast/schemas": "workspace:*",
     "@stackfast/shared": "workspace:*",
