@@ -1,63 +1,34 @@
-import { useState, useEffect } from 'react';
-import { Loader2, AlertCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { StackBuilder } from '@/components/StackBuilder';
-import { ExportDialog } from '@/components/ExportDialog';
-import { SelectionsProvider } from '@/context/SelectionsContext';
-import { EvaluationProvider } from '@/context/EvaluationContext';
-import { SuggestionsProvider } from '@/context/SuggestionsContext';
-import { ExportProvider } from '@/context/ExportContext';
-import { loadCatalog, clearCatalogCache, type CatalogData } from '@/lib/catalog-loader';
-import { Layout } from '@/components/Layout';
+import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { Loader2, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { StackBuilder } from "@/components/StackBuilder";
+import { ExportDialog } from "@/components/ExportDialog";
+import { SelectionsProvider } from "@/context/SelectionsContext";
+import { EvaluationProvider } from "@/context/EvaluationContext";
+import { SuggestionsProvider } from "@/context/SuggestionsContext";
+import { ExportProvider } from "@/context/ExportContext";
+import { clearCatalogCache } from "@/lib/catalog-loader";
+import { Layout } from "@/components/Layout";
+import { useStackBuilderCatalog } from "@/hooks/useApi";
 
 export function StackBuilderPage() {
-  const [catalog, setCatalog] = useState<CatalogData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const queryClient = useQueryClient();
   const [showExportDialog, setShowExportDialog] = useState(false);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    (async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const data = await loadCatalog();
-        
-        if (!cancelled) {
-          setCatalog(data);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setError(err instanceof Error ? err : new Error('Failed to load catalog'));
-        }
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const {
+    data: catalog,
+    isLoading,
+    error,
+    refetch,
+    isRefetching,
+  } = useStackBuilderCatalog();
 
   const handleRefreshCatalog = async () => {
     clearCatalogCache();
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      const data = await loadCatalog();
-      setCatalog(data);
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to load catalog'));
-    } finally {
-      setIsLoading(false);
-    }
+    await queryClient.invalidateQueries({ queryKey: ["catalog"] });
+    await refetch();
   };
 
   if (isLoading) {
@@ -91,12 +62,14 @@ export function StackBuilderPage() {
             <div className="space-y-2">
               <h2 className="text-2xl font-bold">Failed to Load Catalog</h2>
               <p className="text-muted-foreground">
-                {error?.message || 'Unable to load the tool catalog. Please check your connection and try again.'}
+                {error instanceof Error
+                  ? error.message
+                  : "Unable to load the tool catalog. Please check your connection and try again."}
               </p>
             </div>
             <div className="flex gap-2 justify-center">
-              <Button onClick={handleRefreshCatalog}>
-                Retry
+              <Button onClick={handleRefreshCatalog} disabled={isRefetching}>
+                {isRefetching ? "Retrying..." : "Retry"}
               </Button>
               <Button onClick={() => window.location.reload()} variant="outline">
                 Refresh Page
@@ -123,7 +96,7 @@ export function StackBuilderPage() {
                   catalogVersion={catalog.manifest.version}
                   catalogUpdatedAt={catalog.manifest.updatedAt}
                 />
-                
+
                 <ExportDialog
                   open={showExportDialog}
                   onOpenChange={setShowExportDialog}

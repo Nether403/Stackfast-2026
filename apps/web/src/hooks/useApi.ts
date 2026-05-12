@@ -1,11 +1,16 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";
-import { BlueprintRequest, ScaffoldRequest, StackAnalyzeRequest } from "@stackfast/schemas";
+import { loadCatalog } from "@/lib/catalog-loader";
+import {
+  BlueprintRequest,
+  ScaffoldRequest,
+  StackAnalyzeRequest,
+} from "@stackfast/schemas";
 
-export const useTools = (params?: { 
-  q?: string; 
-  category?: string; 
-  capabilities?: string; 
+export const useTools = (params?: {
+  q?: string;
+  category?: string;
+  capabilities?: string;
   pricing?: string;
   sort?: "name" | "category" | "confidence";
   limit?: number;
@@ -29,6 +34,31 @@ export const useCategories = () => {
   return useQuery({
     queryKey: ["categories"],
     queryFn: () => apiClient.getCategories(),
+  });
+};
+
+/**
+ * Raw /api/v1/catalog payload for components that already have the tools and
+ * rules they need on hand (e.g. the compatibility matrix heatmap).
+ */
+export const useCatalog = () => {
+  return useQuery({
+    queryKey: ["catalog"],
+    queryFn: () => apiClient.getCatalog(),
+    staleTime: 10 * 60 * 1000, // catalog rarely changes within a session
+  });
+};
+
+/**
+ * Catalog wrapped in the Stack Builder's localStorage-cache + static-fallback
+ * loader. Use this when the page needs to render even if the API is down.
+ */
+export const useStackBuilderCatalog = () => {
+  return useQuery({
+    queryKey: ["catalog", "full-with-fallback"],
+    queryFn: () => loadCatalog(),
+    staleTime: 10 * 60 * 1000,
+    retry: 1,
   });
 };
 
