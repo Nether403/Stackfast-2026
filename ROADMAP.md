@@ -242,15 +242,21 @@ Build a registry that's genuinely useful for 2026 technology decisions.
 
 ## Phase 8: Deployment & Operations *(Days 29-31)*
 
+See `docs/decisions/003-deployment-architecture.md` for the full
+architecture decision: split Railway web/API, Neon Postgres, Upstash
+Redis for rate limiting, cross-origin cookie strategy, Sentry behind a
+feature flag, and the rollback plan.
+
 ### Deliverables
-- [ ] Web + API deployed to Railway
-- [ ] Neon Postgres provisioned and connected
-- [ ] Neon Auth configured with GitHub OAuth via Neon Console
+- [ ] Web + API deployed to Railway (via Railway CLI)
+- [ ] Neon Postgres production branch provisioned and connected
+- [ ] Better Auth + GitHub OAuth configured (ADR 001)
+- [ ] Upstash Redis provisioned, rate limiter migrated off in-memory `Map`
 - [ ] Health check verified
 - [ ] Rate limiting verified in production
-- [ ] Error tracking (Sentry) configured
+- [ ] Error tracking (Sentry) wired behind `SENTRY_DSN` feature flag
 - [ ] Admin API key configured
-- [ ] DNS + domain configured
+- [ ] DNS + domain configured (`stackfast.app` + `api.stackfast.app`)
 - [ ] README updated with deployment instructions
 
 ---
