@@ -22,17 +22,40 @@ test.describe("Stackfast MVP flows", () => {
   });
 
   test("generates an idea-to-stack blueprint", async ({ page }) => {
-    test.setTimeout(120_000);
+    test.setTimeout(180_000);
     await page.goto("/blueprint");
 
+    // Step 1 — idea
+    await expect(page.getByRole("heading", { name: "Idea to Stack" })).toBeVisible();
+    await expect(page.getByTestId("wizard-progress")).toBeVisible();
     await page.getByLabel(/What are you building/i).fill(
       "A subscription dashboard with login, billing, and email notifications",
     );
-    await page.getByRole("button", { name: /Generate Blueprint/i }).click();
+    await page.screenshot({ path: "test-results/wizard-step-1-idea.png", fullPage: true });
+    await page.getByRole("button", { name: /Next: Constraints/i }).click();
 
-    await expect(page.getByRole("heading", { name: "Recommended Architecture" })).toBeVisible({ timeout: 60_000 });
+    // Step 2 — constraints (optional)
+    await expect(page.getByLabel(/Technical constraints/i)).toBeVisible();
+    await page.getByLabel(/Technical constraints/i).fill("Must use TypeScript");
+    await page.getByLabel(/Budget/i).selectOption("medium");
+    await page.getByLabel(/Timeline/i).selectOption("mvp");
+    await page.screenshot({ path: "test-results/wizard-step-2-constraints.png", fullPage: true });
+    await page.getByRole("button", { name: /Generate blueprint/i }).click();
+
+    // Step 3 — results
+    await expect(page.getByRole("heading", { name: "Recommended Architecture" })).toBeVisible({
+      timeout: 30_000,
+    });
     await expect(page.getByText("Primary Stack")).toBeVisible();
     await expect(page.getByText("Harmony Score")).toBeVisible();
+    await page.screenshot({ path: "test-results/wizard-step-3-results.png", fullPage: true });
+
+    // Step 4 — export
+    await page.getByRole("button", { name: /Continue to export/i }).click();
+    const exportStep = page.getByTestId("wizard-export-step");
+    await expect(exportStep).toBeVisible({ timeout: 30_000 });
+    await expect(exportStep.getByRole("button", { name: /Download ZIP/i })).toBeVisible();
+    await page.screenshot({ path: "test-results/wizard-step-4-export.png", fullPage: true });
   });
 
   test("analyzes pairwise compatibility", async ({ page }) => {
