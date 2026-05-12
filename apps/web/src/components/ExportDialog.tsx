@@ -3,7 +3,7 @@
  * Modal for exporting stack configuration with preview and download
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { ExportData, ExportFormat } from '@stackfast/schemas';
 import {
   Dialog,
@@ -16,7 +16,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useSelectionsContext } from '@/context/SelectionsContext';
-import { apiClient } from '@/lib/api-client';
+import { useGenerateScaffold } from '@/hooks/useApi';
 import { generateArchive, downloadArchive } from '@/lib/archive-generator';
 
 function generateExportAsText(exportData: ExportData): string {
@@ -36,70 +36,74 @@ export function ExportDialog({
 }: ExportDialogProps) {
   // Get data from context
   const { getAllSelectedTools } = useSelectionsContext();
-  
+
   const selectedTools = getAllSelectedTools();
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [exportData, setExportData] = useState<ExportData | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
   const [selectedFormat, setSelectedFormat] = useState<ExportFormat>('zip');
 
-  // Generate export when dialog opens
-  const handleGenerate = async () => {
-    setIsGenerating(true);
-    setError(null);
-    
-    try {
-      const data = await apiClient.generateScaffold({
-        toolIds: selectedTools.map((tool) => tool.id),
-        projectName: 'stackfast-app',
-      });
-      setExportData(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to generate export');
-    } finally {
-      setIsGenerating(false);
-    }
-  };
+  const {
+    mutateAsync: generateScaffold,
+    data: exportData,
+    error: scaffoldError,
+    isPending: isGenerating,
+    reset: resetScaffold,
+  } = useGenerateScaffold();
+
+  // Generate the scaffold once when the dialog first opens.
+  useEffect(() => {
+    if (!open || exportData || isGenerating) return;
+    generateScaffold({
+      toolIds: selectedTools.map((tool) => tool.id),
+      projectName: 'stackfast-app',
+    }).catch(() => {
+      // Error surfaced via scaffoldError below; nothing to do here.
+    });
+  }, [open, exportData, isGenerating, generateScaffold, selectedTools]);
 
   // Download as archive
   const handleDownload = async () => {
     if (!exportData) return;
-    
-    setIsGenerating(true);
+
+    setIsDownloading(true);
+    setDownloadError(null);
     try {
       const projectName = exportData.files.find(f => f.path === 'package.json')
         ? JSON.parse(exportData.files.find(f => f.path === 'package.json')!.content).name
         : 'stackfast-app';
-      
+
       const blob = await generateArchive(
         exportData.files,
         exportData.format,
         projectName
       );
-      
+
       downloadArchive(blob, `${projectName}.${exportData.format}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to download archive');
+      setDownloadError(err instanceof Error ? err.message : 'Failed to download archive');
     } finally {
-      setIsGenerating(false);
+      setIsDownloading(false);
     }
   };
 
   // Copy as text
   const handleCopyText = () => {
     if (!exportData) return;
-    
+
     const text = generateExportAsText(exportData);
     navigator.clipboard.writeText(text);
   };
 
-  // Generate on open
   const handleOpenChange = (newOpen: boolean) => {
     onOpenChange(newOpen);
-    if (newOpen && !exportData) {
-      handleGenerate();
+    if (!newOpen) {
+      // Reset mutation state so the next open regenerates.
+      resetScaffold();
+      setDownloadError(null);
     }
   };
+
+  const combinedError = downloadError ?? (scaffoldError ? errorMessage(scaffoldError) : null);
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -117,14 +121,14 @@ export function ExportDialog({
           </div>
         )}
 
-        {error && (
+        {combinedError && (
           <div className="rounded-lg bg-destructive/10 p-4 text-destructive">
             <p className="font-semibold">Export Failed</p>
-            <p className="text-sm mt-1">{error}</p>
+            <p className="text-sm mt-1">{combinedError}</p>
           </div>
         )}
 
-        {exportData && !error && (
+        {exportData && !downloadError && (
           <div className="space-y-4">
             {/* Export Preview */}
             <div>
@@ -224,18 +228,23 @@ export function ExportDialog({
           <Button
             variant="outline"
             onClick={handleCopyText}
-            disabled={!exportData || isGenerating}
+            disabled={!exportData || isGenerating || isDownloading}
           >
             Copy as Text
           </Button>
           <Button
             onClick={handleDownload}
-            disabled={!exportData || isGenerating}
+            disabled={!exportData || isGenerating || isDownloading}
           >
-            {isGenerating ? 'Generating...' : 'Download'}
+            {isGenerating || isDownloading ? 'Generating...' : 'Download'}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
+}
+
+function errorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  return 'Failed to generate export';
 }
