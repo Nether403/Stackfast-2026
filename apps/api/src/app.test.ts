@@ -1,5 +1,14 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import app from "./app.js";
+import { BUCKETS } from "./rate-limit/buckets.js";
+import {
+  __resetBackendForTests,
+} from "./rate-limit/index.js";
+import type {
+  RateLimitBackend,
+  RateLimitCheckArgs,
+  RateLimitDecision,
+} from "./rate-limit/types.js";
 
 describe("api", () => {
   it("returns health status", async () => {
@@ -457,5 +466,204 @@ describe("api", () => {
       headers: { "X-Request-ID": customId },
     });
     expect(response.headers.get("X-Request-ID")).toBe(customId);
+  });
+
+  // ─── A6 rate-limit contract tests ──────────────────────────────
+  //
+  // These four cases are named verbatim in design.md § 8 "Testing strategy"
+  // and pin down the behavior the factory rewrite in
+  // `apps/api/src/rate-limit/index.ts` has to preserve. Every case is
+  // self-isolating: each one installs its own backend via
+  // `__resetBackendForTests` and restores the default in `afterEach` so a
+  // failing case cannot bleed counters into the next.
+
+  describe("rate-limit contract", () => {
+    afterEach(() => {
+      __resetBackendForTests(null);
+    });
+
+    /**
+     * Build a `RateLimitBackend` that records every `check()` call it
+     * receives into the returned `calls` array. Always returns an allow
+     * decision with full remaining quota so the admin/exempt-route checks
+     * can focus on "was this called at all?".
+     */
+    function createSpyBackend(): {
+      backend: RateLimitBackend;
+      calls: RateLimitCheckArgs[];
+    } {
+      const calls: RateLimitCheckArgs[] = [];
+      const backend: RateLimitBackend = {
+        name: "memory",
+        async check(args: RateLimitCheckArgs): Promise<RateLimitDecision> {
+          calls.push(args);
+          return {
+            allowed: true,
+            remaining: BUCKETS[args.bucket].limit,
+            limit: BUCKETS[args.bucket].limit,
+            resetAtEpochMs: Date.now() + BUCKETS[args.bucket].windowMs,
+          };
+        },
+      };
+      return { backend, calls };
+    }
+
+    /**
+     * Build a `RateLimitBackend` that delegates to a shared Map. Used by
+     * the "bucket count survives backend swap" case to prove that two
+     * wrapper instances sharing the same underlying state keep accounting
+     * consistent across a simulated restart. Semantics mirror the real
+     * memory backend: count is incremented on every call, `allowed` is
+     * `count <= limit`, and the window resets lazily at `resetAtEpochMs`.
+     */
+    function createSharedStateBackend(
+      store: Map<string, { count: number; resetAtEpochMs: number }>,
+    ): RateLimitBackend {
+      return {
+        name: "upstash",
+        async check({ bucket, clientId }): Promise<RateLimitDecision> {
+          const key = `${bucket}:${clientId}`;
+          const config = BUCKETS[bucket];
+          const now = Date.now();
+          let entry = store.get(key);
+          if (!entry || now >= entry.resetAtEpochMs) {
+            entry = { count: 1, resetAtEpochMs: now + config.windowMs };
+            store.set(key, entry);
+          } else {
+            entry.count += 1;
+          }
+          return {
+            allowed: entry.count <= config.limit,
+            remaining: Math.max(0, config.limit - entry.count),
+            limit: config.limit,
+            resetAtEpochMs: entry.resetAtEpochMs,
+          };
+        },
+      };
+    }
+
+    it("admin 401 before rate-limit counter increments (R8.1)", async () => {
+      const { backend, calls } = createSpyBackend();
+      __resetBackendForTests(backend);
+
+      const response = await app.request("/admin/tools/import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tools: [{ id: "whatever" }] }),
+      });
+
+      expect(response.status).toBe(401);
+      // The admin middleware rejects before any downstream middleware runs.
+      // `/admin/*` also isn't under `/api/v1/*`, so the rate-limit
+      // middleware cannot match it — the backend is never consulted.
+      expect(calls).toHaveLength(0);
+    });
+
+    it("Retry-After only on 429 (R4.7, R4.8)", async () => {
+      const store = new Map<string, { count: number; resetAtEpochMs: number }>();
+      __resetBackendForTests(createSharedStateBackend(store));
+
+      const clientId = "retry-after-test";
+      const readLimit = BUCKETS.read.limit;
+
+      // Requests 1..limit should all be 200 and MUST NOT include a
+      // Retry-After header. We collect the Retry-After values to assert
+      // they are all null in one shot.
+      const retryAfterDuringAllowed: (string | null)[] = [];
+      for (let i = 0; i < readLimit; i += 1) {
+        const ok = await app.request("/api/v1/tools/search", {
+          headers: { "x-forwarded-for": clientId },
+        });
+        expect(ok.status).toBe(200);
+        retryAfterDuringAllowed.push(ok.headers.get("Retry-After"));
+      }
+      expect(retryAfterDuringAllowed.every((v) => v === null)).toBe(true);
+
+      // Request limit+1 trips the rate limit: must return 429 and a
+      // positive-integer Retry-After header.
+      const blocked = await app.request("/api/v1/tools/search", {
+        headers: { "x-forwarded-for": clientId },
+      });
+      expect(blocked.status).toBe(429);
+      const retryAfter = blocked.headers.get("Retry-After");
+      expect(retryAfter).not.toBeNull();
+      const seconds = Number(retryAfter);
+      expect(Number.isInteger(seconds)).toBe(true);
+      expect(seconds).toBeGreaterThan(0);
+    });
+
+    it("exempt routes never counted (R4.9)", async () => {
+      const { backend, calls } = createSpyBackend();
+      __resetBackendForTests(backend);
+
+      for (let i = 0; i < 5; i += 1) {
+        const health = await app.request("/health");
+        expect(health.status).toBe(200);
+      }
+      for (let i = 0; i < 5; i += 1) {
+        const openapi = await app.request("/openapi.json");
+        expect(openapi.status).toBe(200);
+      }
+
+      expect(calls).toHaveLength(0);
+    });
+
+    it("bucket count survives backend swap (R6.4)", async () => {
+      const store = new Map<string, { count: number; resetAtEpochMs: number }>();
+      __resetBackendForTests(createSharedStateBackend(store));
+
+      const clientId = "backend-swap-test";
+      const generationLimit = BUCKETS.generation.limit;
+      const preSwap = generationLimit - 10; // 20 of the 30-quota window
+
+      // Fire `preSwap` generation-bucket requests. These exercise both
+      // rate-limit middlewares (generation + /api/v1/*), so we just look
+      // at the generation counter in the shared store.
+      for (let i = 0; i < preSwap; i += 1) {
+        const response = await app.request("/api/v1/blueprints", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-forwarded-for": clientId,
+          },
+          // Empty body intentionally: we want the rate-limit middleware
+          // to count every request, but the blueprint handler to short-
+          // circuit quickly with a 400 so the test stays fast.
+          body: "{}",
+        });
+        expect(response.status).not.toBe(429);
+      }
+      expect(
+        store.get(`generation:${clientId}`)?.count,
+      ).toBe(preSwap);
+
+      // Swap the backend wrapper but keep the SAME shared store — this
+      // simulates an API service restart where the underlying Redis
+      // keyspace survives. If accounting resets, the next 11 requests
+      // would all be 200 and the invariant breaks.
+      __resetBackendForTests(createSharedStateBackend(store));
+
+      const postSwapStatuses: number[] = [];
+      for (let i = 0; i < 11; i += 1) {
+        const response = await app.request("/api/v1/blueprints", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-forwarded-for": clientId,
+          },
+          body: "{}",
+        });
+        postSwapStatuses.push(response.status);
+      }
+
+      // 20 pre-swap + first 10 post-swap = 30 (still allowed). Request 31
+      // (the 11th post-swap) must be 429 because the shared store tracks
+      // the cumulative count across the restart.
+      expect(postSwapStatuses.slice(0, 10).every((s) => s !== 429)).toBe(true);
+      expect(postSwapStatuses[10]).toBe(429);
+      expect(
+        store.get(`generation:${clientId}`)?.count,
+      ).toBe(generationLimit + 1);
+    });
   });
 });
