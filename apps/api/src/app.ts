@@ -18,6 +18,7 @@ import type { MiddlewareHandler } from "hono/types";
 import { z } from "zod";
 import { openApiDocument } from "./openapi.js";
 import { getAuth, requireSession, optionalSession } from "./middleware/auth.js";
+import { createRateLimitMiddleware } from "./rate-limit/index.js";
 
 type Bindings = {
   ADMIN_API_KEY?: string;
@@ -51,11 +52,6 @@ const EnrichToolSchema = z.object({
   toolId: z.string().min(1),
   force: z.boolean().optional(),
 });
-
-const GENERATION_LIMIT = 30;
-const READ_LIMIT = 100;
-const WINDOW_MS = 60_000;
-export const rateLimitBuckets = new Map<string, { count: number; resetAt: number }>();
 
 const catalogLoader = new CatalogLoader();
 const configuredCorsOrigin = process.env.CORS_ORIGIN ?? process.env.WEB_ORIGIN ?? "http://localhost:5173";
@@ -94,9 +90,12 @@ app.use("*", async (c, next) => {
 });
 
 // --- Rate limiting ---
-app.use("/api/v1/blueprints", rateLimit("generation", GENERATION_LIMIT));
-app.use("/api/v1/scaffolds", rateLimit("generation", GENERATION_LIMIT));
-app.use("/api/v1/*", rateLimit("read", READ_LIMIT));
+// `/health` and `/openapi.json` are registered as top-level routes without any
+// `/api/v1/*` prefix, so the rate-limit middleware below never matches them
+// (R4.9: exempt routes never counted).
+app.use("/api/v1/blueprints", createRateLimitMiddleware("generation"));
+app.use("/api/v1/scaffolds", createRateLimitMiddleware("generation"));
+app.use("/api/v1/*", createRateLimitMiddleware("read"));
 
 // --- Auth middleware ---
 app.use("/api/v1/blueprints", requireSession());
@@ -344,29 +343,6 @@ function resolveTools(toolIds: string[]): Tool[] {
     throw Object.assign(new Error(`Unknown tool ids: ${missing.join(", ")}`), { status: 400 });
   }
   return tools as Tool[];
-}
-
-function rateLimit(bucket: string, limit: number): MiddlewareHandler<{ Bindings: Bindings; Variables: Variables }> {
-  return async (c, next) => {
-    const clientId = c.req.header("x-forwarded-for") ?? c.req.header("cf-connecting-ip") ?? "local";
-    const key = `${bucket}:${clientId}`;
-    const now = Date.now();
-    const current = rateLimitBuckets.get(key);
-
-    if (!current || current.resetAt <= now) {
-      rateLimitBuckets.set(key, { count: 1, resetAt: now + WINDOW_MS });
-      await next();
-      return;
-    }
-
-    if (current.count >= limit) {
-      c.header("Retry-After", String(Math.ceil((current.resetAt - now) / 1000)));
-      return c.json({ error: "Rate limit exceeded", requestId: c.get("requestId") }, 429);
-    }
-
-    current.count += 1;
-    await next();
-  };
 }
 
 function requireAdminApiKey(): MiddlewareHandler<{ Bindings: Bindings; Variables: Variables }> {
