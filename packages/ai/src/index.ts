@@ -1,4 +1,4 @@
-import type { Diagnostic, Tool } from "@stackfast/schemas";
+import type { Diagnostic, ImplementationRoadmap, Tool, WhyNotExplanation } from "@stackfast/schemas";
 import { GeminiExplainer } from "./providers/gemini.js";
 
 // ---------------------------------------------------------------------------
@@ -21,16 +21,35 @@ export interface TradeoffResult {
   source: "heuristic" | "ai";
 }
 
+export interface WhyNotResult {
+  whyNot: WhyNotExplanation;
+  source: "heuristic" | "ai";
+}
+
+export interface RoadmapResult {
+  roadmap: ImplementationRoadmap;
+  source: "heuristic" | "ai";
+}
+
 /**
  * Abstraction over the explanation layer.
  *
  * Phase 3 shipped a HeuristicExplainer (deterministic, no LLM).
  * Phase 5 adds AI-backed implementations via the Vercel AI SDK
  * as a drop-in replacement via `createExplainer({ provider: "gemini" })`.
+ *
+ * All methods have heuristic fallbacks — callers can always trust
+ * they will return a valid result, even if the LLM fails.
  */
 export interface BlueprintExplainer {
   explainStack(tools: Tool[], idea: string): Promise<ExplanationResult>;
   summarizeTradeoffs(tools: Tool[], diagnostics: Diagnostic[]): Promise<TradeoffResult>;
+  explainWhyNot(
+    primaryTools: Tool[],
+    alternativeTools: Tool[],
+    idea: string,
+  ): Promise<WhyNotResult>;
+  generateRoadmap(tools: Tool[], idea: string): Promise<RoadmapResult>;
 }
 
 // ---------------------------------------------------------------------------
@@ -60,6 +79,122 @@ class HeuristicExplainer implements BlueprintExplainer {
 
     return { tradeoffs, source: "heuristic" };
   }
+
+  async explainWhyNot(
+    primaryTools: Tool[],
+    alternativeTools: Tool[],
+    _idea: string,
+  ): Promise<WhyNotResult> {
+    const changed = diffToolNames(primaryTools, alternativeTools);
+    const altName = alternativeTools.map((t) => t.name).join(" + ");
+
+    // Figure out which dimension changed (hosting swap, ORM swap, etc.) and
+    // emit a reason based on the category of the changed tool(s).
+    const reason =
+      changed.length > 0
+        ? `Uses ${changed.map((c) => c.alt.name).join(", ")} instead of ${changed.map((c) => c.primary.name).join(", ")}. This is a reasonable alternative, but the primary stack was scored higher by the compatibility engine.`
+        : `The alternative stack ${altName} scored slightly lower on the compatibility engine's harmony score.`;
+
+    const betterFor = inferBetterFor(changed);
+
+    return {
+      whyNot: betterFor ? { reason, betterFor } : { reason },
+      source: "heuristic",
+    };
+  }
+
+  async generateRoadmap(tools: Tool[], _idea: string): Promise<RoadmapResult> {
+    // Deterministic 3-phase skeleton keyed off the tools selected.
+    const hasAuth = tools.some((t) => t.categoryId === "auth");
+    const hasDb = tools.some((t) => t.categoryId === "database" || t.categoryId === "orm");
+    const hasPayments = tools.some((t) => t.categoryId === "payments");
+    const hasHosting = tools.some((t) => t.categoryId === "hosting");
+
+    const foundationTasks: string[] = [
+      `Scaffold ${tools.find((t) => t.categoryId === "frontend")?.name ?? "the frontend"} app and install dependencies`,
+      "Configure local environment variables from `.env.example`",
+    ];
+    if (hasDb) foundationTasks.push("Provision the database and run initial migrations");
+    if (hasAuth) foundationTasks.push("Wire up authentication provider and protect routes");
+
+    const coreTasks: string[] = [
+      "Build primary data models and server routes",
+      "Implement main UI screens with loading and error states",
+    ];
+    if (hasPayments) coreTasks.push("Integrate payments checkout and webhooks");
+    coreTasks.push("Add validation, logging, and basic observability");
+
+    const deployTasks: string[] = [
+      "Write smoke tests for critical paths",
+      hasHosting
+        ? `Deploy to ${tools.find((t) => t.categoryId === "hosting")?.name ?? "production"} with production env vars`
+        : "Deploy to production with production env vars",
+      "Configure custom domain and monitoring",
+    ];
+
+    return {
+      roadmap: {
+        phases: [
+          { name: "Foundation", duration: "1-2 weeks", tasks: foundationTasks },
+          { name: "Core Features", duration: "2-4 weeks", tasks: coreTasks },
+          { name: "Polish & Deploy", duration: "1-2 weeks", tasks: deployTasks },
+        ],
+        totalEstimate: "4-8 weeks",
+      },
+      source: "heuristic",
+    };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Heuristic helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Identify which tools differ between the primary and alternative stacks.
+ * Pairs alternates by category when possible so we can say
+ * "Drizzle instead of Prisma" rather than "Drizzle instead of everything".
+ */
+function diffToolNames(
+  primary: Tool[],
+  alternative: Tool[],
+): Array<{ primary: Tool; alt: Tool }> {
+  const primaryIds = new Set(primary.map((t) => t.id));
+  const altIds = new Set(alternative.map((t) => t.id));
+
+  const removed = primary.filter((t) => !altIds.has(t.id));
+  const added = alternative.filter((t) => !primaryIds.has(t.id));
+
+  const pairs: Array<{ primary: Tool; alt: Tool }> = [];
+  for (const removedTool of removed) {
+    const match = added.find((t) => t.categoryId === removedTool.categoryId);
+    if (match) {
+      pairs.push({ primary: removedTool, alt: match });
+    }
+  }
+  return pairs;
+}
+
+function inferBetterFor(
+  changed: Array<{ primary: Tool; alt: Tool }>,
+): string | undefined {
+  if (changed.length === 0) return undefined;
+  const { primary, alt } = changed[0];
+
+  // A small set of category-based heuristics. The AI provider will produce
+  // richer copy; this just gives the UI something meaningful to show.
+  switch (alt.categoryId) {
+    case "hosting":
+      return alt.selfHostable
+        ? `Teams who prefer more control over runtime and pricing than ${primary.name}.`
+        : `Projects with a strong preference for ${alt.name}'s deployment model.`;
+    case "orm":
+      return `Projects that prefer ${alt.name}'s ${alt.id === "drizzle" ? "SQL-first, lightweight" : "higher-level"} approach.`;
+    case "database":
+      return `Workloads that align with ${alt.name}'s data model.`;
+    default:
+      return `Teams already standardized on ${alt.name}.`;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -87,6 +222,28 @@ class FallbackExplainer implements BlueprintExplainer {
     } catch {
       console.warn("[ai] Primary tradeoff analysis failed, using heuristic fallback.");
       return this.fallback.summarizeTradeoffs(tools, diagnostics);
+    }
+  }
+
+  async explainWhyNot(
+    primaryTools: Tool[],
+    alternativeTools: Tool[],
+    idea: string,
+  ): Promise<WhyNotResult> {
+    try {
+      return await this.primary.explainWhyNot(primaryTools, alternativeTools, idea);
+    } catch {
+      console.warn("[ai] Primary why-not explanation failed, using heuristic fallback.");
+      return this.fallback.explainWhyNot(primaryTools, alternativeTools, idea);
+    }
+  }
+
+  async generateRoadmap(tools: Tool[], idea: string): Promise<RoadmapResult> {
+    try {
+      return await this.primary.generateRoadmap(tools, idea);
+    } catch {
+      console.warn("[ai] Primary roadmap generation failed, using heuristic fallback.");
+      return this.fallback.generateRoadmap(tools, idea);
     }
   }
 }

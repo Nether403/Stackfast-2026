@@ -357,8 +357,9 @@ describe("api", () => {
     const body = await response.json();
 
     expect(response.status).toBe(200);
-    expect(body.difficulty).toBe("high");
-    expect(body.caveats.length).toBeGreaterThan(0);
+    expect(body.complexity).toBe("high");
+    expect(body.estimatedTime).toBe("1-2 weeks");
+    expect(body.steps).toContain("Schedule a manual architecture review for this cross-category migration");
   });
 
   it("handles same-category migration", async () => {
@@ -366,8 +367,9 @@ describe("api", () => {
     const body = await response.json();
 
     expect(response.status).toBe(200);
-    expect(body.difficulty).toBe("moderate");
-    expect(body.caveats).toEqual([]);
+    expect(body.complexity).toBe("medium");
+    expect(body.estimatedTime).toBe("1-3 days");
+    expect(body.steps).not.toContain("Review cross-category architecture impact before replacing database with database.");
   });
 
   // Blueprint response shape validation
@@ -385,6 +387,28 @@ describe("api", () => {
     expect(body.recommendedStack.rationale.length).toBeGreaterThan(0);
   });
 
+  it("blueprint response includes a populated roadmap", async () => {
+    const response = await app.request("/api/v1/blueprints", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-forwarded-for": "roadmap-test" },
+      body: JSON.stringify({ idea: "a subscription dashboard with auth and email" }),
+    });
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.roadmap).toBeDefined();
+    expect(Array.isArray(body.roadmap.phases)).toBe(true);
+    expect(body.roadmap.phases.length).toBeGreaterThanOrEqual(2);
+    expect(body.roadmap.phases.length).toBeLessThanOrEqual(5);
+    expect(typeof body.roadmap.totalEstimate).toBe("string");
+    for (const phase of body.roadmap.phases) {
+      expect(typeof phase.name).toBe("string");
+      expect(typeof phase.duration).toBe("string");
+      expect(Array.isArray(phase.tasks)).toBe(true);
+      expect(phase.tasks.length).toBeGreaterThan(0);
+    }
+  });
+
   it("blueprint alternatives include tradeoff source", async () => {
     const response = await app.request("/api/v1/blueprints", {
       method: "POST",
@@ -397,6 +421,27 @@ describe("api", () => {
     for (const alt of body.alternatives) {
       expect(alt.tradeoffSource).toBe("heuristic");
       expect(Array.isArray(alt.tradeoffs)).toBe(true);
+    }
+  });
+
+  it("blueprint alternatives include whyNot explanations", async () => {
+    const response = await app.request("/api/v1/blueprints", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-forwarded-for": "whynot-test" },
+      body: JSON.stringify({ idea: "a blog with user accounts" }),
+    });
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.alternatives.length).toBeGreaterThan(0);
+    for (const alt of body.alternatives) {
+      expect(alt.whyNot).toBeDefined();
+      expect(typeof alt.whyNot.reason).toBe("string");
+      expect(alt.whyNot.reason.length).toBeGreaterThan(0);
+      // betterFor is optional but should be a string when present
+      if (alt.whyNot.betterFor !== undefined) {
+        expect(typeof alt.whyNot.betterFor).toBe("string");
+      }
     }
   });
 

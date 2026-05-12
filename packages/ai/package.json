@@ -2,6 +2,7 @@
   "name": "@stackfast/ai",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "scripts": {
@@ -13,7 +14,8 @@
     "@ai-sdk/google": "^3.0.71",
     "@stackfast/schemas": "workspace:*",
     "@stackfast/shared": "workspace:*",
-    "ai": "^6.0.177"
+    "ai": "^6.0.177",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "typescript": "^5.6.3"

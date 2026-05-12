@@ -126,6 +126,48 @@
 
 ## Post-Extraction Cleanup
 
+Completed on 2026-05-11. The following were removed from the main working tree
+(all preserved on `origin/archive/pre-rebuild` if ever needed):
+
+1. Root `client/` (old React app — 104 files)
+2. Root `server/` (old Express/Drizzle server — 19 files)
+3. Root `shared/schema.ts` (migrated to `packages/schemas/src/db.ts`)
+4. `Branches/StackFast-101/`, `Branches/StackfastPro/` (orphan submodule
+   gitlinks — no `.gitmodules` ever existed, so git couldn't hydrate them)
+5. `Branches/StackWiseAI/` (inspiration-only, concepts already documented)
+6. `WebAILyzerAPI/` (orphan submodule gitlink; SHA preserved in
+   `docs/deferred/webailyzer.md` for post-MVP revival)
+7. `Referencedocs/` — `INTEGRATION_PLAN.md` moved to `docs/backlog/`,
+   `README_CI_DOCKER.md` dropped (superseded by current CI workflow)
+8. Root build configs: `vite.config.ts`, `tailwind.config.ts`, `tsconfig.json`,
+   `postcss.config.js`, `drizzle.config.ts`, `components.json` (each app now
+   owns its own config)
+9. Root `Dockerfile` (npm-based, port 5000 — will be rewritten for monorepo
+   deployment in Phase 8)
+10. Root `package-lock.json` (monorepo uses `pnpm-lock.yaml`)
+11. `attached_assets/` (legacy screenshots and docs — 23 files, 5.8MB)
+12. `fix-scores.js`, `export.csv`, `dev.log`, `run.log` (stale debris)
+
+The repository now contains only:
+```
+stackfast/
+├── apps/web/
+├── apps/api/
+├── packages/{registry,rules-engine,schemas,exporter,ai,shared}/
+├── docs/{decisions,backlog,deferred}/
+├── tests/e2e/
+├── scripts/
+├── .github/workflows/
+├── pnpm-workspace.yaml
+├── tsconfig.base.json
+├── .env.example
+├── .gitignore
+├── Agents.md
+├── readme.md
+├── ROADMAP.md
+└── SALVAGE_MANIFEST.md
+```
+
 After all files are extracted to their new locations:
 
 1. Delete `Branches/StackFast-101/` (no longer needed as reference)

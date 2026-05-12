@@ -6,22 +6,31 @@
   },
   "packageManager": "pnpm@9.15.4",
   "scripts": {
-    "dev": "pnpm -r --parallel dev",
+    "dev": "concurrently -n api,web -c blue,magenta --kill-others-on-fail \"pnpm --filter @stackfast/api dev\" \"pnpm --filter @stackfast/web dev\"",
+    "dev:api": "pnpm --filter @stackfast/api dev",
+    "dev:web": "pnpm --filter @stackfast/web dev",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
     "test": "pnpm -r test",
+    "test:e2e": "playwright test",
     "type-check": "pnpm -r type-check",
+    "seed": "pnpm --filter @stackfast/api seed",
     "validate:registry": "pnpm --filter @stackfast/registry validate"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
+    "@playwright/test": "^1.59.1",
+    "@types/node": "^25.6.2",
+    "concurrently": "^9.2.1",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^9.17.0",
     "prettier": "^3.4.2",
     "typescript": "^5.6.3",
     "typescript-eslint": "^8.19.1",
+    "vite": "^5.4.11",
     "vitest": "^2.1.8"
   },
   "dependencies": {
-    "playwright": "^1.59.1"
+    "@better-auth/infra": "^0.2.7"
   }
 }

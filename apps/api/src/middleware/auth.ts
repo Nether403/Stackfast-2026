@@ -91,13 +91,23 @@ export function requireSession(): MiddlewareHandler<{
   return async (c, next) => {
     const auth = getAuth();
 
+    // When auth isn't configured (no DATABASE_URL), production must fail closed
+    // with 503. Non-production with ALLOW_AUTH_BYPASS != "false" skips auth
+    // so catalog-only local dev and unit tests can run.
     if (!auth) {
-      if (!canBypassAuthForLocalDev(c.env)) {
-        return c.json(
-          { error: "Authentication is not configured", requestId: c.get("requestId") },
-          503 as ContentfulStatusCode,
-        );
+      if (canBypassAuthForLocalDev(c.env)) {
+        await next();
+        return;
       }
+      return c.json(
+        { error: "Authentication is not configured", requestId: c.get("requestId") },
+        503 as ContentfulStatusCode,
+      );
+    }
+
+    // When auth IS configured, non-production may still bypass for tests/dev
+    // unless the operator explicitly sets ALLOW_AUTH_BYPASS=false.
+    if (canBypassAuthForLocalDev(c.env)) {
       await next();
       return;
     }

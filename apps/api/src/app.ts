@@ -130,8 +130,13 @@ app.post("/api/v1/blueprints", async (c) => {
   const primaryEvaluation = evaluateRulesSync(primaryTools, catalogLoader.getRules());
   const primaryExport = await generateSafeExport(primaryTools, primaryEvaluation.diagnostics, "blueprint-app");
 
-  // AI explainer — uses configured provider with automatic heuristic fallback
-  const explanation = await explainer.explainStack(primaryTools, body.idea);
+  // AI explainer — uses configured provider with automatic heuristic fallback.
+  // explainStack, generateRoadmap, per-alternative tradeoffs and whyNot are
+  // all issued in parallel so a blueprint request does not fan out serially.
+  const [explanation, roadmapResult] = await Promise.all([
+    explainer.explainStack(primaryTools, body.idea),
+    explainer.generateRoadmap(primaryTools, body.idea),
+  ]);
 
   // Static cost estimation from registry pricing data
   const costEstimate = estimateCosts(primaryTools);
@@ -140,7 +145,10 @@ app.post("/api/v1/blueprints", async (c) => {
     buildAlternatives(primaryToolIds).map(async (toolIds) => {
       const tools = resolveTools(toolIds);
       const evaluation = evaluateRulesSync(tools, catalogLoader.getRules());
-      const tradeoffResult = await explainer.summarizeTradeoffs(tools, evaluation.diagnostics);
+      const [tradeoffResult, whyNotResult] = await Promise.all([
+        explainer.summarizeTradeoffs(tools, evaluation.diagnostics),
+        explainer.explainWhyNot(primaryTools, tools, body.idea),
+      ]);
       return {
         id: toolIds.join("-"),
         name: tools.map((tool) => tool.name).join(" + "),
@@ -148,6 +156,7 @@ app.post("/api/v1/blueprints", async (c) => {
         harmonyScore: evaluation.score,
         tradeoffs: tradeoffResult.tradeoffs,
         tradeoffSource: tradeoffResult.source,
+        whyNot: whyNotResult.whyNot,
       };
     }),
   );
@@ -169,6 +178,7 @@ app.post("/api/v1/blueprints", async (c) => {
       .filter((diagnostic) => diagnostic.level === "error" || diagnostic.level === "warning")
       .map((diagnostic) => diagnostic.message),
     costEstimate,
+    roadmap: roadmapResult.roadmap,
     files: primaryExport.files,
     export: primaryExport,
   });
@@ -277,14 +287,15 @@ app.get("/api/v1/migrations/:from/:to", (c) => {
   return c.json({
     from: from.id,
     to: to.id,
-    difficulty: from.categoryId === to.categoryId ? "moderate" : "high",
+    complexity: from.categoryId === to.categoryId ? "medium" : "high",
+    estimatedTime: from.categoryId === to.categoryId ? "1-3 days" : "1-2 weeks",
     steps: [
       `Inventory current ${from.name} usage and configuration`,
       `Create equivalent ${to.name} configuration in a branch`,
       "Migrate environment variables and secrets",
       "Run compatibility tests and deploy behind a rollback plan",
+      ...(from.categoryId === to.categoryId ? [] : ["Schedule a manual architecture review for this cross-category migration"]),
     ],
-    caveats: from.categoryId === to.categoryId ? [] : ["Cross-category migrations require manual architecture review"],
   });
 });
 
