@@ -358,7 +358,7 @@ export const openApiDocument = {
       // ── Response schemas ─────────────────────────────────────────
       BlueprintResponse: {
         type: "object" as const,
-        required: ["idea", "recommendedStack", "alternatives", "risks", "files", "export"],
+        required: ["idea", "recommendedStack", "alternatives", "risks", "costEstimate", "roadmap", "files", "export"],
         properties: {
           idea: { type: "string" },
           recommendedStack: {
@@ -370,10 +370,75 @@ export const openApiDocument = {
               diagnostics: { type: "array", items: { $ref: "#/components/schemas/Diagnostic" } },
               rationale: { type: "string" },
               explanationSource: { type: "string", enum: ["heuristic", "ai"] },
+              keyReasons: { type: "array", items: { type: "string" } },
+              confidence: { type: "number", minimum: 0, maximum: 1 },
             },
           },
-          alternatives: { type: "array", items: { type: "object", properties: { id: { type: "string" }, name: { type: "string" }, toolIds: { type: "array", items: { type: "string" } }, harmonyScore: { type: "number" }, tradeoffs: { type: "array", items: { type: "string" } }, tradeoffSource: { type: "string", enum: ["heuristic", "ai"] } } } },
+          alternatives: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                id: { type: "string" },
+                name: { type: "string" },
+                toolIds: { type: "array", items: { type: "string" } },
+                harmonyScore: { type: "number" },
+                tradeoffs: { type: "array", items: { type: "string" } },
+                tradeoffSource: { type: "string", enum: ["heuristic", "ai"] },
+                whyNot: {
+                  type: "object",
+                  properties: {
+                    reason: { type: "string" },
+                    betterFor: { type: "string" },
+                  },
+                  required: ["reason"],
+                },
+              },
+            },
+          },
           risks: { type: "array", items: { type: "string" } },
+          costEstimate: {
+            type: "object",
+            properties: {
+              items: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    toolId: { type: "string" },
+                    toolName: { type: "string" },
+                    pricingModel: { type: "string", enum: ["free", "free-tier", "paid"] },
+                    estimatedMonthlyCost: { type: ["number", "null"] },
+                    note: { type: "string" },
+                  },
+                },
+              },
+              totalMonthlyEstimate: { type: "number" },
+              totalAnnualEstimate: { type: "number" },
+              currency: { type: "string", enum: ["USD"] },
+            },
+          },
+          roadmap: {
+            type: "object",
+            properties: {
+              phases: {
+                type: "array",
+                minItems: 2,
+                maxItems: 5,
+                items: {
+                  type: "object",
+                  properties: {
+                    name: { type: "string" },
+                    duration: { type: "string" },
+                    tasks: { type: "array", items: { type: "string" } },
+                  },
+                  required: ["name", "duration", "tasks"],
+                },
+              },
+              totalEstimate: { type: "string" },
+            },
+            required: ["phases", "totalEstimate"],
+          },
           files: { type: "array", items: { type: "object", properties: { path: { type: "string" }, content: { type: "string" } } } },
           export: { type: "object", description: "Full export data including log and metadata" },
         },

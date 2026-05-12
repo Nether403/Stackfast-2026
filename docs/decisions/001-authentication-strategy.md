@@ -1,7 +1,8 @@
-# ADR-001: Authentication Strategy — Neon Auth with GitHub OAuth
+# ADR-001: Authentication Strategy — Better Auth with GitHub OAuth
 
 ## Status
-**Accepted** — 2026-05-09
+**Accepted** — 2026-05-09 (original)
+**Revised** — 2026-05-11 (correcting factual errors in the original decision)
 
 ## Context
 
@@ -10,56 +11,75 @@ Stackfast needs authentication for two purposes:
 2. **Admin protection** — Protect mutation endpoints (`/admin/*`, `/internal/*`)
 
 ### Constraints
+
 - Target audience is developers → GitHub OAuth is the natural fit
-- Already using Neon Postgres for the database → adding another platform (Clerk, Supabase) just for auth is undesirable
-- Railway is the deployment target → Railway has no built-in auth service
+- Using Neon Postgres for the database → adding another managed auth platform just for users is undesirable
+- Railway is the deployment target → no built-in auth service
 - Must work with Postgres Row-Level Security for future data isolation
+- Our backend is a **Hono** API in `apps/api/`, not Next.js
+- Our frontend is **Vite + wouter** in `apps/web/`, not Next.js
+
+### Factual clarification (correcting the original ADR)
+
+The original version of this ADR claimed "Neon Auth is built on the Better Auth framework." That is incorrect.
+
+- **Neon Auth** is an integration between Neon and [Stack Auth](https://stack-auth.com) (`@stackframe/stack`). When you enable Neon Auth in the Neon Console, a Stack Auth tenant is provisioned and the `neon_auth.users_sync` table is created in your Postgres. User records live on Stack Auth's hosted servers; Neon mirrors a read-only copy into your database via sync.
+- **Better Auth** (`better-auth`) is a separate framework-agnostic TypeScript auth library. It stores all authentication data directly in your own Postgres in `user`, `session`, `account`, and `verification` tables. It is not affiliated with Neon or Stack Auth.
+
+Neither is "Neon native" in a strict sense. Stack Auth is Neon's official partner integration. Better Auth stores everything in your own Neon database.
 
 ### Options Considered
 
 | Option | Pros | Cons |
 |--------|------|------|
-| **Neon Auth (Better Auth)** | Auth data lives in Neon Postgres, branch-aware, supports GitHub OAuth natively, no new platform | Newer service, less community examples than Clerk |
-| **Clerk** | Mature, excellent DX, many providers | Adds another platform, costs money at scale, data lives outside your DB |
-| **GitHub OAuth (raw)** | No dependencies, full control | Must build session management, token storage, refresh logic yourself |
-| **Supabase Auth** | Mature, free tier | Would add Supabase just for auth while using Neon for DB — messy |
+| **Stack Auth (via Neon Auth)** | Neon-provisioned, managed UI flows, `users_sync` in Postgres, one-click setup in Neon Console | Primarily targeted at Next.js App Router. Source of truth lives on Stack Auth's servers — you do not fully own the data. Hono and Vite integration is manual. |
+| **Better Auth** | Framework-agnostic with first-class Hono support, all data in your own Neon Postgres, branch-aware (auth rows branch with your DB), Drizzle adapter, works identically in dev and production | Younger than Clerk/Auth0 in non-Next stacks. Less Neon Console tooling. |
+| **Clerk** | Mature, polished DX, many providers | External platform, priced at scale, auth data lives outside your DB |
+| **Supabase Auth** | Mature, free tier | Would add Supabase just for auth while using Neon for data — messy |
+| **GitHub OAuth (raw)** | Zero dependencies | Must build session management, token storage, CSRF, refresh ourselves |
 
 ## Decision
 
-Use **Neon Auth (Better Auth)** with **GitHub OAuth** as the primary social provider.
+Use **Better Auth** (`better-auth`) with **GitHub OAuth** as the primary social provider.
 
 ### Rationale
 
-1. **Neon Auth has dramatically improved** (May 2026 — built on Better Auth framework):
-   - Auth data stored directly in Neon Postgres in a `neon_auth` schema
-   - Branch-aware: auth state branches with your database (dev/staging isolation)
-   - Native RLS integration for row-level access control
-   - Managed REST API — no external auth infrastructure to maintain
-   - GitHub OAuth configured directly in the Neon Console
-
-2. **Zero new platforms**: Since we're already using Neon Postgres, auth comes for free
-3. **Developer audience fit**: GitHub OAuth is the expected login method
-4. **Future-proof**: Neon Auth supports adding more providers (Google, email/password) post-MVP
+1. **Stack fit.** Our API is Hono and our frontend is Vite + wouter. Better Auth drops directly into Hono with `app.on(["GET","POST"], "/api/auth/*", c => auth.handler(c.req.raw))`. Stack Auth's strongest story is Next.js App Router; outside of that its integration is noticeably thinner.
+2. **Data ownership.** All auth data — users, sessions, OAuth accounts, verification tokens — lives in four tables in our Neon Postgres. Drizzle queries and RLS policies work the same as for any other table. With Stack Auth, the source of truth lives on a third-party server and the `users_sync` copy is read-only.
+3. **Branch-aware auth.** Because Better Auth tables are regular Postgres tables, Neon branches carry the auth state with them. Dev branches naturally get dev-scoped users.
+4. **Zero lock-in.** Better Auth is an npm library. If we ever replace it, we own the tables.
+5. **Works identically in dev and prod.** No tenant provisioning, no cross-origin cookie surprises, no differences between local and deployed behavior.
 
 ### Admin Protection
+
 Admin routes (`/admin/*`, `/internal/*`) use a simple **API key** validated via middleware. This is separate from user auth and is sufficient for MVP where only the project owner needs admin access.
 
 ## Consequences
 
 ### Positive
+
 - Auth data lives alongside application data (single source of truth)
-- No additional platform costs or vendor lock-in
-- Branch-aware auth enables proper dev/staging testing
-- Can add email/password and Google OAuth later without changing architecture
+- No external auth platform, no additional vendor cost
+- Branch-aware auth enables clean dev/staging testing
+- Can add email/password, Google OAuth, passkeys later via Better Auth plugins without re-architecture
 
 ### Negative
-- Neon Auth is newer than Clerk/Auth0 — less community support and examples
-- Tied to Neon as database provider (acceptable since we chose Neon already)
-- Must generate Better Auth schema tables via CLI (`npx better-auth@latest generate`)
+
+- Must manage the schema (`user`, `session`, `account`, `verification`) as part of our own migrations
+- Less ready-made admin UI than Clerk or Stack Auth (not needed for MVP)
+- Small, unfamiliar dependency for teammates who haven't used Better Auth before
 
 ### Implementation Notes
-- Configure GitHub OAuth App credentials in Neon Console
-- Add `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` to `.env.example`
-- Use Better Auth client SDK in `apps/web/` for login UI
-- Validate sessions in `apps/api/` middleware using Better Auth server SDK
-- Admin API key is a separate `ADMIN_API_KEY` environment variable
+
+- **Server:** `apps/api/src/middleware/auth.ts` wires Better Auth with `drizzleAdapter(db, { provider: "pg" })` and the GitHub social provider.
+- **Client:** `apps/web/src/lib/auth-client.ts` exposes `signIn`, `signOut`, `useSession` from `better-auth/react`.
+- **Schema:** Tables `user`, `session`, `account`, `verification` live in Neon Postgres `public` schema (see migration `002-better-auth-tables`).
+- **GitHub OAuth callback:** `{BETTER_AUTH_URL}/api/auth/callback/github` (local: `http://localhost:3000/api/auth/callback/github`).
+- **Environment:** `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`.
+- **Admin:** `ADMIN_API_KEY` — separate from user sessions.
+
+### Deferred
+
+- The `neon_auth.users_sync` table provisioned by Neon Auth is unused and has been dropped.
+- The `NEXT_PUBLIC_STACK_*` and `STACK_SECRET_SERVER_KEY` environment variables left over from the Neon Console provisioning have been removed from `.env`.
+- Better Auth Cloud (optional hosted add-ons such as SSO and analytics) is not enabled. A Better Auth Cloud account/API key exists and is held for possible future use, but the MVP uses the self-hosted library only.

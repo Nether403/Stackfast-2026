@@ -61,14 +61,19 @@ const catalogLoader = new CatalogLoader();
 const configuredCorsOrigin = process.env.CORS_ORIGIN ?? process.env.WEB_ORIGIN ?? "http://localhost:5173";
 
 // Initialize AI explainer from env config (defaults to heuristic if no key)
-const aiProvider = (process.env.AI_PROVIDER ?? "heuristic") as "gemini" | "openai" | "heuristic";
+const aiProvider = (process.env.AI_PROVIDER ?? "heuristic") as "gemini" | "azure-openai" | "heuristic";
 const explainer = createExplainer({
   provider: aiProvider,
   apiKey:
     aiProvider === "gemini" ? process.env.GEMINI_API_KEY :
-    aiProvider === "openai" ? process.env.OPENAI_API_KEY :
+    aiProvider === "azure-openai" ? process.env.AZURE_OPENAI_API_KEY :
     undefined,
-  model: process.env.AI_MODEL || undefined,
+  model:
+    aiProvider === "azure-openai"
+      ? process.env.AZURE_OPENAI_DEPLOYMENT || process.env.AI_MODEL || undefined
+      : process.env.AI_MODEL || undefined,
+  azureResourceName: process.env.AZURE_OPENAI_RESOURCE_NAME,
+  azureApiVersion: process.env.AZURE_OPENAI_API_VERSION,
   maxTokens: process.env.AI_MAX_TOKENS ? Number(process.env.AI_MAX_TOKENS) : undefined,
   timeoutMs: process.env.AI_TIMEOUT_MS ? Number(process.env.AI_TIMEOUT_MS) : undefined,
 });
@@ -130,8 +135,13 @@ app.post("/api/v1/blueprints", async (c) => {
   const primaryEvaluation = evaluateRulesSync(primaryTools, catalogLoader.getRules());
   const primaryExport = await generateSafeExport(primaryTools, primaryEvaluation.diagnostics, "blueprint-app");
 
-  // AI explainer — uses configured provider with automatic heuristic fallback
-  const explanation = await explainer.explainStack(primaryTools, body.idea);
+  // AI explainer — uses configured provider with automatic heuristic fallback.
+  // explainStack, generateRoadmap, per-alternative tradeoffs and whyNot are
+  // all issued in parallel so a blueprint request does not fan out serially.
+  const [explanation, roadmapResult] = await Promise.all([
+    explainer.explainStack(primaryTools, body.idea),
+    explainer.generateRoadmap(primaryTools, body.idea),
+  ]);
 
   // Static cost estimation from registry pricing data
   const costEstimate = estimateCosts(primaryTools);
@@ -140,7 +150,10 @@ app.post("/api/v1/blueprints", async (c) => {
     buildAlternatives(primaryToolIds).map(async (toolIds) => {
       const tools = resolveTools(toolIds);
       const evaluation = evaluateRulesSync(tools, catalogLoader.getRules());
-      const tradeoffResult = await explainer.summarizeTradeoffs(tools, evaluation.diagnostics);
+      const [tradeoffResult, whyNotResult] = await Promise.all([
+        explainer.summarizeTradeoffs(tools, evaluation.diagnostics),
+        explainer.explainWhyNot(primaryTools, tools, body.idea),
+      ]);
       return {
         id: toolIds.join("-"),
         name: tools.map((tool) => tool.name).join(" + "),
@@ -148,6 +161,7 @@ app.post("/api/v1/blueprints", async (c) => {
         harmonyScore: evaluation.score,
         tradeoffs: tradeoffResult.tradeoffs,
         tradeoffSource: tradeoffResult.source,
+        whyNot: whyNotResult.whyNot,
       };
     }),
   );
@@ -169,6 +183,7 @@ app.post("/api/v1/blueprints", async (c) => {
       .filter((diagnostic) => diagnostic.level === "error" || diagnostic.level === "warning")
       .map((diagnostic) => diagnostic.message),
     costEstimate,
+    roadmap: roadmapResult.roadmap,
     files: primaryExport.files,
     export: primaryExport,
   });
@@ -277,14 +292,15 @@ app.get("/api/v1/migrations/:from/:to", (c) => {
   return c.json({
     from: from.id,
     to: to.id,
-    difficulty: from.categoryId === to.categoryId ? "moderate" : "high",
+    complexity: from.categoryId === to.categoryId ? "medium" : "high",
+    estimatedTime: from.categoryId === to.categoryId ? "1-3 days" : "1-2 weeks",
     steps: [
       `Inventory current ${from.name} usage and configuration`,
       `Create equivalent ${to.name} configuration in a branch`,
       "Migrate environment variables and secrets",
       "Run compatibility tests and deploy behind a rollback plan",
+      ...(from.categoryId === to.categoryId ? [] : ["Schedule a manual architecture review for this cross-category migration"]),
     ],
-    caveats: from.categoryId === to.categoryId ? [] : ["Cross-category migrations require manual architecture review"],
   });
 });
 

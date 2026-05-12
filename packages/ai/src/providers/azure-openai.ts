@@ -1,6 +1,11 @@
 import { generateText } from "ai";
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
-import type { Diagnostic, ImplementationRoadmap, Tool, WhyNotExplanation } from "@stackfast/schemas";
+import { createAzure } from "@ai-sdk/azure";
+import type {
+  Diagnostic,
+  ImplementationRoadmap,
+  Tool,
+  WhyNotExplanation,
+} from "@stackfast/schemas";
 import type {
   BlueprintExplainer,
   ExplanationResult,
@@ -23,25 +28,42 @@ import {
 } from "../prompts.js";
 
 // ---------------------------------------------------------------------------
-// Gemini Explainer — powered by Vercel AI SDK + @ai-sdk/google
+// Azure OpenAI Explainer — powered by Vercel AI SDK + @ai-sdk/azure
+// ---------------------------------------------------------------------------
+//
+// Azure deployments are customer-named, so the "model" here is actually the
+// deployment name configured in the Azure OpenAI Foundry resource. The
+// resource name, API key, and deployment name are all operator-provided.
 // ---------------------------------------------------------------------------
 
-export interface GeminiExplainerConfig {
+export interface AzureOpenAIExplainerConfig {
+  /** Azure resource name (the sub-domain in <resource>.openai.azure.com). */
+  resourceName: string;
+  /** Azure OpenAI API key. */
   apiKey: string;
-  model?: string;
+  /** Deployment name (e.g., "gpt-5.5" or "gpt-4.1"). Must exist in the resource. */
+  deployment: string;
+  /** Optional API version override. */
+  apiVersion?: string;
+  /** Max output tokens. Default: 2048. */
   maxTokens?: number;
+  /** Timeout in ms before falling back to heuristic. Default: 30000. */
   timeoutMs?: number;
 }
 
-export class GeminiExplainer implements BlueprintExplainer {
-  private readonly google;
-  private readonly modelId: string;
+export class AzureOpenAIExplainer implements BlueprintExplainer {
+  private readonly azure;
+  private readonly deployment: string;
   private readonly maxOutputTokens: number;
   private readonly timeoutMs: number;
 
-  constructor(config: GeminiExplainerConfig) {
-    this.google = createGoogleGenerativeAI({ apiKey: config.apiKey });
-    this.modelId = config.model ?? "gemini-2.5-flash";
+  constructor(config: AzureOpenAIExplainerConfig) {
+    this.azure = createAzure({
+      resourceName: config.resourceName,
+      apiKey: config.apiKey,
+      ...(config.apiVersion ? { apiVersion: config.apiVersion } : {}),
+    });
+    this.deployment = config.deployment;
     this.maxOutputTokens = config.maxTokens ?? 2048;
     this.timeoutMs = config.timeoutMs ?? 30_000;
   }
@@ -49,16 +71,16 @@ export class GeminiExplainer implements BlueprintExplainer {
   async explainStack(tools: Tool[], idea: string): Promise<ExplanationResult> {
     try {
       const result = await generateText({
-        model: this.google(this.modelId),
+        model: this.azure(this.deployment),
         system: SYSTEM_PROMPT,
-        prompt: buildExplanationPrompt(tools, idea) +
+        prompt:
+          buildExplanationPrompt(tools, idea) +
           "\n\nRespond ONLY with a valid JSON object matching this shape: " +
           '{ "summary": string, "keyReasons": string[], "confidence": number }',
         maxOutputTokens: this.maxOutputTokens,
         abortSignal: AbortSignal.timeout(this.timeoutMs),
       });
 
-      // Strip markdown code fences if the model wraps output in them
       const raw = stripJsonFences(result.text);
       const parsed = AiExplanationResponseSchema.parse(JSON.parse(raw));
 
@@ -74,7 +96,7 @@ export class GeminiExplainer implements BlueprintExplainer {
       };
     } catch (error) {
       console.warn(
-        `[ai/gemini] explainStack failed, will fall back to heuristic:`,
+        "[ai/azure-openai] explainStack failed, will fall back to heuristic:",
         error instanceof Error ? error.message : error,
       );
       throw error;
@@ -87,27 +109,32 @@ export class GeminiExplainer implements BlueprintExplainer {
   ): Promise<TradeoffResult> {
     try {
       const result = await generateText({
-        model: this.google(this.modelId),
+        model: this.azure(this.deployment),
         system: SYSTEM_PROMPT,
-        prompt: buildTradeoffPrompt(tools, diagnostics) +
+        prompt:
+          buildTradeoffPrompt(tools, diagnostics) +
           "\n\nRespond ONLY with a valid JSON object matching this shape: " +
           '{ "tradeoffs": Array<{ "aspect": string, "description": string, "severity": "low"|"medium"|"high" }> }',
         maxOutputTokens: this.maxOutputTokens,
         abortSignal: AbortSignal.timeout(this.timeoutMs),
       });
 
-      const raw = result.text.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "").trim();
+      const raw = stripJsonFences(result.text);
       const parsed = AiTradeoffResponseSchema.parse(JSON.parse(raw));
 
       return {
         tradeoffs: parsed.tradeoffs.map(
-          (t: { severity: "low" | "medium" | "high"; aspect: string; description: string }) => `[${t.severity.toUpperCase()}] ${t.aspect}: ${t.description}`,
+          (t: {
+            severity: "low" | "medium" | "high";
+            aspect: string;
+            description: string;
+          }) => `[${t.severity.toUpperCase()}] ${t.aspect}: ${t.description}`,
         ),
         source: "ai",
       };
     } catch (error) {
       console.warn(
-        `[ai/gemini] summarizeTradeoffs failed, will fall back to heuristic:`,
+        "[ai/azure-openai] summarizeTradeoffs failed, will fall back to heuristic:",
         error instanceof Error ? error.message : error,
       );
       throw error;
@@ -121,9 +148,10 @@ export class GeminiExplainer implements BlueprintExplainer {
   ): Promise<WhyNotResult> {
     try {
       const result = await generateText({
-        model: this.google(this.modelId),
+        model: this.azure(this.deployment),
         system: SYSTEM_PROMPT,
-        prompt: buildWhyNotPrompt(primaryTools, alternativeTools, idea) +
+        prompt:
+          buildWhyNotPrompt(primaryTools, alternativeTools, idea) +
           "\n\nRespond ONLY with a valid JSON object matching this shape: " +
           '{ "reason": string, "betterFor"?: string }',
         maxOutputTokens: this.maxOutputTokens,
@@ -140,7 +168,7 @@ export class GeminiExplainer implements BlueprintExplainer {
       return { whyNot, source: "ai" };
     } catch (error) {
       console.warn(
-        `[ai/gemini] explainWhyNot failed, will fall back to heuristic:`,
+        "[ai/azure-openai] explainWhyNot failed, will fall back to heuristic:",
         error instanceof Error ? error.message : error,
       );
       throw error;
@@ -150,9 +178,10 @@ export class GeminiExplainer implements BlueprintExplainer {
   async generateRoadmap(tools: Tool[], idea: string): Promise<RoadmapResult> {
     try {
       const result = await generateText({
-        model: this.google(this.modelId),
+        model: this.azure(this.deployment),
         system: SYSTEM_PROMPT,
-        prompt: buildRoadmapPrompt(tools, idea) +
+        prompt:
+          buildRoadmapPrompt(tools, idea) +
           "\n\nRespond ONLY with a valid JSON object matching this shape: " +
           '{ "phases": Array<{ "name": string, "duration": string, "tasks": string[] }>, "totalEstimate": string }. ' +
           "Return 2-5 phases with 1-6 tasks each.",
@@ -171,7 +200,7 @@ export class GeminiExplainer implements BlueprintExplainer {
       return { roadmap, source: "ai" };
     } catch (error) {
       console.warn(
-        `[ai/gemini] generateRoadmap failed, will fall back to heuristic:`,
+        "[ai/azure-openai] generateRoadmap failed, will fall back to heuristic:",
         error instanceof Error ? error.message : error,
       );
       throw error;

@@ -74,10 +74,8 @@ web_modules/
 
 # dotenv environment variables file
 .env
-.env.test
-.env.production
-.env.local
-.env.*.local
+.env.*
+!.env.example
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -139,3 +137,5 @@ Thumbs.db
 server/public/
 vite.config.ts.*
 .local/
+test-results/
+playwright-report/

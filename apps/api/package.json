@@ -4,31 +4,31 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "dotenv -e ../../.env -- tsx watch src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "dotenv -e ../../.env -- node dist/index.js",
     "lint": "eslint src/",
     "type-check": "tsc --noEmit",
-    "test": "vitest run --config ../../vitest.package.config.ts",
-    "seed": "tsx src/db/seed.ts"
+    "test": "vitest run",
+    "seed": "dotenv -e ../../.env -- tsx src/db/seed.ts"
   },
   "dependencies": {
-    "@stackfast/shared": "workspace:*",
-    "@stackfast/schemas": "workspace:*",
+    "@hono/node-server": "^1.13.7",
+    "@neondatabase/serverless": "^0.10.4",
+    "@stackfast/ai": "workspace:*",
+    "@stackfast/exporter": "workspace:*",
     "@stackfast/registry": "workspace:*",
     "@stackfast/rules-engine": "workspace:*",
-    "@stackfast/exporter": "workspace:*",
-    "@stackfast/ai": "workspace:*",
-    "hono": "^4.6.1",
-    "@hono/node-server": "^1.13.7",
+    "@stackfast/schemas": "workspace:*",
+    "@stackfast/shared": "workspace:*",
     "better-auth": "^1.1.13",
-    "zod": "^3.24.2",
     "drizzle-orm": "^0.45.2",
-    "@neondatabase/serverless": "^0.10.4"
+    "hono": "^4.6.1",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
-    "typescript": "^5.6.3",
+    "@types/node": "^22.10.2",
     "tsx": "^4.19.2",
-    "@types/node": "^22.10.2"
+    "typescript": "^5.6.3"
   }
 }

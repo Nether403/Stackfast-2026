@@ -91,9 +91,11 @@ export interface EnhancedBlueprintResponse {
  * Configuration for the AI provider.
  */
 export interface AiProviderConfig {
-  provider: "gemini" | "openai" | "heuristic";
+  provider: "gemini" | "azure-openai" | "heuristic";
   apiKey?: string;
   model?: string;
   maxTokens?: number;
   timeoutMs?: number;
+  azureResourceName?: string;
+  azureApiVersion?: string;
 }

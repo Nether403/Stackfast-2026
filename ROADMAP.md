@@ -27,13 +27,14 @@ Secure existing work and remove dead weight before building anything new.
 ### Deliverables
 - [x] Archive branch `archive/pre-rebuild` created
 - [x] Salvage manifest finalized (SALVAGE_MANIFEST.md)
-- [ ] Old branches deleted (StackFastold, StackFast1)
-- [ ] developer-tools-api deleted
-- [ ] Stale docs deleted (5 files)
+- [x] Old branches deleted (StackFastold, StackFast1, StackfastPro, StackFast-101, StackWiseAI)
+- [x] developer-tools-api deleted
+- [x] Stale docs deleted (5 files) — 3 actual deletions + 2 moved to `docs/backlog/` and `docs/deferred/`
 - [x] `.env` files removed from source
 - [x] `desktop.ini` files removed recursively
 - [x] `.gitignore` updated with comprehensive exclusions
-- [ ] Clean commit: "Phase 0: Repository cleanup for 2026 rebuild"
+- [x] Post-extraction cleanup complete (root `client/`, `server/`, `shared/`, `Branches/`, `Referencedocs/`, legacy build configs, logs, debris)
+- [x] Clean commit: "Phase 0: Repository cleanup for 2026 rebuild"
 
 ### Risk
 **Low.** Archive branch preserves everything. Reversible.
@@ -154,7 +155,7 @@ Ship a polished frontend that makes the API accessible and delightful.
 Make the blueprint generator actually valuable with LLM-powered explanations.
 
 ### Deliverables
-- [ ] `packages/ai/` — Provider abstraction (OpenAI/Gemini/Anthropic)
+- [x] `packages/ai/` — Provider abstraction (heuristic, Gemini, Azure OpenAI)
 - [x] Deterministic rules remain source of truth for scoring
 - [x] LLM adds explanation and synthesis layer
 - [x] Every AI response validated with Zod
@@ -166,7 +167,13 @@ Make the blueprint generator actually valuable with LLM-powered explanations.
 - [x] Fallback to deterministic-only mode if AI unavailable
 
 ### Current Status
-**Started/in progress.** Gemini-backed explanation and deterministic fallback paths exist, but the provider abstraction is incomplete and OpenAI/Anthropic support remains stubbed or not implemented.
+**Phase 5 scope is complete for MVP.** `heuristic`, `gemini`, and
+`azure-openai` providers ship in `packages/ai`. The operator's Azure AI
+Foundry resource (with `gpt-5.5` / `gpt-4.1` deployments) is the primary
+production provider; Gemini remains available as a lower-cost fallback.
+Every AI call is wrapped in a heuristic fallback and validated with Zod.
+See `docs/decisions/002-ai-provider-strategy.md`. The one remaining item
+(ADR generation in the blueprint response itself) is deferred to v1.1.
 
 ### Risk
 **Medium.** LLM integration introduces latency and cost. Provider API changes can break things. Zod validation of AI output needs thorough testing.
@@ -223,13 +230,13 @@ Build a registry that's genuinely useful for 2026 technology decisions.
 - [x] Zero type errors across all packages
 - [x] All unit tests pass (rules, scoring, registry, exporter, schemas)
 - [x] API contract tests for every public endpoint
-- [ ] Playwright E2E tests for primary flows
+- [x] Playwright E2E tests for primary flows
 - [x] Security tests for admin routes and rate limiting
 - [x] CI pipeline blocks merge on any failure
 - [x] Small seed dataset for database-free local dev
 
 ### Current Status
-**Basic quality gate is green.** Lint, type-check, unit tests, builds, registry validation, API contract coverage, admin protection checks, and rate-limit tests pass. E2E and deeper security testing remain open.
+**Quality gate is green for the MVP codebase.** Type-check, lint, unit/API tests, builds, registry validation, API contract coverage, admin protection checks, rate-limit tests, and Playwright E2E MVP flows pass locally. Remaining security/deployment hardening belongs to Phase 8.
 
 ---
 
@@ -254,14 +261,14 @@ Build a registry that's genuinely useful for 2026 technology decisions.
 
 | Feature | Status | Priority |
 |---------|--------|----------|
-| Idea-to-stack blueprint | 🔲 | P0 |
-| Compatibility-scored stack options | 🔲 | P0 |
-| Tool search and details | 🔲 | P0 |
-| Stack builder with diagnostics | 🔲 | P0 |
-| Starter file export | 🔲 | P0 |
-| Alternatives and tradeoffs | 🔲 | P0 |
-| GitHub OAuth login | 🔲 | P0 |
-| Migration path (basic) | 🔲 | P1 |
+| Idea-to-stack blueprint | ✅ | P0 |
+| Compatibility-scored stack options | ✅ | P0 |
+| Tool search and details | ✅ | P0 |
+| Stack builder with diagnostics | ✅ | P0 |
+| Starter file export | ✅ | P0 |
+| Alternatives and tradeoffs | ✅ | P0 |
+| GitHub OAuth login | ⚠️ Configured, production verification pending | P0 |
+| Migration path (basic) | ✅ | P1 |
 
 ### NOT in MVP
 

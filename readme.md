@@ -1,69 +1,155 @@
-# Stackfast - AI-Powered Tech Stack Builder
+# Stackfast 2026
 
-## Overview
-Stackfast is a comprehensive platform for discovering AI development tools, analyzing compatibility, building tech stacks, and generating project blueprints. Born from the merger of TechStack Explorer and StackFast, it provides intelligent recommendations, harmony scoring, migration planning, and analytics to help developers create optimal stacks.
+Stackfast 2026 is a pnpm TypeScript monorepo for building, validating, and exporting modern application stacks. It combines a curated tool registry, compatibility rules, idea-to-stack blueprint generation, migration planning, and scaffold export flows.
 
-Key features:
-- Curated database of 51+ tools with add/edit/delete and fuzzy search
-- Compatibility matrix with heatmap, insights, and migration wizard
-- Stack builder with validation, recommendations, saving/loading, and export (JSON/CSV)
-- AI-like blueprint generation with compatibility awareness
-- Analytics dashboard with charts and stats
-- User voting for dynamic popularity scores
-- External data imports and API integrations
+## Current Status
 
-Live Demo: [stackfast-demo.vercel.app](https://stackfast-demo.vercel.app) (See DEMO.md for walkthrough)
+- Monorepo scaffold is complete.
+- Core packages compile and test successfully.
+- API contract tests cover the public MVP API surface.
+- Registry validation passes for the expanded catalog.
+- Playwright E2E tests cover the primary MVP flows.
+- Deployment work is still pending.
 
-## System Architecture
+## Architecture
 
-### Frontend
-- **Framework**: React 18 with TypeScript
-- **Routing**: Wouter
-- **UI**: shadcn/ui, Radix UI, Tailwind CSS (dark theme with neon orange accents)
-- **State**: TanStack Query
-- **Build**: Vite
-- **Key Pages**: Dashboard, Tool Database (paginated/fuzzy search), Stack Builder (with export/save), Compatibility Matrix (virtualized), Blueprint Builder, Analytics, Migration Wizard
+```text
+apps/
+	api/        Hono API server
+	web/        React + Vite web app
+packages/
+	ai/         Blueprint explanation providers and heuristic fallback
+	exporter/   Starter file, README, env, and setup-guide generation
+	registry/   Curated tool/catalog loading and validation
+	rules-engine/ Compatibility scoring and diagnostics
+	schemas/    Shared Zod, API, and Drizzle schemas
+	shared/     Shared utilities
+```
 
-### Backend
-- **Runtime**: Node.js/Express with TypeScript
-- **API**: RESTful, split into modular routes (tools, categories, etc.)
-- **Database**: PostgreSQL with Drizzle ORM
-- **Services**: Compatibility engine, blueprint generator, external imports (GitHub, npm, etc.)
-- **Security**: Rate limiting (100 req/15min), caching
+## Tech Stack
 
-### Database
-- Tables: tools, categories, compatibilities, junctions for multi-category
-- Features: JSONB for flexible data, migrations via Drizzle Kit
-
-## API Endpoints (Selected)
-- `/api/tools`: CRUD for tools
-- `/api/v1/compatibility/:toolA/:toolB`: Score between tools
-- `/api/v1/stack/analyze`: Stack harmony analysis
-- `/api/v1/tools/search`: Fuzzy/filtered search
-- `/api/v1/blueprint`: Generate blueprint
-- `/api/v1/migration/:from/:to`: Migration paths
-- `/api/tools/:id/vote`: Update popularity (new)
-
-Full list in routes files.
+- Package manager: pnpm workspaces
+- Runtime: Node.js 20+
+- API: Hono, Zod, Better Auth, Drizzle, Neon Postgres-ready
+- Web: React 18, Vite, TypeScript, Wouter, TanStack Query, Tailwind CSS
+- Tests: Vitest, Playwright
+- Registry: static curated catalog with build-time Zod validation
 
 ## Setup
-1. Install: `npm install`
-2. Database: Set up PostgreSQL, run migrations `npx drizzle-kit push:pg`
-3. Env: Copy .env.example to .env and fill keys
-4. Run: `npm run dev` (frontend + backend)
-5. Import Data: POST to /api/tools/import-stackfast and /api/tools/import-csv
 
-## Usage
-- Explore tools and vote on popularity
-- Build/analyze stacks with exports
-- Generate blueprints for ideas
-- View compatibility in matrix/heatmap
+1. Install Node.js 20+.
+2. Install dependencies:
 
-## Recent Changes
-- Added pagination, fuzzy search, voting, saved stacks, exports
-- Virtualized matrix for performance
-- Expanded to 51+ tools via imports
-- Rate limiting and route modularization
-- Dependency updates
+	 ```sh
+	 pnpm install
+	 ```
 
-See CODEBASE_REVIEW.md for full audit.
+3. Copy `.env.example` to `.env` at the workspace root and fill in the values
+	 (at minimum `DATABASE_URL`, `BETTER_AUTH_SECRET`, `GITHUB_CLIENT_ID`,
+	 `GITHUB_CLIENT_SECRET`, and optionally `GEMINI_API_KEY`).
+4. Run both dev servers:
+
+	 ```sh
+	 pnpm dev
+	 ```
+
+	 This starts the Hono API on `http://localhost:3000` and the Vite web app
+	 on `http://localhost:5173`. The web dev server proxies `/api/*` to the
+	 API, so sign-in cookies and CORS "just work" in dev.
+
+	 To start only one server:
+
+	 ```sh
+	 pnpm dev:api   # Hono API with tsx watch
+	 pnpm dev:web   # Vite dev server
+	 ```
+
+## Environment Variables
+
+Common local variables are documented in `.env.example`:
+
+| Variable | Purpose |
+| --- | --- |
+| `PORT` | API port, default `3000` |
+| `CORS_ORIGIN` / `WEB_ORIGIN` | Allowed browser origin for API CORS |
+| `DATABASE_URL` | Neon/Postgres connection string |
+| `BETTER_AUTH_SECRET` | Better Auth session secret |
+| `BETTER_AUTH_URL` | Public API/auth base URL |
+| `ALLOW_AUTH_BYPASS` | Local non-production auth bypass when no database is configured |
+| `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | GitHub OAuth credentials |
+| `ADMIN_API_KEY` | Protects `/admin/*` and `/internal/*` routes |
+| `AI_PROVIDER` | `heuristic`, `gemini`, or `azure-openai` |
+| `GEMINI_API_KEY` | Gemini API key (when `AI_PROVIDER=gemini`) |
+| `AZURE_OPENAI_RESOURCE_NAME` | Azure Foundry resource subdomain (when `AI_PROVIDER=azure-openai`) |
+| `AZURE_OPENAI_API_KEY` | Azure OpenAI API key |
+| `AZURE_OPENAI_DEPLOYMENT` | Azure deployment name, e.g. `gpt-5.5` or `gpt-4.1` |
+| `VITE_API_URL` | Web build-time API URL, e.g. `http://localhost:3000/api/v1` |
+| `VITE_AUTH_URL` | Optional web build-time auth origin override |
+
+For local development without a database, keep `NODE_ENV=development` and `ALLOW_AUTH_BYPASS=true`.
+
+## Scripts
+
+| Command | Description |
+| --- | --- |
+| `pnpm dev` | Run API and web dev servers together (colored, shared Ctrl-C) |
+| `pnpm dev:api` | Run only the API (tsx watch, loads `.env` via dotenv-cli) |
+| `pnpm dev:web` | Run only the Vite web dev server |
+| `pnpm seed` | Seed the Neon DB from the registry catalog (needs `DATABASE_URL`) |
+| `pnpm -r type-check` | Type-check every workspace package/app |
+| `pnpm -r lint` | Lint every workspace package/app |
+| `pnpm -r test` | Run unit/API tests |
+| `pnpm validate:registry` | Validate the catalog and compatibility rules |
+| `pnpm -r build` | Build all packages/apps |
+| `pnpm test:e2e` | Run Playwright MVP flow tests |
+
+## API Surface
+
+Public MVP routes:
+
+- `GET /health`
+- `POST /api/v1/blueprints`
+- `POST /api/v1/stacks/analyze`
+- `GET /api/v1/tools/search`
+- `GET /api/v1/tools/:id`
+- `GET /api/v1/categories`
+- `GET /api/v1/catalog`
+- `GET /api/v1/compatibility/:a/:b`
+- `POST /api/v1/scaffolds`
+- `GET /api/v1/migrations/:from/:to`
+
+Protected routes:
+
+- `POST /admin/tools/import`
+- `POST /admin/compatibility/recompute`
+- `POST /internal/enrich-tool`
+
+## Testing and Quality Gate
+
+Recommended local validation before a PR:
+
+```sh
+pnpm -r type-check
+pnpm -r lint
+pnpm -r test
+pnpm validate:registry
+pnpm -r build
+pnpm test:e2e
+```
+
+Playwright uses isolated local ports by default and builds the web app with `VITE_API_URL` pointing at the test API.
+
+## Deployment Notes
+
+Phase 8 deployment is still pending. Before production deployment:
+
+- Replace in-memory rate limiting with a distributed backend such as Redis/Upstash.
+- Provision Neon Postgres and configure `DATABASE_URL`.
+- Configure Better Auth and GitHub OAuth callback URLs.
+- Set production `CORS_ORIGIN`, `BETTER_AUTH_URL`, `VITE_API_URL`, and `VITE_AUTH_URL`.
+- Configure `ADMIN_API_KEY` and AI provider secrets.
+- Add error tracking such as Sentry.
+
+## Roadmap
+
+See `ROADMAP.md` for phase-by-phase progress and remaining deployment/MVP ship tasks.

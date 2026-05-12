@@ -48,6 +48,12 @@ async function seed() {
     const url = tool.homepageUrl ?? tool.docsUrl ?? null;
     const pricing = tool.pricing?.model ?? "free";
     const notes = tool.deprecated ? "DEPRECATED" : null;
+    // jsonb columns require serialized JSON — @neondatabase/serverless otherwise
+    // sends JS arrays as postgres array literals (e.g. {"nextjs"}).
+    const frameworks = JSON.stringify(tool.supports.frameworks ?? []);
+    const languages = JSON.stringify(tool.languages ?? []);
+    const capabilities = JSON.stringify(tool.capabilities ?? []);
+    const integrations = JSON.stringify(tool.integrations ?? []);
 
     await sql`
       INSERT INTO tools (
@@ -57,7 +63,7 @@ async function seed() {
         setup_complexity, cost_tier
       ) VALUES (
         ${tool.id}, ${tool.name}, ${tool.description}, ${tool.categoryId}, ${url},
-        ${tool.supports.frameworks ?? []}, ${tool.languages}, ${tool.capabilities}, ${tool.integrations},
+        ${frameworks}::jsonb, ${languages}::jsonb, ${capabilities}::jsonb, ${integrations}::jsonb,
         ${tool.confidence}, ${tool.confidence}, ${pricing}, ${notes},
         ${"medium"}, ${pricing === "paid" ? "paid" : "free"}
       )
