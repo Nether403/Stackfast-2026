@@ -1,0 +1,67 @@
+# Railway service manifest for `stackfast-api`.
+#
+# Phase 8 deployment — ties back to:
+#   - ADR 003 § 1 "Hosting: split web + API, both on Railway"
+#     (docs/decisions/003-deployment-architecture.md)
+#   - design.md § "Railway service topology — API Service"
+#     (.kiro/specs/phase-8-deployment/design.md)
+#
+# Schema reference: https://railway.com/railway.schema.json
+# Config-as-code docs: https://docs.railway.com/config-as-code/reference
+#
+# Node 20 runtime: Nixpacks auto-detects the Node major version from the
+# root `package.json` "engines" field (">=20.0.0"). If the Nixpacks
+# autodetection ever regresses, the operator can pin it explicitly via a
+# Railway env var: `NIXPACKS_NODE_VERSION=20`. Pinning in the repo is
+# intentionally deferred to a follow-up task so this manifest stays
+# focused on build/run/healthcheck.
+#
+# Environment variables are NOT declared here — they are set per
+# environment via the Railway CLI/dashboard, per ADR 003 § 6 and
+# design § "Configuration surface". Example:
+#   railway variables \
+#     --set NODE_ENV=production \
+#     --set DATABASE_URL=... \
+#     --service stackfast-api \
+#     --environment production
+# See Batch G (staging) and Batch H (production) in
+# .kiro/specs/phase-8-deployment/tasks.md for the cutover runbook.
+
+"$schema" = "https://railway.com/railway.schema.json"
+
+[build]
+# Nixpacks is the deterministic path: it reads the repo-root
+# package.json "engines" to select Node 20 and runs pnpm from the repo
+# root so workspace filters (`--filter @stackfast/api...`) resolve.
+builder = "NIXPACKS"
+
+# Explicit install+build pipeline from design § "API Service". The `...`
+# suffix on the filter includes @stackfast/api's workspace dependencies
+# (schemas, registry, rules-engine, exporter, ai, shared), so tsc's
+# project references compile against the built packages.
+buildCommand = "pnpm install --frozen-lockfile --filter @stackfast/api... && pnpm --filter @stackfast/api build"
+
+[deploy]
+# Hono server entrypoint (`node dist/index.js` via the package's `start`
+# script, wrapped in `dotenv -e ../../.env --` for local parity; on
+# Railway the dotenv step is a no-op because `.env` is not shipped).
+startCommand = "pnpm --filter @stackfast/api start"
+
+# /health is the unauthenticated liveness endpoint exposed by
+# apps/api/src/app.ts; it is exempt from rate limiting (R4.9) so the
+# Railway edge probe never consumes a generation/read token.
+healthcheckPath = "/health"
+
+# Upper bound (seconds) Railway waits for the first successful /health
+# response before marking the deploy failed. The Node cold start
+# (pnpm resolve + `node dist/index.js`) finishes in a few seconds on
+# Railway's default container; 30 s leaves headroom without letting a
+# genuinely broken deploy linger. Tune upward if cold starts regress.
+healthcheckTimeout = 30
+
+# If the process crashes post-boot, restart up to 3 times before the
+# deployment is marked failed. ON_FAILURE matches design § "Rollback,
+# observability, and runbook notes" — we do not want ALWAYS-retrying a
+# crash loop to mask a real regression from the rollback operator.
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3

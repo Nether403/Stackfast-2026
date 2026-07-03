@@ -1,0 +1,5 @@
+Traversal: BFS depth=2 | Start: ['Split Web and API Railway Services', 'API_ORIGIN', 'API_ORIGIN'] | Context: import (heuristic) | 3 nodes found
+
+NODE API_ORIGIN [src=tests/e2e/deploy-admin-401.spec.ts loc=L25 community=73]
+NODE Split Web and API Railway Services [src=docs/decisions/003-deployment-architecture.md loc=None community=37]
+NODE API_ORIGIN [src=tests/e2e/deploy-cross-origin-auth.spec.ts loc=L36 community=80]

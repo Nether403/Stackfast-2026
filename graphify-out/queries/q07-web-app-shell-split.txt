@@ -1,0 +1,58 @@
+Traversal: BFS depth=2 | Start: ['App()', 'app'] | Context: import (heuristic) | 23 nodes found
+
+NODE app.ts [src=apps/api/src/app.ts loc=L1 community=5]
+NODE index.ts [src=apps/api/src/rate-limit/index.ts loc=L1 community=2]
+NODE App.tsx [src=apps/web/src/App.tsx loc=L1 community=3]
+NODE buckets.ts [src=apps/api/src/rate-limit/buckets.ts loc=L1 community=2]
+NODE BUCKETS [src=apps/api/src/rate-limit/buckets.ts loc=L22 community=2]
+NODE app.test.ts [src=apps/api/src/app.test.ts loc=L1 community=2]
+NODE app.pbt.test.ts [src=apps/api/src/app.pbt.test.ts loc=L1 community=2]
+NODE types.ts [src=apps/api/src/rate-limit/types.ts loc=L1 community=2]
+NODE RateLimitBackend [src=apps/api/src/rate-limit/types.ts loc=L47 community=2]
+NODE RateLimitDecision [src=apps/api/src/rate-limit/types.ts loc=L22 community=2]
+NODE RateLimitCheckArgs [src=apps/api/src/rate-limit/types.ts loc=L34 community=2]
+NODE sentry.ts [src=apps/api/src/observability/sentry.ts loc=L1 community=5]
+NODE app.sentry.test.ts [src=apps/api/src/app.sentry.test.ts loc=L1 community=5]
+NODE main.tsx [src=apps/web/src/main.tsx loc=L1 community=3]
+NODE app [src=apps/api/src/app.ts loc=L79 community=5]
+NODE initSentry() [src=apps/api/src/observability/sentry.ts loc=L45 community=5]
+NODE __resetSentryForTests() [src=apps/api/src/observability/sentry.ts loc=L175 community=5]
+NODE index.ts [src=apps/api/src/index.ts loc=L1 community=5]
+NODE client.ts [src=apps/api/src/db/client.ts loc=L1 community=70]
+NODE sentry.ts [src=apps/web/src/lib/sentry.ts loc=L1 community=3]
+NODE __resetBackendForTests() [src=apps/api/src/rate-limit/index.ts loc=L85 community=2]
+NODE initSentry() [src=apps/web/src/lib/sentry.ts loc=L45 community=3]
+NODE App() [src=apps/web/src/App.tsx loc=L19 community=3]
+EDGE app --imports [EXTRACTED context=import]--> app.pbt.test.ts
+EDGE app --imports [EXTRACTED context=import]--> app.sentry.test.ts
+EDGE app --imports [EXTRACTED context=import]--> app.test.ts
+EDGE app --imports [EXTRACTED context=import]--> index.ts
+EDGE App() --imports [EXTRACTED context=import]--> main.tsx
+EDGE index.ts --imports_from [EXTRACTED context=import]--> sentry.ts
+EDGE index.ts --imports [EXTRACTED context=import]--> initSentry()
+EDGE app.sentry.test.ts --imports_from [EXTRACTED context=import]--> app.ts
+EDGE app.sentry.test.ts --imports_from [EXTRACTED context=import]--> sentry.ts
+EDGE app.sentry.test.ts --imports [EXTRACTED context=import]--> initSentry()
+EDGE app.sentry.test.ts --imports [EXTRACTED context=import]--> __resetSentryForTests()
+EDGE app.test.ts --imports_from [EXTRACTED context=import]--> app.ts
+EDGE app.test.ts --imports_from [EXTRACTED context=import]--> buckets.ts
+EDGE app.test.ts --imports [EXTRACTED context=import]--> BUCKETS
+EDGE app.test.ts --imports_from [EXTRACTED context=import]--> index.ts
+EDGE app.test.ts --imports [EXTRACTED context=import]--> __resetBackendForTests()
+EDGE app.test.ts --imports_from [EXTRACTED context=import]--> types.ts
+EDGE app.test.ts --imports [EXTRACTED context=import]--> RateLimitBackend
+EDGE app.test.ts --imports [EXTRACTED context=import]--> RateLimitCheckArgs
+EDGE app.test.ts --imports [EXTRACTED context=import]--> RateLimitDecision
+EDGE app.pbt.test.ts --imports_from [EXTRACTED context=import]--> app.ts
+EDGE app.pbt.test.ts --imports_from [EXTRACTED context=import]--> buckets.ts
+EDGE app.pbt.test.ts --imports [EXTRACTED context=import]--> BUCKETS
+EDGE app.pbt.test.ts --imports_from [EXTRACTED context=import]--> index.ts
+EDGE app.pbt.test.ts --imports [EXTRACTED context=import]--> __resetBackendForTests()
+EDGE app.pbt.test.ts --imports_from [EXTRACTED context=import]--> types.ts
+EDGE app.pbt.test.ts --imports [EXTRACTED context=import]--> RateLimitBackend
+EDGE app.pbt.test.ts --imports [EXTRACTED context=import]--> RateLimitCheckArgs
+EDGE app.pbt.test.ts --imports [EXTRACTED context=import]--> RateLimitDecision
+EDGE main.tsx --imports_from [EXTRACTED context=import]--> client.ts
+EDGE main.tsx --imports_from [EXTRACTED context=import]--> App.tsx
+EDGE main.tsx --imports_from [EXTRACTED context=import]--> sentry.ts
+EDGE main.tsx --imports [EXTRACTED context=import]--> initSentry()

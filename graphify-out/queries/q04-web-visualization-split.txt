@@ -1,0 +1,3 @@
+Traversal: BFS depth=2 | Start: ['components'] | Context: import (heuristic) | 1 nodes found
+
+NODE components [src=apps/web/components.json loc=L14 community=28]
