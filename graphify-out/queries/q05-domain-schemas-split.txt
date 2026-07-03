@@ -1,0 +1,69 @@
+Traversal: BFS depth=2 | Start: ['domain.ts', 'Split Web and API Railway Services', 'schemas.ts'] | Context: import (heuristic) | 25 nodes found
+
+NODE index.ts [src=packages/schemas/src/index.ts loc=L1 community=0]
+NODE azure-openai.ts [src=packages/ai/src/providers/azure-openai.ts loc=L1 community=0]
+NODE gemini.ts [src=packages/ai/src/providers/gemini.ts loc=L1 community=0]
+NODE Tool [src=packages/schemas/src/domain.ts loc=L100 community=0]
+NODE index.ts [src=packages/ai/src/index.ts loc=L1 community=0]
+NODE Diagnostic [src=packages/schemas/src/domain.ts loc=L202 community=0]
+NODE prompts.ts [src=packages/ai/src/prompts.ts loc=L1 community=0]
+NODE ImplementationRoadmap [src=packages/schemas/src/domain.ts loc=L471 community=0]
+NODE WhyNotExplanation [src=packages/schemas/src/domain.ts loc=L477 community=0]
+NODE AiTradeoffResponseSchema [src=packages/ai/src/schemas.ts loc=L32 community=0]
+NODE schemas.ts [src=packages/ai/src/schemas.ts loc=L1 community=0]
+NODE BlueprintExplainer [src=packages/ai/src/index.ts loc=L45 community=0]
+NODE buildRoadmapPrompt() [src=packages/ai/src/prompts.ts loc=L93 community=0]
+NODE RoadmapResult [src=packages/ai/src/index.ts loc=L30 community=0]
+NODE AiExplanationResponseSchema [src=packages/ai/src/schemas.ts loc=L11 community=0]
+NODE TradeoffResult [src=packages/ai/src/index.ts loc=L20 community=0]
+NODE AiWhyNotResponseSchema [src=packages/ai/src/schemas.ts loc=L50 community=0]
+NODE buildWhyNotPrompt() [src=packages/ai/src/prompts.ts loc=L75 community=0]
+NODE ExplanationResult [src=packages/ai/src/index.ts loc=L9 community=0]
+NODE buildExplanationPrompt() [src=packages/ai/src/prompts.ts loc=L35 community=0]
+NODE buildTradeoffPrompt() [src=packages/ai/src/prompts.ts loc=L51 community=0]
+NODE AiRoadmapResponseSchema [src=packages/ai/src/schemas.ts loc=L63 community=0]
+NODE WhyNotResult [src=packages/ai/src/index.ts loc=L25 community=0]
+NODE Split Web and API Railway Services [src=docs/decisions/003-deployment-architecture.md loc=None community=37]
+NODE domain.ts [src=packages/schemas/src/domain.ts loc=L1 community=1]
+EDGE schemas.ts --imports_from [EXTRACTED context=import]--> azure-openai.ts
+EDGE schemas.ts --imports_from [EXTRACTED context=import]--> gemini.ts
+EDGE azure-openai.ts --imports_from [EXTRACTED context=import]--> index.ts
+EDGE azure-openai.ts --imports [EXTRACTED context=import]--> ExplanationResult
+EDGE azure-openai.ts --imports [EXTRACTED context=import]--> TradeoffResult
+EDGE azure-openai.ts --imports [EXTRACTED context=import]--> WhyNotResult
+EDGE azure-openai.ts --imports [EXTRACTED context=import]--> RoadmapResult
+EDGE azure-openai.ts --imports [EXTRACTED context=import]--> BlueprintExplainer
+EDGE azure-openai.ts --imports_from [EXTRACTED context=import]--> prompts.ts
+EDGE azure-openai.ts --imports [EXTRACTED context=import]--> buildExplanationPrompt()
+EDGE azure-openai.ts --imports [EXTRACTED context=import]--> buildTradeoffPrompt()
+EDGE azure-openai.ts --imports [EXTRACTED context=import]--> buildWhyNotPrompt()
+EDGE azure-openai.ts --imports [EXTRACTED context=import]--> buildRoadmapPrompt()
+EDGE azure-openai.ts --imports [EXTRACTED context=import]--> AiExplanationResponseSchema
+EDGE azure-openai.ts --imports [EXTRACTED context=import]--> AiRoadmapResponseSchema
+EDGE azure-openai.ts --imports [EXTRACTED context=import]--> AiTradeoffResponseSchema
+EDGE azure-openai.ts --imports [EXTRACTED context=import]--> AiWhyNotResponseSchema
+EDGE azure-openai.ts --imports [EXTRACTED context=import]--> Diagnostic
+EDGE azure-openai.ts --imports [EXTRACTED context=import]--> ImplementationRoadmap
+EDGE azure-openai.ts --imports [EXTRACTED context=import]--> Tool
+EDGE azure-openai.ts --imports [EXTRACTED context=import]--> WhyNotExplanation
+EDGE azure-openai.ts --imports_from [EXTRACTED context=import]--> index.ts
+EDGE gemini.ts --imports_from [EXTRACTED context=import]--> index.ts
+EDGE gemini.ts --imports [EXTRACTED context=import]--> ExplanationResult
+EDGE gemini.ts --imports [EXTRACTED context=import]--> TradeoffResult
+EDGE gemini.ts --imports [EXTRACTED context=import]--> WhyNotResult
+EDGE gemini.ts --imports [EXTRACTED context=import]--> RoadmapResult
+EDGE gemini.ts --imports [EXTRACTED context=import]--> BlueprintExplainer
+EDGE gemini.ts --imports_from [EXTRACTED context=import]--> prompts.ts
+EDGE gemini.ts --imports [EXTRACTED context=import]--> buildExplanationPrompt()
+EDGE gemini.ts --imports [EXTRACTED context=import]--> buildTradeoffPrompt()
+EDGE gemini.ts --imports [EXTRACTED context=import]--> buildWhyNotPrompt()
+EDGE gemini.ts --imports [EXTRACTED context=import]--> buildRoadmapPrompt()
+EDGE gemini.ts --imports [EXTRACTED context=import]--> AiExplanationResponseSchema
+EDGE gemini.ts --imports [EXTRACTED context=import]--> AiRoadmapResponseSchema
+EDGE gemini.ts --imports [EXTRACTED context=import]--> AiTradeoffResponseSchema
+EDGE gemini.ts --imports [EXTRACTED context=import]--> AiWhyNotResponseSchema
+EDGE gemini.ts --imports [EXTRACTED context=import]--> Diagnostic
+EDGE gemini.ts --imports [EXTRACTED context=import]--> ImplementationRoadmap
+EDGE gemini.ts --imports [EXTRACTED context=import]--> Tool
+EDGE gemini.ts --imports [EXTRACTED context=import]--> WhyNotExplanation
+EDGE gemini.ts --imports_from [EXTRACTED context=import]--> index.ts

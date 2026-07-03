@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import app from "./app.js";
 import { BUCKETS } from "./rate-limit/buckets.js";
 import {
@@ -664,6 +664,151 @@ describe("api", () => {
       expect(
         store.get(`generation:${clientId}`)?.count,
       ).toBe(generationLimit + 1);
+    });
+  });
+
+  // ─── C2 fail-closed contract tests ─────────────────────────────
+  //
+  // These four cases are named verbatim in design.md § "Testing strategy"
+  // (Contract tests). They pin the security envelope the deploy depends on:
+  // admin gating runs before anything else, production CORS never wildcards,
+  // the allow-headers list carries every header the SPA sends, and a broken
+  // Better Auth init fails closed with 503 in production. The matching
+  // app-level property suites live in `app.pbt.test.ts`.
+
+  describe("C2 fail-closed contract", () => {
+    const ADMIN_PATHS = [
+      "/admin/tools/import",
+      "/admin/compatibility/recompute",
+      "/internal/enrich-tool",
+    ];
+
+    afterEach(() => {
+      __resetBackendForTests(null);
+      delete process.env.DATABASE_URL;
+      delete process.env.CORS_ORIGIN;
+    });
+
+    it("admin 401 before any middleware (R8.1)", async () => {
+      // A spy backend proves the rate-limit middleware never ran: admin and
+      // internal routes are not under /api/v1/*, so the gate rejects before
+      // any downstream middleware or handler can execute.
+      const calls: RateLimitCheckArgs[] = [];
+      const spy: RateLimitBackend = {
+        name: "memory",
+        async check(args: RateLimitCheckArgs): Promise<RateLimitDecision> {
+          calls.push(args);
+          return {
+            allowed: true,
+            remaining: BUCKETS[args.bucket].limit,
+            limit: BUCKETS[args.bucket].limit,
+            resetAtEpochMs: Date.now() + BUCKETS[args.bucket].windowMs,
+          };
+        },
+      };
+      __resetBackendForTests(spy);
+
+      for (const path of ADMIN_PATHS) {
+        const response = await app.request(path, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: "{}",
+        });
+        expect(response.status).toBe(401);
+        const body = await response.json();
+        expect(body.error).toBe("Unauthorized");
+      }
+
+      expect(calls).toHaveLength(0);
+    });
+
+    it("CORS never wildcard in prod (R10.3, R10.4)", async () => {
+      // CORS_ORIGIN is captured once at module import, so build a fresh app
+      // pinned to the production origin.
+      process.env.CORS_ORIGIN = "https://stackfast.app";
+      delete process.env.DATABASE_URL;
+      vi.resetModules();
+      const prodApp = (await import("./app.js")).default;
+
+      // Matching origin → exact-match ACAO + credentials, never a wildcard.
+      const matching = await prodApp.request(
+        "/api/v1/tools/search",
+        { headers: { Origin: "https://stackfast.app" } },
+        { NODE_ENV: "production" },
+      );
+      expect(matching.headers.get("access-control-allow-origin")).toBe(
+        "https://stackfast.app",
+      );
+      expect(matching.headers.get("access-control-allow-origin")).not.toBe("*");
+      expect(matching.headers.get("access-control-allow-credentials")).toBe(
+        "true",
+      );
+
+      // Non-matching origin (R10.4) → ACAO must not name the foreign origin
+      // and must never be the wildcard.
+      const mismatching = await prodApp.request(
+        "/api/v1/tools/search",
+        { headers: { Origin: "https://evil.example" } },
+        { NODE_ENV: "production" },
+      );
+      const acao = mismatching.headers.get("access-control-allow-origin");
+      expect(acao).not.toBe("*");
+      expect(acao).not.toBe("https://evil.example");
+      expect(acao === null || acao === "https://stackfast.app").toBe(true);
+    });
+
+    it("CORS allowed-headers list (R10.5)", async () => {
+      // Preflight surfaces Access-Control-Allow-Headers from the configured
+      // allowHeaders list. Origin matches the default dev origin so the
+      // preflight is fully formed.
+      const response = await app.request("/api/v1/tools/search", {
+        method: "OPTIONS",
+        headers: {
+          Origin: "http://localhost:5173",
+          "Access-Control-Request-Method": "GET",
+          "Access-Control-Request-Headers": "x-admin-api-key",
+        },
+      });
+
+      const allowHeaders = (
+        response.headers.get("access-control-allow-headers") ?? ""
+      )
+        .split(",")
+        .map((header) => header.trim().toLowerCase());
+
+      for (const required of [
+        "x-admin-api-key",
+        "x-request-id",
+        "x-ai-provider",
+        "content-type",
+        "authorization",
+      ]) {
+        expect(allowHeaders).toContain(required);
+      }
+    });
+
+    it("prod auth 503 when Better Auth init throws (R11.4)", async () => {
+      // An invalid DATABASE_URL makes neon() throw inside createAuth(), so
+      // getAuth() throws. In production requireSession() must fail closed
+      // with 503 rather than fall through to the handler.
+      process.env.DATABASE_URL = "not-a-valid-connection-string";
+
+      const response = await app.request(
+        "/api/v1/blueprints",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-forwarded-for": "init-throws-test",
+          },
+          body: JSON.stringify({ idea: "better auth init throws" }),
+        },
+        { NODE_ENV: "production" },
+      );
+
+      expect(response.status).toBe(503);
+      const body = await response.json();
+      expect(body.error).toContain("Authentication is not configured");
     });
   });
 });

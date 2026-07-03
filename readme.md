@@ -9,7 +9,7 @@ Stackfast 2026 is a pnpm TypeScript monorepo for building, validating, and expor
 - API contract tests cover the public MVP API surface.
 - Registry validation passes for the expanded catalog.
 - Playwright E2E tests cover the primary MVP flows.
-- Deployment work is still pending.
+- Deployment tooling and docs are ready; production cutover is operator-driven — see [Production deployment](#production-deployment).
 
 ## Architecture
 
@@ -139,16 +139,150 @@ pnpm test:e2e
 
 Playwright uses isolated local ports by default and builds the web app with `VITE_API_URL` pointing at the test API.
 
-## Deployment Notes
+## Production deployment
 
-Phase 8 deployment is still pending. Before production deployment:
+Stackfast runs in production as **two independent Railway services in one Railway
+project**, both deployed via the Railway CLI:
 
-- Replace in-memory rate limiting with a distributed backend such as Redis/Upstash.
-- Provision Neon Postgres and configure `DATABASE_URL`.
-- Configure Better Auth and GitHub OAuth callback URLs.
-- Set production `CORS_ORIGIN`, `BETTER_AUTH_URL`, `VITE_API_URL`, and `VITE_AUTH_URL`.
-- Configure `ADMIN_API_KEY` and AI provider secrets.
-- Add error tracking such as Sentry.
+- `stackfast-api` — Node 20 Hono process, served at `https://api.stackfast.app`.
+- `stackfast-web` — static Vite bundle (`apps/web/dist`), served at `https://stackfast.app`.
+
+The two services build, redeploy, and roll back independently. The architecture
+itself is decided in [ADR 003 — Deployment architecture for MVP](docs/decisions/003-deployment-architecture.md);
+this section is the operator runbook for executing it. Auth and AI provider
+choices are decided in [ADR 001 — Authentication strategy](docs/decisions/001-authentication-strategy.md)
+and [ADR 002 — AI provider strategy](docs/decisions/002-ai-provider-strategy.md).
+
+In production the web service calls `https://api.stackfast.app` **directly — there
+is no proxy**. The local Vite `/api/*` proxy only exists in dev. This is enforced
+at build time by `VITE_API_URL` and `VITE_AUTH_URL` pointing at the absolute API
+origin, which is what makes the cross-origin `SameSite=None; Domain=.stackfast.app`
+session cookie take effect (see ADR 003 § 4).
+
+### Production environment variables
+
+Set every variable below on the relevant Railway service before the first deploy.
+API variables go on `stackfast-api`; the `VITE_*` variables are read by
+`stackfast-web` **at build time**. Secrets live only in Railway, never in git.
+
+| Variable | Service | Production value | Required | Provisioned by |
+| --- | --- | --- | --- | --- |
+| `PORT` | api | injected by Railway | yes | Railway |
+| `NODE_ENV` | api | `production` | yes | Operator |
+| `CORS_ORIGIN` | api | `https://stackfast.app` | yes | Operator |
+| `DATABASE_URL` | api | Neon production branch pooled connection string | yes | Neon |
+| `BETTER_AUTH_SECRET` | api | 32-byte random (distinct per environment) | yes | Operator |
+| `BETTER_AUTH_URL` | api | `https://api.stackfast.app` | yes | Operator |
+| `ALLOW_AUTH_BYPASS` | api | `false` (auth fails closed in prod) | yes | Operator |
+| `GITHUB_CLIENT_ID` | api | Production GitHub OAuth app client id | yes | GitHub |
+| `GITHUB_CLIENT_SECRET` | api | Production GitHub OAuth app secret | yes | GitHub |
+| `ADMIN_API_KEY` | api | 32-byte random, distinct from `BETTER_AUTH_SECRET` | yes | Operator |
+| `AI_PROVIDER` | api | `azure-openai` | yes | Operator |
+| `AZURE_OPENAI_RESOURCE_NAME` | api | Azure Foundry resource subdomain | when provider = `azure-openai` | Azure Foundry |
+| `AZURE_OPENAI_API_KEY` | api | Azure OpenAI API key | when provider = `azure-openai` | Azure Foundry |
+| `AZURE_OPENAI_DEPLOYMENT` | api | Azure deployment name (e.g. `gpt-4.1`) | when provider = `azure-openai` | Azure Foundry |
+| `GEMINI_API_KEY` | api | Gemini key so fallback works if Azure degrades | optional | Google |
+| `UPSTASH_REDIS_REST_URL` | api | Upstash production database REST URL | required when `RATE_LIMIT_BACKEND=upstash` | Upstash |
+| `UPSTASH_REDIS_REST_TOKEN` | api | Upstash production database REST token | required when `RATE_LIMIT_BACKEND=upstash` | Upstash |
+| `RATE_LIMIT_BACKEND` | api | `upstash` | optional (defaults to `memory`) | Operator |
+| `SENTRY_DSN` | api | prod DSN, or unset to disable | optional | Sentry |
+| `SENTRY_AUTH_TOKEN` | api/web | org-scoped token for source-map upload | required for source maps | Sentry |
+| `SENTRY_ORG` | api/web | Sentry org slug | required for source maps | Sentry |
+| `SENTRY_PROJECT_API` | api | Sentry API project slug | required for source maps | Sentry |
+| `SENTRY_PROJECT_WEB` | web | Sentry web project slug | required for source maps | Sentry |
+| `RAILWAY_GIT_COMMIT_SHA` | api/web | injected by Railway (Sentry release tag) | optional | Railway |
+| `VITE_API_URL` | web | `https://api.stackfast.app/api/v1` | yes | Operator (build) |
+| `VITE_AUTH_URL` | web | `https://api.stackfast.app` | yes | Operator (build) |
+| `VITE_SENTRY_DSN` | web | prod DSN, or unset to disable | optional | Sentry |
+| `VITE_APP_RELEASE` | web | Railway commit SHA (Sentry release tag) | optional | Operator (build) |
+
+`BETTER_AUTH_SECRET`, `ADMIN_API_KEY`, and the Upstash credentials must be distinct
+from every other environment. All variables are also documented inline in
+[`.env.example`](.env.example).
+
+### Deploying with the Railway CLI
+
+From a fresh clone, with the Railway CLI installed:
+
+```sh
+# 1. Authenticate (browser SSO round trip).
+railway login
+
+# 2. Link the repo to the existing Railway project.
+railway link
+
+# 3. Select the target environment.
+railway environment production        # or: railway environment staging
+
+# 4. Set every variable from the table above (repeat per key / per service).
+railway variables set CORS_ORIGIN=https://stackfast.app --service stackfast-api
+railway variables set VITE_API_URL=https://api.stackfast.app/api/v1 --service stackfast-web
+# ...set the rest of the variables for each service...
+
+# 5. Build and deploy the API. Wait for the /health check to go green.
+railway up --service stackfast-api
+
+# 6. Apply pending Drizzle migrations (one-shot, see below).
+railway run --service stackfast-api -- pnpm exec tsx scripts/deploy/migrate.ts
+
+# 7. Build and deploy the web bundle.
+railway up --service stackfast-web
+
+# 8. Attach the custom domains (or use the Railway dashboard).
+railway domain add stackfast.app --service stackfast-web
+railway domain add api.stackfast.app --service stackfast-api
+
+# 9. Run the post-deploy smoke test.
+pnpm exec tsx scripts/deploy/smoke.ts --base https://api.stackfast.app --web https://stackfast.app
+```
+
+Staging follows the exact same sequence with `railway environment staging` and the
+staging hostnames. Because the services are independent, re-running
+`railway up --service stackfast-web` leaves the API serving traffic without a
+restart, and vice versa.
+
+### Applying database migrations
+
+Drizzle migrations run as a **one-shot Railway command against the Neon production
+branch**, separate from the API start script. They are forward-only in production.
+
+```sh
+railway run --service stackfast-api -- pnpm exec tsx scripts/deploy/migrate.ts
+```
+
+`scripts/deploy/migrate.ts` waits up to 30 seconds for the database to accept
+connections, applies additive (forward-only) DDL, and exits non-zero on any
+failure. Pass `--dry-run` to print the pending DDL without applying it. Column
+drops and renames must ship across two sequential deploys so the previous API
+build stays schema-compatible (see [ADR 003](docs/decisions/003-deployment-architecture.md) § 2, § 7
+and the rollback runbook).
+
+### Rollback procedure
+
+Each service rolls back to its immediately previous successful build via the
+Railway CLI, independently of the other. The full operator runbook — including the
+schema-compatibility gate for API rollbacks — is in
+[`scripts/deploy/rollback.md`](scripts/deploy/rollback.md).
+
+```sh
+# Roll back the web service (always safe — static bundle, no data layer).
+railway rollback --service stackfast-web --environment production
+
+# Roll back the API service (clear the schema-compatibility gate first).
+railway rollback --service stackfast-api --environment production
+```
+
+Migrations are **not** re-run on rollback. Because every schema change obeys the
+two-deploy rule, a one-deploy API rollback always lands on a build that is
+compatible with the current Neon schema. If a rollback target's schema expectation
+conflicts with the live schema, stop and perform a manual forward-migration
+intervention first — see [`scripts/deploy/rollback.md`](scripts/deploy/rollback.md).
+
+### Architecture decision records
+
+- [ADR 001 — Authentication strategy](docs/decisions/001-authentication-strategy.md)
+- [ADR 002 — AI provider strategy](docs/decisions/002-ai-provider-strategy.md)
+- [ADR 003 — Deployment architecture for MVP](docs/decisions/003-deployment-architecture.md)
 
 ## Roadmap
 

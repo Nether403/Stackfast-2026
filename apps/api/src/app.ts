@@ -16,9 +16,11 @@ import { logger } from "hono/logger";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
 import type { MiddlewareHandler } from "hono/types";
 import { z } from "zod";
+import * as Sentry from "@sentry/node";
 import { openApiDocument } from "./openapi.js";
 import { getAuth, requireSession, optionalSession } from "./middleware/auth.js";
 import { createRateLimitMiddleware } from "./rate-limit/index.js";
+import { isEnabled as isSentryEnabled } from "./observability/sentry.js";
 
 type Bindings = {
   ADMIN_API_KEY?: string;
@@ -106,6 +108,25 @@ app.use("/internal/*", requireAdminApiKey());
 
 app.onError((error, c) => {
   const status = "status" in error && typeof error.status === "number" ? error.status : 500;
+
+  // Forward the error to Sentry tagged with the request id so captured events
+  // are correlatable with API logs (R7.1). This is a no-op whenever Sentry is
+  // disabled (SENTRY_DSN unset) — `isSentryEnabled()` is false, so nothing is
+  // captured and no transport is touched (R7.3). The active client runs
+  // `scrubEvent` as its `beforeSend` hook, so `idea`/`constraints` are stripped
+  // from the event payload before transmission (R7.5).
+  //
+  // NB: capture happens inside the single Hono `onError` handler rather than via
+  // a separate re-throwing handler. Hono keeps exactly one `onError`, and a
+  // re-throwing capture handler both clobbers this JSON formatter and re-fires
+  // at every middleware frame (multi-capture + dropped response). Capturing here
+  // keeps one capture per error and preserves the user-facing envelope.
+  if (isSentryEnabled()) {
+    Sentry.captureException(error, {
+      tags: { requestId: c.get("requestId") },
+    });
+  }
+
   return c.json(
     {
       error: status === 500 ? "Internal server error" : error.message,

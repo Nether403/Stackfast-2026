@@ -1,4 +1,4 @@
-import { betterAuth } from "better-auth";
+import { betterAuth, type BetterAuthOptions } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import type { MiddlewareHandler } from "hono/types";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
@@ -8,13 +8,35 @@ import { getDb, isDatabaseAvailable } from "../db/client.js";
 // Better Auth server instance
 // ---------------------------------------------------------------------------
 
+/**
+ * Cross-subdomain cookie domain used in production so the session cookie set
+ * by `api.stackfast.app` is also sent to `stackfast.app` (Phase 8 R3.4 and
+ * design § Data flow steps 4–6). Leading dot scopes the cookie to the apex
+ * domain and all of its subdomains.
+ */
+const CROSS_SUBDOMAIN_COOKIE_DOMAIN = ".stackfast.app";
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let _auth: any = null;
 
-function createAuth() {
-  const db = getDb();
-  return betterAuth({
-    database: drizzleAdapter(db, { provider: "pg" }),
+/**
+ * Build the Better Auth options object (everything except the database
+ * adapter, which requires a live connection).
+ *
+ * Factored out as a pure, side-effect-free helper so the production vs.
+ * non-production cookie branches can be unit-tested without constructing a
+ * real Drizzle/Neon connection (Phase 8 task C3).
+ *
+ * Cookie behavior (R3.3, R3.4, R3.6):
+ *   - Production: cross-subdomain cookies enabled with `Domain=.stackfast.app`
+ *     and default attributes `Secure`, `HttpOnly`, `SameSite=None` so the
+ *     session round-trips between `stackfast.app` and `api.stackfast.app`.
+ *   - Non-production: the `advanced` block is omitted entirely so cookies stay
+ *     host-only and same-origin, keeping Vite's dev proxy and unit tests
+ *     unaffected (no `SameSite=None`, no cross-subdomain domain).
+ */
+export function buildAuthOptions(env?: AuthBindings): BetterAuthOptions {
+  const options: BetterAuthOptions = {
     secret: process.env.BETTER_AUTH_SECRET,
     baseURL: process.env.BETTER_AUTH_URL ?? "http://localhost:3000",
     socialProviders: {
@@ -29,6 +51,30 @@ function createAuth() {
         maxAge: 60 * 5, // 5 minutes
       },
     },
+  };
+
+  if (isProduction(env)) {
+    options.advanced = {
+      crossSubDomainCookies: {
+        enabled: true,
+        domain: CROSS_SUBDOMAIN_COOKIE_DOMAIN,
+      },
+      defaultCookieAttributes: {
+        secure: true,
+        httpOnly: true,
+        sameSite: "none",
+      },
+    };
+  }
+
+  return options;
+}
+
+function createAuth() {
+  const db = getDb();
+  return betterAuth({
+    database: drizzleAdapter(db, { provider: "pg" }),
+    ...buildAuthOptions(),
   });
 }
 
@@ -81,19 +127,48 @@ function canBypassAuthForLocalDev(env?: AuthBindings): boolean {
 
 /**
  * Middleware that requires a valid Better Auth session.
- * Returns 401 if the user is not authenticated.
- * Falls through only in non-production catalog-only local dev mode.
+ *
+ * Fail-closed ordering (see Phase 8 design § 3 and R11.2–R11.5):
+ *   1. Resolve `auth` from `getAuth()`. Both a `null` return and a throw are
+ *      treated identically — some Better Auth construction errors (missing
+ *      secret, unreachable DB) surface as throws rather than null.
+ *   2. In production, any missing `auth` short-circuits with HTTP 503
+ *      regardless of `ALLOW_AUTH_BYPASS`. This is deliberately checked
+ *      BEFORE the bypass branch so setting `ALLOW_AUTH_BYPASS=true` in prod
+ *      by mistake cannot open a hole.
+ *   3. Otherwise (non-production), `canBypassAuthForLocalDev()` may skip auth
+ *      for catalog-only local dev and unit tests.
+ *   4. If auth is available and bypass is not active, validate the session
+ *      and return 401 for unauthenticated / invalid sessions.
  */
 export function requireSession(): MiddlewareHandler<{
   Bindings: AuthBindings;
   Variables: AuthVariables;
 }> {
   return async (c, next) => {
-    const auth = getAuth();
+    let auth: ReturnType<typeof betterAuth> | null;
+    try {
+      auth = getAuth();
+    } catch {
+      // Treat a throw from getAuth() the same as a null return — some
+      // Better Auth construction errors (missing secret, bad DB) surface
+      // as throws rather than null. Production MUST fail closed either way.
+      auth = null;
+    }
 
-    // When auth isn't configured (no DATABASE_URL), production must fail closed
-    // with 503. Non-production with ALLOW_AUTH_BYPASS != "false" skips auth
-    // so catalog-only local dev and unit tests can run.
+    // Production-first fail-closed guard (R11.2–R11.5): runs before the bypass
+    // branch so `ALLOW_AUTH_BYPASS=true` set in prod by mistake cannot open
+    // a hole.
+    if (isProduction(c.env) && !auth) {
+      return c.json(
+        { error: "Authentication is not configured", requestId: c.get("requestId") },
+        503 as ContentfulStatusCode,
+      );
+    }
+
+    // Non-production path: when auth is missing, catalog-only local dev and
+    // unit tests may proceed if bypass is allowed; otherwise still 503 so the
+    // misconfiguration is visible.
     if (!auth) {
       if (canBypassAuthForLocalDev(c.env)) {
         await next();

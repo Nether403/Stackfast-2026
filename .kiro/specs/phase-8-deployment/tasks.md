@@ -1,8 +1,14 @@
-# Phase 8 Deployment — Tasks
+# Implementation Plan: Phase 8 Deployment
+
+## Overview
+
+Phase 8 turns the green-on-`main` MVP into a running deployment at `stackfast.app` + `api.stackfast.app` by executing the architecture already decided in [ADR 003](../../../docs/decisions/003-deployment-architecture.md). The work is dependency-ordered into batches A–I: code-first batches (A rate limiter, B Sentry, C auth hardening + deploy tests) land before the infrastructure batches (D manifests + scripts, E docs), which precede the operator-driven provisioning and cutover batches (F provisioning, G staging, H production, I cleanup).
+
+This plan is the implementation contract for [`requirements.md`](./requirements.md) and [`design.md`](./design.md). Every task names the acceptance criteria (R-IDs) it satisfies and the files it touches.
 
 ## How to use this document
 
-This file is consumed by the `spec-task-execution` sub-agent one task at a time. Each task is self-contained: a short title, a one- or two-sentence description, the acceptance criteria (R-IDs from [`requirements.md`](./requirements.md)), the files touched (from [`design.md`](./design.md) § 2), a verification line, and an explicit dependency list. Tasks are dependency-ordered: when starting a batch, pick the lowest-numbered task whose dependencies are all closed and execute it end-to-end before moving on.
+This file is consumed by the `spec-task-execution` sub-agent one task at a time. Each task is self-contained: a short title, a one- or two-sentence description, the acceptance criteria (R-IDs from [`requirements.md`](./requirements.md)), the files touched (from [`design.md`](./design.md) § Code layout), a verification line, and an explicit dependency list. Tasks are dependency-ordered: when starting a batch, pick the lowest-numbered task whose dependencies are all closed and execute it end-to-end before moving on.
 
 Tags used below:
 
@@ -10,9 +16,9 @@ Tags used below:
 - `[external]` — requires an external provisioning action (Railway, Neon, Upstash, Sentry, GitHub, DNS). Operator drives; no code lands.
 - `[pbt]` — adds or runs property-based tests; the test harness will surface its property-testing warning and the run is slower than a normal unit test.
 
-Design cross-references: [§ 2 Code layout](./design.md#code-layout), [§ 8 Testing strategy](./design.md#testing-strategy), [§ 9 Migration plan for the rate limiter](./design.md#migration-plan-for-the-rate-limiter), and [ADR 003](../../../docs/decisions/003-deployment-architecture.md).
+Status markers: `[x]` complete, `[~]` in progress / pending, `[ ]` not started.
 
----
+Design cross-references: [§ Code layout](./design.md#code-layout), [§ Module boundaries and interfaces](./design.md#module-boundaries-and-interfaces), [§ Configuration surface](./design.md#configuration-surface), [§ Data flow — cross-origin cookie round trip](./design.md#data-flow--cross-origin-cookie-round-trip), [§ Testing strategy](./design.md#testing-strategy), [§ Migration plan for the rate limiter](./design.md#migration-plan-for-the-rate-limiter), and [ADR 003](../../../docs/decisions/003-deployment-architecture.md).
 
 ## Batch A — Rate limiter module (memory backend default)
 
@@ -41,143 +47,147 @@ Design cross-references: [§ 2 Code layout](./design.md#code-layout), [§ 8 Test
   - Description: Implement `@upstash/ratelimit` + `@upstash/redis` sliding-window counter behind the `RateLimitBackend` interface. Do not switch `apps/api/src/app.ts` to it yet — the factory in A6 picks the backend from `RATE_LIMIT_BACKEND`.
   - Files: `apps/api/src/rate-limit/upstash.ts` (new), `apps/api/src/rate-limit/upstash.test.ts` (new), `apps/api/package.json` (edit: add `@upstash/ratelimit`, `@upstash/redis`).
   - Acceptance criteria: R4.1, R4.6.
-  - Verification: unit tests mock `@upstash/redis`, assert that missing `UPSTASH_REDIS_REST_URL` / `_TOKEN` causes the factory to refuse construction (silently falling back to memory per design § 9), and that a successful response returns a `RateLimitDecision` whose `resetAtEpochMs` matches the window. `pnpm --filter @stackfast/api test` passes.
+  - Verification: unit tests mock `@upstash/redis`, assert that missing `UPSTASH_REDIS_REST_URL` / `_TOKEN` causes the factory to refuse construction (silently falling back to memory per design § Migration plan step 1), and that a successful response returns a `RateLimitDecision` whose `resetAtEpochMs` matches the window. `pnpm --filter @stackfast/api test` passes.
   - Dependencies: A1, A3.
 
 - [x] **A5** Add property-based test suite for the rate limiter `[pbt]`
-  - Description: Add the fast-check suite covering Property 1 from design § 8 — "Upstash failures never produce a 429 (fail-open)". This is the rate-limit PBT file; the Sentry PBT (Property 2) lands in B2 and the app-level PBTs (Properties 3–5) land in C2 and alongside them.
+  - Description: Add the fast-check suite covering Property 1 from design § Testing strategy — "Upstash failures never produce a 429 (fail-open)". This is the rate-limit PBT file; the Sentry PBT (Property 2) lands in B2 and the app-level PBTs (Properties 3–5) land in C2. This task also registers `fast-check` as the canonical devDependency for the API package.
   - Files: `apps/api/src/rate-limit/rate-limit.pbt.test.ts` (new), root Vitest wiring if fast-check is not yet registered: `apps/api/package.json` (edit: add `fast-check` devDependency).
   - Acceptance criteria: R4.5 (as a property, not just the unit test from A3).
-  - Verification: fast-check suite runs for the generator in design § 8 Property 1; every indexed request whose injected backend threw has final status in `{200, 401, 404}` and never `429`. Note that the test harness will flag the property-testing warning on this run.
+  - Verification: fast-check suite runs for the generator in design § Testing strategy Property 1; every indexed request whose injected backend threw has final status in `{200, 401, 404}` and never `429`. Note that the test harness will flag the property-testing warning on this run.
   - Dependencies: A3, A4.
 
 - [x] **A6** Wire the new factory into the app and tighten contract tests
-  - Description: Replace the inline `rateLimit(bucket, limit)` factory body in `apps/api/src/app.ts` with a call to `createRateLimitMiddleware(bucket, limit)` (default backend = memory via `RATE_LIMIT_BACKEND`). Delete the dead `rateLimitBuckets` export and the `setInterval` cleanup in `apps/api/src/index.ts` — the memory backend rolls over lazily per request (design § 9 step 1). Add the four contract test cases named in design § 8.
+  - Description: Replace the inline `rateLimit(bucket, limit)` factory body in `apps/api/src/app.ts` with a call to `createRateLimitMiddleware(bucket, limit)` (default backend = memory via `RATE_LIMIT_BACKEND`). Delete the dead `rateLimitBuckets` export and the `setInterval` cleanup in `apps/api/src/index.ts` — the memory backend rolls over lazily per request (design § Migration plan step 1). Add the four contract test cases named in design § Testing strategy.
   - Files: `apps/api/src/app.ts` (edit: swap factory body, drop `rateLimitBuckets` export), `apps/api/src/index.ts` (edit: remove `setInterval` and the stale-key cleanup TODO), `apps/api/src/app.test.ts` (edit: add cases `admin 401 before rate-limit counter increments`, `Retry-After only on 429`, `exempt routes never counted`, `bucket count survives backend swap`), `apps/api/src/rate-limit/index.ts` (new: public barrel exporting `createRateLimitMiddleware`, `rateLimitHealth`).
   - Acceptance criteria: R4.1, R4.7, R4.8, R4.9, R6.4, R8.1.
   - Verification: `pnpm --filter @stackfast/api test` passes with the four new contract cases green; existing `rate limits generation endpoints` test stays green; `pnpm --filter @stackfast/api type-check` + `lint` + `build` stay green.
   - Dependencies: A1, A2, A3, A4, A5.
 
----
-
 ## Batch B — Sentry wiring behind `SENTRY_DSN`
 
-- [~] **B1** Add API Sentry module (init, scrubber, attach helper)
+- [x] **B1** Add API Sentry module (init, scrubber, attach helper)
   - Description: Add `apps/api/src/observability/sentry.ts` exposing `initSentry()`, `attachSentryToHono(app)`, and `scrubEvent(event)`. Module is a no-op whenever `SENTRY_DSN` is falsy and idempotent across repeat calls.
   - Files: `apps/api/src/observability/sentry.ts` (new), `apps/api/src/observability/sentry.test.ts` (new), `apps/api/package.json` (edit: add `@sentry/node`).
   - Acceptance criteria: R7.1, R7.3, R7.4, R7.5, R7.6.
   - Verification: unit tests assert `Sentry.getCurrentHub().getClient()` is `undefined` when DSN is unset; exactly one client after any number of `initSentry()` calls with the same DSN; `release` equals `process.env.RAILWAY_GIT_COMMIT_SHA`; `scrubEvent` strips `idea` and `constraints` keys from `event.request.data` without mutating the input reference.
   - Dependencies: none (parallel with Batch A).
 
-- [~] **B2** Add property-based test for Sentry init idempotence `[pbt]`
-  - Description: Add fast-check Property 2 from design § 8 — "Sentry init is idempotent and a no-op without DSN".
+- [x] **B2** Add property-based test for Sentry init idempotence `[pbt]`
+  - Description: Add fast-check Property 2 from design § Testing strategy — "Sentry init is idempotent and a no-op without DSN".
   - Files: `apps/api/src/observability/sentry.pbt.test.ts` (new).
   - Acceptance criteria: R7.3, R7.4.
-  - Verification: fast-check replays any interleaving of `init` / `set-dsn` events and asserts the active-client invariant (0 clients when DSN always falsy, exactly 1 client once any non-empty DSN has been set). Note that the test harness will surface the property-testing warning on this run.
+  - Verification: fast-check replays any interleaving of `init` / `set-dsn` events and asserts the active-client invariant (0 clients when DSN always falsy, exactly 1 client once any non-empty DSN has been set). Assumes `fast-check` is installed (registered in A5; install with `pnpm --filter @stackfast/api add -D fast-check` if this task runs first). Note that the test harness will surface the property-testing warning on this run.
   - Dependencies: B1.
 
-- [~] **B3** Wire Sentry into the API process
+- [x] **B3** Wire Sentry into the API process
   - Description: Call `initSentry()` in `apps/api/src/index.ts` before `serve()`, and call `attachSentryToHono(app)` in `apps/api/src/app.ts` so captured events include `requestId`. No-op stays silent when DSN is unset.
   - Files: `apps/api/src/index.ts` (edit), `apps/api/src/app.ts` (edit).
   - Acceptance criteria: R7.1, R7.3.
   - Verification: contract test asserts that with `SENTRY_DSN` unset, `Sentry.getCurrentHub().getClient()` is still `undefined` after `app.request("/health")`. With a stubbed DSN, one client is registered and a thrown error inside a route produces a captured event whose payload has `idea` / `constraints` removed.
   - Dependencies: B1, B2.
 
-- [~] **B4** Add web Sentry module
+- [x] **B4** Add web Sentry module
   - Description: Add `apps/web/src/lib/sentry.ts` exposing a browser `initSentry()` that reads `import.meta.env.VITE_SENTRY_DSN` and `VITE_APP_RELEASE`. Idempotent; no-op when DSN is missing.
   - Files: `apps/web/src/lib/sentry.ts` (new), `apps/web/src/lib/sentry.test.ts` (new), `apps/web/package.json` (edit: add `@sentry/react`, `@sentry/vite-plugin`).
   - Acceptance criteria: R7.2, R7.3, R7.4.
   - Verification: unit tests cover the DSN-unset and double-init branches on the browser side the same way B1 does for the API.
   - Dependencies: none (can parallel B1).
 
-- [~] **B5** Wire Sentry into the web build and entrypoint
+- [x] **B5** Wire Sentry into the web build and entrypoint
   - Description: Call `initSentry()` in `apps/web/src/main.tsx` before `ReactDOM.createRoot`. Register `sentryVitePlugin` conditionally in `apps/web/vite.config.ts` — enabled only when `SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, and `SENTRY_PROJECT_WEB` are all set at build time.
   - Files: `apps/web/src/main.tsx` (edit), `apps/web/vite.config.ts` (edit).
   - Acceptance criteria: R7.2, R7.3, R7.6.
   - Verification: `pnpm --filter @stackfast/web build` with no Sentry env vars builds cleanly (plugin not registered, source maps still emitted locally via `build.sourcemap: true`). Running the build with all four env vars set loads the Sentry Vite plugin once — asserted via a local dry-run script that greps `dist/assets/*.map.sentry*` metadata.
   - Dependencies: B4.
 
----
+## Batch C — Auth hardening (R3 cookies, R11 fail-closed) and app-level deploy tests
 
-## Batch C — Auth fail-closed tightening (R11)
-
-- [~] **C1** Add production-first fail-closed guard in `requireSession()`
-  - Description: Apply the two-line edit described in design § 3 ("Module boundaries — auth middleware"): at the very top of `requireSession`, return HTTP 503 when `isProduction(c.env)` is true and `getAuth()` yields a null/throwing result, regardless of the `ALLOW_AUTH_BYPASS` value. The non-production bypass path is unchanged.
+- [x] **C1** Add production-first fail-closed guard in `requireSession()`
+  - Description: Apply the two-line edit described in design § Module boundaries ("auth middleware"): at the very top of `requireSession`, return HTTP 503 when `isProduction(c.env)` is true and `getAuth()` yields a null/throwing result, regardless of the `ALLOW_AUTH_BYPASS` value. The non-production bypass path is unchanged.
   - Files: `apps/api/src/middleware/auth.ts` (edit).
   - Acceptance criteria: R11.2, R11.3, R11.4, R11.5.
   - Verification: existing test case `fails protected generation closed in production when auth is unavailable` stays green; the local-dev bypass path still works with the default `.env.example` values.
   - Dependencies: none (parallel with A and B).
 
-- [~] **C2** Add fail-closed contract + property tests `[pbt]`
-  - Description: Add the app-level contract tests for "admin 401 before any middleware", "CORS never wildcard in prod", and "prod auth 503 when Better Auth init throws" (design § 8). Add the fast-check suites for Properties 3 (CORS never wildcard), 4 (admin-key gating), and 5 (auth fail-closed in prod) since these target app-level behavior rather than a single rate-limit module.
-  - Files: `apps/api/src/app.test.ts` (edit: add the three contract cases), `apps/api/src/app.pbt.test.ts` (new: holds Properties 3, 4, 5).
-  - Acceptance criteria: R8.1, R10.3, R10.4, R11.4 (contract), R10.3, R8.1, R8.3, R8.4, R8.5, R8.6, R11.2, R11.3, R11.4 (properties).
-  - Verification: `pnpm --filter @stackfast/api test` passes; the PBT run triggers the property-testing warning for the new `.pbt.test.ts` file.
+- [x] **C2** Add fail-closed contract + property tests `[pbt]`
+  - Description: Add the app-level contract tests for "admin 401 before any middleware", "CORS never wildcard in prod", "CORS allowed-headers list", and "prod auth 503 when Better Auth init throws" (design § Testing strategy). Add the fast-check suites for Properties 3 (CORS never wildcard), 4 (admin-key gating), and 5 (auth fail-closed in prod) since these target app-level behavior rather than a single rate-limit module.
+  - Files: `apps/api/src/app.test.ts` (edit: add the four contract cases), `apps/api/src/app.pbt.test.ts` (new: holds Properties 3, 4, 5).
+  - Acceptance criteria: R8.1, R10.3, R10.4, R10.5, R11.4 (contract), R10.3, R8.1, R8.3, R8.4, R8.5, R8.6, R11.2, R11.3, R11.4 (properties).
+  - Verification: `pnpm --filter @stackfast/api test` passes; a contract case asserts `Access-Control-Allow-Headers` includes `X-Admin-API-Key`, `X-Request-ID`, `X-AI-Provider`, `Content-Type`, and `Authorization` (R10.5); the PBT run triggers the property-testing warning for the new `.pbt.test.ts` file. Assumes `fast-check` is installed (registered in A5).
   - Dependencies: C1.
 
----
+- [x] **C3** Configure cross-subdomain session cookies for production
+  - Description: Extend `createAuth()` in `apps/api/src/middleware/auth.ts` with Better Auth's `advanced.crossSubDomainCookies` (`enabled` + `domain: ".stackfast.app"`) and `advanced.defaultCookieAttributes` (`secure`, `httpOnly`, `sameSite: "none"`), all gated on `isProduction(env)`. Non-production keeps the existing host-only same-origin cookie behavior so Vite's proxy and unit tests are unaffected. This is the code that realizes the cookie tuple described in design § Data flow steps 4–6.
+  - Files: `apps/api/src/middleware/auth.ts` (edit: `createAuth()` config), `apps/api/src/middleware/auth.test.ts` (new: assert cookie config branches).
+  - Acceptance criteria: R3.3, R3.4, R3.6.
+  - Verification: a unit test asserts the Better Auth options passed in production set `crossSubDomainCookies.enabled = true`, `crossSubDomainCookies.domain = ".stackfast.app"`, and `defaultCookieAttributes` with `secure`/`httpOnly`/`sameSite: "none"`; the same test asserts non-production omits `SameSite=None` and the cross-subdomain domain (R3.6). `pnpm --filter @stackfast/api test` + `type-check` + `lint` stay green.
+  - Dependencies: C1.
+
+- [x] **C4** Write Playwright deploy E2E specs
+  - Description: Add the four `tests/e2e/deploy-*.spec.ts` files enumerated in design § Code layout and § Testing strategy ("End-to-end"). The cross-origin auth spec stubs the GitHub round trip via `page.route("**/github.com/**", ...)` and asserts the session cookie is readable on both origins; the rate-limit spec uses the in-memory backend; the health spec asserts unauthenticated `200 OK`; the admin spec asserts 401 on every missing/wrong-key variant. These specs are executed against staging in G5.
+  - Files: `tests/e2e/deploy-cross-origin-auth.spec.ts` (new), `tests/e2e/deploy-rate-limit.spec.ts` (new), `tests/e2e/deploy-health.spec.ts` (new), `tests/e2e/deploy-admin-401.spec.ts` (new).
+  - Acceptance criteria: R3.8, R5.1, R5.3, R6.1, R6.2, R6.3, R8.1, R8.3.
+  - Verification: `pnpm test:e2e` runs the four new specs green against a local dev server (`pnpm dev`); cross-origin spec confirms the cookie is present for both `stackfast.app` and `api.stackfast.app` origins via `page.context().cookies()`; health spec confirms `status === 200 && body === "OK"` without cookies; admin spec confirms 401 for none/wrong `X-Admin-API-Key`/wrong `Bearer` and 202 for the matching key.
+  - Dependencies: A6, C1, C3.
 
 ## Batch D — Railway manifests + runbook scripts
 
-- [~] **D1** Add API service Railway manifest
+- [x] **D1** Add API service Railway manifest
   - Description: Declare the Node 20 runtime, build/start commands, and `/health` healthcheck path for `stackfast-api` so `railway up` is deterministic regardless of Railway's autodetection.
   - Files: `apps/api/railway.toml` (new).
   - Acceptance criteria: R1.1, R5.1.
-  - Verification: `railway up --service stackfast-api --dry-run` against a local Railway link (or a `railway config validate` equivalent) reports the manifest as valid. File is reviewed against ADR 003 § 1 and design § "API Service".
+  - Verification: `railway up --service stackfast-api --dry-run` against a local Railway link (or a `railway config validate` equivalent) reports the manifest as valid. File is reviewed against ADR 003 § 1 and design § Railway service topology ("API Service").
   - Dependencies: A6 (must not ship the manifest before the rate-limit module that the service will run).
 
-- [~] **D2** Add Web service Railway manifest
+- [x] **D2** Add Web service Railway manifest
   - Description: Declare the static-hosting build and serve configuration for `stackfast-web` so the web service is redeployable by `railway up` with no manual dashboard fiddling.
   - Files: `apps/web/railway.toml` (new).
   - Acceptance criteria: R1.2.
-  - Verification: manifest is reviewed against design § "Web Service"; `railway up --service stackfast-web --dry-run` reports valid.
+  - Verification: manifest is reviewed against design § Railway service topology ("Web Service"); `railway up --service stackfast-web --dry-run` reports valid.
   - Dependencies: B5 (web Sentry wiring must exist before the manifest declares the build that will upload source maps).
 
-- [~] **D3** Add migration one-shot script
+- [x] **D3** Add migration one-shot script
   - Description: Add `scripts/deploy/migrate.ts` — a `tsx`-runnable wrapper around `drizzle-kit push` with a 30-second connection-retry loop per R2.3. Exits non-zero on any failure.
   - Files: `scripts/deploy/migrate.ts` (new).
   - Acceptance criteria: R2.3, R2.4, R2.5.
   - Verification: running `pnpm exec tsx scripts/deploy/migrate.ts --dry-run` against a local Neon branch prints the pending DDL (or "no changes"); forcing `DATABASE_URL` to an unreachable host causes the script to retry for ~30s before exiting non-zero; exit code is captured in the runbook.
   - Dependencies: none (parallel with D1, D2).
 
-- [~] **D4** Add post-deploy smoke script
-  - Description: Add `scripts/deploy/smoke.ts` implementing the six assertions in design § 8 "Deploy smoke" — health, 31-req generation burst, 101-req read burst, admin 401, same-origin CORS ACAO, evil-origin ACAO absent. Exits 0/non-zero, prints a one-line JSON summary, and writes a timestamped report to `test-results/deploy-smoke-<timestamp>.json`.
+- [x] **D4** Add post-deploy smoke script
+  - Description: Add `scripts/deploy/smoke.ts` implementing the six assertions in design § Testing strategy "Deploy smoke" — health, 31-req generation burst, 101-req read burst, admin 401, same-origin CORS ACAO, evil-origin ACAO absent. Exits 0/non-zero, prints a one-line JSON summary, and writes a timestamped report to `test-results/deploy-smoke-<timestamp>.json`.
   - Files: `scripts/deploy/smoke.ts` (new).
   - Acceptance criteria: R5.4, R6.1, R6.2, R6.3, R8.3, R10.2, R10.3.
   - Verification: run against the local dev server (`pnpm dev` + `pnpm exec tsx scripts/deploy/smoke.ts --base http://localhost:3000 --web http://localhost:5173`); all six assertions pass, the JSON summary lands in `test-results/`, and the script exits 0. A second run with the API stopped exits non-zero and the summary marks the health assertion as failed.
   - Dependencies: A6 (rate limiter wired in so R6.1/R6.3 are testable), C1 (admin + CORS behavior finalized), D3 (so `migrate` → `smoke` order is clear in the runbook).
 
-- [~] **D5** Add rollback runbook `[docs]`
-  - Description: Document `railway rollback --service stackfast-api` and `railway rollback --service stackfast-web`, the two-phase schema-compatibility rule from design § "Rollback, observability, and runbook notes", and the manual intervention point from R12.4.
+- [x] **D5** Add rollback runbook `[docs]`
+  - Description: Document `railway rollback --service stackfast-api` and `railway rollback --service stackfast-web`, the two-phase schema-compatibility rule from design § Rollback, observability, and runbook notes (column drops/renames ship across two sequential deploys), and the manual intervention point from R12.4.
   - Files: `scripts/deploy/rollback.md` (new).
-  - Acceptance criteria: R12.1, R12.2, R12.3, R12.4, R12.5, R12.6, R12.7.
-  - Verification: operator reviewer confirms each R12 acceptance criterion has a named step in the runbook and that the runbook cross-references ADR 003 § "Rollback strategy".
+  - Acceptance criteria: R2.6, R2.7, R12.1, R12.2, R12.3, R12.4, R12.5, R12.6, R12.7.
+  - Verification: operator reviewer confirms each R12 acceptance criterion has a named step in the runbook, that the two-deploy schema rule (R2.6, R2.7) is stated explicitly, and that the runbook cross-references ADR 003 § "Rollback strategy".
   - Dependencies: D1, D2 (rollback applies per-service, so manifests must exist).
-
----
 
 ## Batch E — `.env.example` and README `[docs]`
 
-- [~] **E1** Extend `.env.example` with Phase 8 variables `[docs]`
-  - Description: Add the new rows from design § "Configuration surface" — `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `RATE_LIMIT_BACKEND`, `SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT_API`, `SENTRY_PROJECT_WEB`, `RAILWAY_GIT_COMMIT_SHA`, `VITE_SENTRY_DSN`, `VITE_APP_RELEASE`. Each row has a short comment linking to ADR 003 § 3 (Upstash) or § 5 (Sentry).
+- [x] **E1** Extend `.env.example` with Phase 8 variables `[docs]`
+  - Description: Add the new rows from design § Configuration surface — `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `RATE_LIMIT_BACKEND`, `SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT_API`, `SENTRY_PROJECT_WEB`, `RAILWAY_GIT_COMMIT_SHA`, `VITE_SENTRY_DSN`, `VITE_APP_RELEASE`. Each row has a short comment linking to ADR 003 § 3 (Upstash) or § 5 (Sentry).
   - Files: `.env.example` (edit).
   - Acceptance criteria: R14.1.
-  - Verification: reviewer diffs `.env.example` against design § "Configuration surface" and confirms every new row is present with a comment.
+  - Verification: reviewer diffs `.env.example` against design § Configuration surface and confirms every new row is present with a comment.
   - Dependencies: none (parallel with A–D).
 
-- [~] **E2** Add production-deployment section to the README `[docs]`
-  - Description: Add the Railway CLI deploy flow (steps 1-9 from design § "End-to-end `railway link` → deployed story"), the Drizzle one-shot migration command, the per-service rollback commands, and the full production env var table. Link to ADR 001, ADR 002, and ADR 003.
+- [x] **E2** Add production-deployment section to the README `[docs]`
+  - Description: Add the Railway CLI deploy flow (steps 1-9 from design § Railway service topology "End-to-end `railway link` → deployed story"), the Drizzle one-shot migration command, the per-service rollback commands, and the full production env var table. Document that the web service calls `api.stackfast.app` directly (no proxy) in production via `VITE_API_URL` (R3.7). Link to ADR 001, ADR 002, and ADR 003.
   - Files: `readme.md` (edit).
-  - Acceptance criteria: R14.1, R14.2, R14.3, R14.4, R14.5.
-  - Verification: reviewer confirms every R14 acceptance criterion is addressed by a named subsection; the three ADR links resolve.
+  - Acceptance criteria: R3.7, R14.1, R14.2, R14.3, R14.4, R14.5.
+  - Verification: reviewer confirms every R14 acceptance criterion is addressed by a named subsection; the production env var table shows `VITE_API_URL=https://api.stackfast.app/api/v1` (R3.7); the three ADR links resolve.
   - Dependencies: D3, D4, D5 (README cites the scripts and runbook by path).
-
----
 
 ## Batch F — External provisioning `[external]`
 
 - [~] **F1** Provision Railway project + production and staging environments `[external]`
-  - Description: Create (or link to) the `stackfast` Railway project; create `production` and `staging` Railway environments inside it; link the repo from the operator's workstation with `railway link`.
+  - Description: Create (or link to) the `stackfast` Railway project; create `production` and `staging` Railway environments inside it; link the repo from the operator's workstation with `railway link`. The two services (`stackfast-api`, `stackfast-web`) are provisioned as distinct services so each can be built, redeployed, and rolled back independently.
   - Preconditions: Railway account, Railway CLI installed and `railway login` completed, operator has project-create permission in the target team/workspace.
   - Acceptance criteria: R1.3, R1.4, R13.1.
   - Verification: operator records the project id, environment names, and the output of `railway status` (showing both services attached to both environments) in the deploy log. No code lands.
@@ -232,22 +242,20 @@ Design cross-references: [§ 2 Code layout](./design.md#code-layout), [§ 8 Test
   - Verification: `dig api.stackfast.app` and `dig stackfast.app` resolve to Railway edge; `curl -I http://stackfast.app` returns 301 or 308 to the HTTPS URL; TLS certificate on both origins is Railway-issued.
   - Dependencies: F1.
 
----
-
 ## Batch G — Staging cutover
 
 - [~] **G1** Set staging environment variables in Railway `[external]`
-  - Description: Set every variable in the "Staging" column of design § "Configuration surface" on both `stackfast-api` and `stackfast-web` in the Railway staging environment. Leave `RATE_LIMIT_BACKEND` at its default (`memory`) for this first deploy; leave `SENTRY_DSN` optional.
+  - Description: Set every variable in the "Staging" column of design § Configuration surface on both `stackfast-api` and `stackfast-web` in the Railway staging environment, including `VITE_API_URL`/`VITE_AUTH_URL` pointing at the staging API host so the web service calls the API directly with no proxy (R3.7). Leave `RATE_LIMIT_BACKEND` at its default (`memory`) for this first deploy; leave `SENTRY_DSN` optional.
   - Preconditions: F1, F3, F4, F5, F7.
-  - Acceptance criteria: R3.2, R3.5, R11.1, R13.2, R13.3, R13.4, R13.5.
-  - Verification: `railway variables list --service stackfast-api --environment staging` reports every required variable (operator redacts secrets); `ALLOW_AUTH_BYPASS=false`.
+  - Acceptance criteria: R3.2, R3.5, R3.7, R11.1, R13.2, R13.3, R13.4, R13.5.
+  - Verification: `railway variables list --service stackfast-api --environment staging` reports every required variable (operator redacts secrets); `ALLOW_AUTH_BYPASS=false`; the web service's `VITE_API_URL` is the absolute staging API URL.
   - Dependencies: F1, F3, F4, F5, F7.
 
 - [~] **G2** Deploy API and Web to staging `[external]`
-  - Description: `railway up --service stackfast-api --environment staging` and `railway up --service stackfast-web --environment staging`. Confirm both services reach healthy state.
+  - Description: `railway up --service stackfast-api --environment staging` and `railway up --service stackfast-web --environment staging`. Confirm both services reach healthy state, then validate independent redeploy.
   - Preconditions: D1, D2, G1.
-  - Acceptance criteria: R1.1, R1.2, R1.4, R5.1, R5.2.
-  - Verification: operator records the two `railway up` build ids; `GET https://api.staging.stackfast.app/health` returns 200 `OK` within 15 seconds of the container marking ready.
+  - Acceptance criteria: R1.1, R1.2, R1.4, R1.5, R1.6, R5.1, R5.2.
+  - Verification: operator records the two `railway up` build ids; `GET https://api.staging.stackfast.app/health` returns 200 `OK` within 15 seconds of the container marking ready; re-running `railway up --service stackfast-web` leaves the API serving traffic without a restart (R1.5) and re-running `railway up --service stackfast-api` leaves the web service unaffected (R1.6).
   - Dependencies: D1, D2, G1.
 
 - [~] **G3** Run migrations against Neon staging branch `[external]`
@@ -260,33 +268,31 @@ Design cross-references: [§ 2 Code layout](./design.md#code-layout), [§ 8 Test
 - [~] **G4** Flip `RATE_LIMIT_BACKEND=upstash` in staging `[external]`
   - Description: Set `RATE_LIMIT_BACKEND=upstash`, `UPSTASH_REDIS_REST_URL`, and `UPSTASH_REDIS_REST_TOKEN` on the staging API service. Railway restarts the instance automatically.
   - Preconditions: A6 (factory reads the flag), F4, G2.
-  - Acceptance criteria: R4.1, R4.6, design § 9 step 3.
+  - Acceptance criteria: R4.1, R4.6, design § Migration plan step 3.
   - Verification: `railway logs --service stackfast-api --environment staging` shows no `[rate-limit] upstash unavailable` entries in the minute after restart.
   - Dependencies: A6, F4, G2.
 
 - [~] **G5** Run deploy smoke + Playwright E2E against staging `[external]`
-  - Description: Run `pnpm exec tsx scripts/deploy/smoke.ts --base https://api.staging.stackfast.app --web https://staging.stackfast.app` and `E2E_BASE_URL=https://staging.stackfast.app E2E_API_URL=https://api.staging.stackfast.app/api/v1 pnpm test:e2e`. File the resulting `test-results/deploy-smoke-*.json` in the deploy log.
-  - Preconditions: D4, G3, G4.
-  - Acceptance criteria: R5.4, R6.1, R6.2, R6.3, R8.3, R10.2, R10.3, R3.8.
-  - Verification: smoke script exits 0 and the JSON report shows six passing assertions; Playwright reports all specs green against the staging origins.
-  - Dependencies: D4, G3, G4.
+  - Description: Run `pnpm exec tsx scripts/deploy/smoke.ts --base https://api.staging.stackfast.app --web https://staging.stackfast.app` and `E2E_BASE_URL=https://staging.stackfast.app E2E_API_URL=https://api.staging.stackfast.app/api/v1 pnpm test:e2e` (the deploy specs written in C4). File the resulting `test-results/deploy-smoke-*.json` in the deploy log.
+  - Preconditions: C4, D4, G3, G4.
+  - Acceptance criteria: R3.8, R5.1, R5.3, R5.4, R6.1, R6.2, R6.3, R8.3, R10.2, R10.3.
+  - Verification: smoke script exits 0 and the JSON report shows six passing assertions; Playwright reports all C4 specs green against the staging origins.
+  - Dependencies: C4, D4, G3, G4.
 
 - [~] **G6** Soak the rate-limit properties against real Upstash `[external] [pbt]`
-  - Description: Re-run the rate-limit property-based suite with `RATE_LIMIT_BACKEND=upstash` and the real staging Upstash credentials in the local environment — design § 9 step 3 calls out confirming Property 1 holds end-to-end. The test harness surfaces its property-testing warning on this run.
+  - Description: Re-run the rate-limit property-based suite with `RATE_LIMIT_BACKEND=upstash` and the real staging Upstash credentials in the local environment — design § Migration plan step 3 calls out confirming Property 1 holds end-to-end. The test harness surfaces its property-testing warning on this run.
   - Preconditions: A5, F4, G4.
-  - Acceptance criteria: R4.5 (end-to-end against the real backend), design § 9 step 3.
+  - Acceptance criteria: R4.5 (end-to-end against the real backend), design § Migration plan step 3.
   - Verification: `pnpm --filter @stackfast/api test src/rate-limit/rate-limit.pbt.test.ts` passes with the staging Upstash URL/token exported locally; run duration and seed are recorded in the deploy log.
   - Dependencies: A5, F4, G4.
-
----
 
 ## Batch H — Production cutover
 
 - [~] **H1** Set production environment variables in Railway `[external]`
-  - Description: Set every variable in the "Prod" column of design § "Configuration surface" on both services. Leave `RATE_LIMIT_BACKEND=memory` for the first deploy — the flag flip happens after the smoke in H6. Set `ALLOW_AUTH_BYPASS=false`.
+  - Description: Set every variable in the "Prod" column of design § Configuration surface on both services, including `VITE_API_URL=https://api.stackfast.app/api/v1` so the web service calls the API directly (R3.7). Leave `RATE_LIMIT_BACKEND=memory` for the first deploy — the flag flip happens after the smoke in H6. Set `ALLOW_AUTH_BYPASS=false`.
   - Preconditions: F1, F2, F4, F5, F6.
-  - Acceptance criteria: R3.2, R3.5, R8.2, R10.1, R11.1.
-  - Verification: `railway variables list --service stackfast-api --environment production` shows every required var; admin and auth secrets are distinct from `BETTER_AUTH_SECRET`.
+  - Acceptance criteria: R3.2, R3.5, R3.7, R8.2, R10.1, R11.1.
+  - Verification: `railway variables list --service stackfast-api --environment production` shows every required var; admin and auth secrets are distinct from `BETTER_AUTH_SECRET`; the web `VITE_API_URL` is the absolute production API URL.
   - Dependencies: F1, F2, F4, F5, F6.
 
 - [~] **H2** Deploy API and Web to production `[external]`
@@ -318,9 +324,9 @@ Design cross-references: [§ 2 Code layout](./design.md#code-layout), [§ 8 Test
   - Dependencies: D4, H3, H4.
 
 - [~] **H6** Flip `RATE_LIMIT_BACKEND=upstash` in production `[external]`
-  - Description: Set `RATE_LIMIT_BACKEND=upstash` plus `UPSTASH_REDIS_REST_URL` / `_TOKEN` on the production API service. Railway restarts the instance. Per design § 9 step 4 this is reversible by flipping the flag back to `memory`.
+  - Description: Set `RATE_LIMIT_BACKEND=upstash` plus `UPSTASH_REDIS_REST_URL` / `_TOKEN` on the production API service. Railway restarts the instance. Per design § Migration plan step 4 this is reversible by flipping the flag back to `memory`.
   - Preconditions: F4, H5.
-  - Acceptance criteria: R4.1, R4.6, design § 9 step 4.
+  - Acceptance criteria: R4.1, R4.6, design § Migration plan step 4.
   - Verification: post-restart `railway logs` show no fail-open warning in the first minute; a single `GET /api/v1/tools/search` round-trip responds 200.
   - Dependencies: F4, H5.
 
@@ -331,21 +337,19 @@ Design cross-references: [§ 2 Code layout](./design.md#code-layout), [§ 8 Test
   - Verification: `pnpm exec tsx scripts/deploy/smoke.ts --base https://api.stackfast.app --web https://stackfast.app --only rate-limit` exits 0; the JSON report is attached to the deploy log.
   - Dependencies: D4, H6.
 
----
-
 ## Batch I — Post-deploy cleanup
 
 - [~] **I1** Post-deploy verification of dead-code removal
   - Description: Confirm, after production has been running on `RATE_LIMIT_BACKEND=upstash`, that the `setInterval` cleanup removed in A6 is not being reintroduced and that `rateLimitBuckets` is not imported anywhere outside the memory backend and its tests. Purely a verification task — the removal itself landed in A6.
   - Files: none edited; verification only.
-  - Acceptance criteria: design § 9 step 1.
+  - Acceptance criteria: design § Migration plan step 1.
   - Verification: `grep -R "rateLimitBuckets" apps/api/src` returns only matches under `apps/api/src/rate-limit/memory*`; `grep -R "setInterval" apps/api/src/index.ts` returns no matches; Railway production logs show no `[rate-limit] Cleaned` lines since H6.
   - Dependencies: H7.
 
 - [~] **I2** Drop memory-mode rows from production-facing docs and configs `[docs]`
-  - Description: Remove any remaining `RATE_LIMIT_BACKEND=memory` example rows from the production column of `.env.example` and the README production section. The memory backend stays in the codebase for tests (design § 9 step 5) — only the prod-facing docs are trimmed.
+  - Description: Remove any remaining `RATE_LIMIT_BACKEND=memory` example rows from the production column of `.env.example` and the README production section. The memory backend stays in the codebase for tests (design § Migration plan step 5) — only the prod-facing docs are trimmed.
   - Files: `.env.example` (edit), `readme.md` (edit).
-  - Acceptance criteria: R14.1, design § 9 step 5.
+  - Acceptance criteria: R14.1, design § Migration plan step 5.
   - Verification: reviewer diffs the updated docs and confirms the production column lists `RATE_LIMIT_BACKEND=upstash` unambiguously.
   - Dependencies: I1.
 
@@ -355,3 +359,44 @@ Design cross-references: [§ 2 Code layout](./design.md#code-layout), [§ 8 Test
   - Acceptance criteria: closes the Phase 8 deliverable per ADR 003 § "Implementation notes".
   - Verification: reviewer confirms the Phase 8 checkbox is ticked and the CHANGELOG entry cites ADR 003 and this spec.
   - Dependencies: I2.
+
+## Notes
+
+- Tasks tagged `[external]` are operator-driven provisioning/cutover steps; no code lands in those tasks. Tasks tagged `[docs]` are documentation-only. Tasks tagged `[pbt]` add or run property-based (fast-check) tests and will surface the harness's property-testing warning.
+- Test sub-work is folded into the implementing task (per this spec's batch convention) rather than split into separate optional sub-tasks — each code task's verification line names the tests it must land.
+- `fast-check` is registered as a devDependency in task A5; B2 and C2 assume it is present and may install it (`pnpm --filter @stackfast/api add -D fast-check`) if they execute before A5.
+- The rate-limiter migration is feature-flagged (`RATE_LIMIT_BACKEND=memory|upstash`) so code (Batches A–C) can ship ahead of Upstash provisioning (F4); the flag is flipped in staging (G4) then production (H6), and is reversible by flipping it back.
+- Each task references specific requirements clauses (R-IDs) for traceability back to [`requirements.md`](./requirements.md).
+
+## Task Dependency Graph
+
+```json
+{
+  "waves": [
+    { "id": 0, "tasks": ["A1", "B1", "B4", "C1", "D3", "E1"] },
+    { "id": 1, "tasks": ["A2", "B2", "B5", "C2", "C3"] },
+    { "id": 2, "tasks": ["A3", "B3", "D2"] },
+    { "id": 3, "tasks": ["A4"] },
+    { "id": 4, "tasks": ["A5"] },
+    { "id": 5, "tasks": ["A6"] },
+    { "id": 6, "tasks": ["C4", "D1", "D4"] },
+    { "id": 7, "tasks": ["D5"] },
+    { "id": 8, "tasks": ["E2"] },
+    { "id": 9, "tasks": ["F1"] },
+    { "id": 10, "tasks": ["F2", "F4", "F5", "F6", "F7", "F8"] },
+    { "id": 11, "tasks": ["F3", "H1"] },
+    { "id": 12, "tasks": ["G1"] },
+    { "id": 13, "tasks": ["G2"] },
+    { "id": 14, "tasks": ["G3", "G4"] },
+    { "id": 15, "tasks": ["G5", "G6"] },
+    { "id": 16, "tasks": ["H2"] },
+    { "id": 17, "tasks": ["H3", "H4"] },
+    { "id": 18, "tasks": ["H5"] },
+    { "id": 19, "tasks": ["H6"] },
+    { "id": 20, "tasks": ["H7"] },
+    { "id": 21, "tasks": ["I1"] },
+    { "id": 22, "tasks": ["I2"] },
+    { "id": 23, "tasks": ["I3"] }
+  ]
+}
+```

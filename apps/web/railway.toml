@@ -1,0 +1,88 @@
+# Railway service manifest for `stackfast-web`.
+#
+# Phase 8 deployment — ties back to:
+#   - ADR 003 § 1 "Hosting: split web + API, both on Railway"
+#     (docs/decisions/003-deployment-architecture.md): the web app is fully
+#     static after `vite build`, so it is served by Railway's static hosting
+#     (Caddy) with NO long-running Node process.
+#   - design.md § "Railway service topology — Web Service"
+#     (.kiro/specs/phase-8-deployment/design.md)
+#   - Satisfies R1.2 (Web Service is Railway static hosting, built with the
+#     pnpm filter pipeline below, serving the contents of apps/web/dist).
+#
+# Schema reference: https://railway.com/railway.schema.json
+# Config-as-code docs: https://docs.railway.com/config-as-code/reference
+#
+# Environment variables are NOT declared here — they are set per environment
+# via the Railway CLI/dashboard, per ADR 003 § 6 and design § "Configuration
+# surface". For the Web Service these are BUILD-TIME vars baked into the
+# bundle by Vite:
+#   railway variables \
+#     --set VITE_API_URL=https://api.stackfast.app/api/v1 \
+#     --set VITE_AUTH_URL=https://api.stackfast.app \
+#     --set VITE_SENTRY_DSN=... \
+#     --set VITE_APP_RELEASE=$RAILWAY_GIT_COMMIT_SHA \
+#     --service stackfast-web \
+#     --environment production
+# (R3.7: the web service calls api.stackfast.app DIRECTLY in production — no
+# proxy — so VITE_API_URL must be the absolute API URL.) See Batch G (staging)
+# and Batch H (production) in .kiro/specs/phase-8-deployment/tasks.md for the
+# cutover runbook.
+
+"$schema" = "https://railway.com/railway.schema.json"
+
+[build]
+# RAILPACK (not NIXPACKS like the API manifest) is deliberate: Railpack ships
+# a first-class static-file provider that serves a built SPA through Caddy with
+# no application process at runtime — exactly the "Railway static hosting"
+# behaviour design § "Web Service" calls for. Nixpacks has no equivalent
+# static-serve path. Railpack reads Node 20 from the repo-root package.json
+# "engines" field (">=20.0.0") for the build stage.
+builder = "RAILPACK"
+
+# Explicit install+build pipeline from design § "Web Service" (R1.2). The `...`
+# suffix on the filter includes @stackfast/web's workspace dependencies
+# (schemas, registry, rules-engine, shared) so the Vite build compiles against
+# the built packages. Vite emits the bundle to apps/web/dist (default outDir;
+# vite.config.ts sets no custom `base`, and `build.sourcemap` is true so Sentry
+# source-map upload — wired in task B5 — has maps to attach).
+buildCommand = "pnpm install --frozen-lockfile --filter @stackfast/web... && pnpm --filter @stackfast/web build"
+
+[deploy]
+# Static hosting via Caddy means there is no Node start command — Railpack's
+# static-file provider boots Caddy to serve the build output. The serve root
+# and SPA fallback are configured OUT OF BAND of this file because Railway's
+# config-as-code schema has no static-root key (see the two companion settings
+# below). On `railway up` Railpack copies the served directory and starts Caddy.
+#
+#   1. Serve root — set as a service variable (CLI, same as every other env
+#      var; no dashboard fiddling required):
+#        railway variables --set RAILPACK_STATIC_FILE_ROOT=apps/web/dist \
+#          --service stackfast-web --environment production
+#      This points Railpack's static-file provider at the Vite output (R1.2).
+#
+#   2. SPA history-routing fallback — the web app uses wouter path routing
+#      (/blueprint, /catalog, /compatibility, /migration), so a direct hit or
+#      refresh on a sub-route must return index.html rather than a 404. Railpack
+#      enables this via a root `Staticfile` with:
+#        root: apps/web/dist
+#        index_fallback: true
+#      (`index_fallback` defaults to false; it must be true for this SPA.)
+#
+# Reference: https://railpack.com/languages/staticfile/
+
+# Health check path "/" — a 200 on the SPA entry point (index.html) is enough
+# liveness signal for a static bundle (design § "Web Service"; verified by the
+# deploy-health E2E in task C4). Railway's edge terminates TLS and provides the
+# HTTP→HTTPS redirect (R9.5); Caddy here runs with auto_https off.
+healthcheckPath = "/"
+
+# Cold start for a static Caddy server is sub-second; 30 s mirrors the API
+# manifest and leaves ample headroom without letting a broken deploy linger.
+healthcheckTimeout = 30
+
+# Restart at most 3 times on failure before marking the deploy failed, matching
+# the API manifest and design § "Rollback, observability, and runbook notes" —
+# ON_FAILURE avoids masking a genuine regression from the rollback operator.
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
